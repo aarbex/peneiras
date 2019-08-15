@@ -21,7 +21,7 @@
             <v-btn dark text @click="dialog = false">Save</v-btn>
           </v-toolbar-items>
         </v-toolbar>
-        <v-form >
+        <v-form>
           <v-col cols="12" sm="6" md="6">
             <v-text-field label="Nome" placeholder="Digite o nome..."></v-text-field>
           </v-col>
@@ -227,14 +227,14 @@ export default {
     },
     select: null,
     items: ["Administrador", "Usuário"],
-    usuarios: [ ]
+    usuarios: []
   }),
 
- created(){
-      this.$http
-      .get('https://localhost:44397/api/usuarios')
+  created() {
+    this.$http
+      .get("http://localhost:3000/usuarios")
       .then(res => res.json())
-      .then(usr => this.usuarios = usr)
+      .then(usr => (this.usuarios = usr));
   },
 
   computed: {
