@@ -48,8 +48,8 @@ export default {
       route: "/atletas"
     },
     items: [
-      { title: "Escolas", route: "/escolas" },
-      { title: "Cursos", route: "/cursos" },
+      { title: "Treinadores", route: "/treinadores" },
+      { title: "Status", route: "/status" },
       { title: "Categorias", route: "/categorias" },
       { title: "Usuários", route: "/usuarios" },
       { title: "Perfil", route: "/perfil" }

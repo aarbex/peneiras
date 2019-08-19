@@ -1,7 +1,7 @@
 <template>
     <div>
         <Nav />
-        <h1>Escolas</h1>
+        <h1>Treinadores</h1>
     </div>
 </template>
 

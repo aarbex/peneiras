@@ -1,20 +1,20 @@
 <template>
-  <v-app id="app">    
+  <v-app id="app">
     <v-content>
-      <router-view></router-view>    
+      <router-view :key="$route.fullPath"></router-view>
     </v-content>
   </v-app>
 </template>
 
 <script>
-
 export default {
-  name: "app",
-  
-}  
+  name: "app"
+};
 </script>
 
 <style>
-
+.btn {
+  width: 10px;
+}
 </style>
 

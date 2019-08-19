@@ -35,15 +35,11 @@
               @blur="$v.email.$touch()"
             ></v-text-field>
           </v-col>
-          <v-col cols="12" sm="6">
-            <v-select
-              v-model="select"
-              :items="items"
-              :rules="[v => !!v || 'O perfil é obrigatório!']"
-              label="Perfil"
-              required
-            ></v-select>
-          </v-col>
+          <!--v-col-- cols="12" sm="6">
+            <select v-model="usuario.Perfil">
+              <option v-for="(perfil, index) in perfis" :key="index" :value="Perfil">{{perfil.nome}}</option>
+            </select>
+          </!--v-col-->
           <v-col cols="12" sm="6">
             <v-text-field
               v-model="password1"
@@ -91,7 +87,7 @@
         <tr v-for="(usuario, index) in usuarios" :key="index">
           <td class="text-center">{{usuario.Nome}}</td>
           <td class="text-center">{{usuario.Email}}</td>
-          <td class="text-center">{{usuario.Perfil}}</td>
+          <td class="text-center">{{usuario.Perfil.nome}}</td>
           <td class="text-center">{{usuario.DataCadastro}}</td>
           <td class="text-center" style="width: 20%">
             <v-dialog
@@ -131,26 +127,13 @@
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6">
-                    <v-select
-                      v-model="select"
-                      :items="items"
-                      :rules="[v => !!v || 'O perfil é obrigatório!']"
-                      label="Perfil"
-                      required
-                    ></v-select>
-                  </v-col>
-                  <v-col cols="12" sm="6">
-                    <v-text-field
-                      v-model="password1"
-                      :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                      :rules="[rules.required, rules.min]"
-                      :type="show1 ? 'text' : 'password'"
-                      name="senha"
-                      label="Senha"
-                      hint="No mínimo 8 caracteres"
-                      counter
-                      @click:append="show1 = !show1"
-                    ></v-text-field>
+                    <select v-model="usuario.Perfil">
+                      <option
+                        v-for="(perfil, index) in perfis"
+                        :key="index"
+                        :value="perfil"
+                      >{{perfil.nome}}</option>
+                    </select>
                   </v-col>
                   <v-col cols="12" sm="6">
                     <v-text-field
@@ -226,8 +209,8 @@ export default {
       emailMatch: () => "The email and password you entered don't match"
     },
     select: null,
-    items: ["Administrador", "Usuário"],
-    usuarios: []
+    usuarios: [],
+    perfis: []
   }),
 
   created() {
@@ -235,6 +218,11 @@ export default {
       .get("http://localhost:3000/usuarios")
       .then(res => res.json())
       .then(usr => (this.usuarios = usr));
+
+    this.$http
+      .get("http://localhost:3000/perfis")
+      .then(res => res.json())
+      .then(perfil => (this.perfis = perfil));
   },
 
   computed: {
