@@ -1,40 +1,40 @@
 {
   "usuarios": [
     {
-      "Id": 1,
-      "Nome": "André Arbex",
-      "Email": "arbex.andre@gmail.com",
-      "Perfil": {
+      "id": 1,
+      "nome": "André Arbex",
+      "email": "arbex.andre@gmail.com",
+      "perfil": {
         "nome": "Administrador",
         "dtCadastro": "12/08/2019",
         "id": 1
       },
-      "Senha": "123",
-      "DataCadastro": "12/08/2019"
+      "senha": "123",
+      "dataCadastro": "12/08/2019"
     },
     {
-      "Id": 2,
-      "Nome": "Victor Arbex",
-      "Email": "arbex.victor@gmail.com",
-      "Perfil": {
+      "id": 2,
+      "nome": "Victor Arbex",
+      "email": "arbex.victor@gmail.com",
+      "perfil": {
         "id": 3,
         "nome": "Treinador",
         "dtCadastro": "12/08/2019"
       },
-      "Senha": "123",
-      "DataCadastro": "14/08/2019"
+      "senha": "123",
+      "dataCadastro": "14/08/2019"
     },
     {
-      "Id": 3,
-      "Nome": "Arthur Arbex",
-      "Email": "arbex.arthur@gmail.com",
-      "Perfil": {
+      "id": 3,
+      "nome": "Arthur Arbex",
+      "email": "arbex.arthur@gmail.com",
+      "perfil": {
         "nome": "Usuários",
         "dtCadastro": "12/08/2019",
         "id": 2
       },
-      "Senha": "123",
-      "DataCadastro": "14/08/2019"
+      "senha": "123",
+      "dataCadastro": "14/08/2019"
     }
   ],
   "perfis": [
@@ -52,6 +52,11 @@
       "id": 3,
       "nome": "Treinador",
       "dtCadastro": "12/08/2019"
+    },
+    {
+      "nome": "Teste",
+      "dtCadastro": "12/08/2019",
+      "id": 4
     }
   ],
   "permissoes": [

@@ -1,14 +1,15 @@
 import Vue from "vue";
 import Router from "vue-router";
-import Usuario from "./components/Usuario/Usuario";
-import Perfil from "./components/Perfil/Perfil";
-import Login from "./components/Login/Login";
-import Avaliacoes from "./components/Avaliacoes/Avaliacoes";
-import Atletas from "./components/Atletas/Atletas";
-import Categorias from "./components/Categorias/Categorias";
-import Treinador from "./components/Treinador/Treinador";
-import Status from "./components/Status/Status";
-import Permissoes from "./components/Permissoes/Permissoes";
+import Usuario from "./components/Usuario/Usuario.vue";
+import Perfil from "./components/Perfil/Perfil.vue";
+import Login from "./components/Login/Login.vue";
+import Avaliacoes from "./components/Avaliacoes/Avaliacoes.vue";
+import Atletas from "./components/Atletas/Atletas.vue";
+import Categorias from "./components/Categorias/Categorias.vue";
+import Treinador from "./components/Treinador/Treinador.vue";
+import Status from "./components/Status/Status.vue";
+import Permissoes from "./components/Permissoes/Permissoes.vue";
+import UsuarioModel from "./components/Usuario/UsuarioModel.vue";
 
 Vue.use(Router);
 
@@ -31,7 +32,22 @@ export default new Router({
       component: Usuario
     },
     {
+      path: "/usuario/:id",
+      nome: "UsuarioModel",
+      component: UsuarioModel
+    },
+    {
+      path: "/usuario/",
+      nome: "UsuarioModel",
+      component: UsuarioModel
+    },
+    {
       path: "/perfil",
+      nome: "Perfil",
+      component: Perfil
+    },
+    {
+      path: "/perfil/:id",
       nome: "Perfil",
       component: Perfil
     },

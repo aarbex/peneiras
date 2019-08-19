@@ -2,25 +2,27 @@
   <div>
     <Nav></Nav>
     <h1>Permissões</h1>
-    <v-simple-table style="text-align: center">
-      <thead>
-        <th style="text-align: center"></th>
-        <th style="text-align: center">Controle</th>
-        <th style="text-align: left">Permissão</th>
-      </thead>
-      <tbody v-if="permissoes.length">
-        <tr v-for="(permissao) in permissoes" :key="permissao.id">
-          <td class="colunaCheck">
-            <label class="container">
-              <input type="checkbox" />
-              <span class="checkmark"></span>
-            </label>
-          </td>
-          <td class="colunaControle">{{permissao.controle}}</td>
-          <td class="colunaPermissao">{{permissao.permissao}}</td>
-        </tr>
-      </tbody>
-    </v-simple-table>
+    <div class="divTable center">
+      <v-simple-table style="text-align: center">
+        <thead>
+          <th style="text-align: center"></th>
+          <th style="text-align: center">Controle</th>
+          <th style="text-align: left">Permissão</th>
+        </thead>
+        <tbody v-if="permissoes.length">
+          <tr v-for="(permissao) in permissoes" :key="permissao.id">
+            <td class="colunaCheck">
+              <label class="container">
+                <input type="checkbox" />
+                <span class="checkmark"></span>
+              </label>
+            </td>
+            <td class="colunaControle">{{permissao.controle}}</td>
+            <td class="colunaPermissao">{{permissao.permissao}}</td>
+          </tr>
+        </tbody>
+      </v-simple-table>
+    </div>
   </div>
 </template>
 
@@ -46,10 +48,12 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.divTable {
+  width: 90%;
+}
 .center {
   margin: 0 auto;
   text-align: center;
-  width: 100%;
 }
 .colunaCheck {
   width: 5%;

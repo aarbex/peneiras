@@ -136,24 +136,35 @@
 import Nav from "../Nav/Nav";
 
 export default {
-  data: () => ({
-    valid: true,
-    dialog1: false,
-    dialog2: false,
-    dialog3: false,
-    nome: "",
-    nameRules: [v => !!v || "O nome do Perfil é obrigatório!"],
-    perfis: []
-  }),
+  data() {
+    return {
+      valid: true,
+      dialog1: false,
+      dialog2: false,
+      dialog3: false,
+      nome: "",
+      nameRules: [v => !!v || "O nome do Perfil é obrigatório!"],
+      perfis: [],
+      perfil: {},
+      id: this.$route.params.id
+    };
+  },
   components: {
     Nav
   },
 
   created() {
-    this.$http
-      .get("http://localhost:3000/perfis")
-      .then(res => res.json())
-      .then(perfil => (this.perfis = perfil));
+    if (this.id) {
+      this.$http
+        .get("http://localhost:3000/perfis/" + this.id)
+        .then(res => res.json())
+        .then(perfil => (this.perfis = perfil));
+    } else {
+      this.$http
+        .get("http://localhost:3000/perfis")
+        .then(res => res.json())
+        .then(perfil => (this.perfis = perfil));
+    }
   },
 
   methods: {
