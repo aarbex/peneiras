@@ -40,23 +40,18 @@
   "perfis": [
     {
       "nome": "Administrador",
-      "dtCadastro": "12/08/2019",
+      "dtCadastro": "20/8/2019",
       "id": 1
     },
     {
-      "nome": "Usuários",
-      "dtCadastro": "12/08/2019",
+      "nome": "Treinador",
+      "dtCadastro": "20/8/2019",
       "id": 2
     },
     {
-      "id": 3,
-      "nome": "Treinador",
-      "dtCadastro": "12/08/2019"
-    },
-    {
-      "nome": "Teste",
-      "dtCadastro": "12/08/2019",
-      "id": 4
+      "nome": "Somente Leitura",
+      "dtCadastro": "20/8/2019",
+      "id": 3
     }
   ],
   "permissoes": [

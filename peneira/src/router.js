@@ -2,6 +2,7 @@ import Vue from "vue";
 import Router from "vue-router";
 import Usuario from "./components/Usuario/Usuario.vue";
 import Perfil from "./components/Perfil/Perfil.vue";
+import PerfilModel from "./components/Perfil/PerfilModel.vue";
 import Login from "./components/Login/Login.vue";
 import Avaliacoes from "./components/Avaliacoes/Avaliacoes.vue";
 import Atletas from "./components/Atletas/Atletas.vue";
@@ -18,67 +19,70 @@ export default new Router({
   routes: [
     {
       path: "/login",
-      nome: "Login",
+      name: "Login",
       component: Login
     },
     {
       path: "/usuarios",
-      nome: "Usuario",
       component: Usuario
     },
     {
       path: "/usuarios/:id",
-      nome: "Usuario",
       component: Usuario
     },
     {
       path: "/usuario/:id",
-      nome: "UsuarioModel",
+      name: "UsuarioModelEdit",
       component: UsuarioModel
     },
     {
       path: "/usuario/",
-      nome: "UsuarioModel",
+      name: "UsuarioModel",
       component: UsuarioModel
     },
     {
-      path: "/perfil",
-      nome: "Perfil",
+      path: "/perfis",
+      name: "Perfil",
       component: Perfil
     },
     {
       path: "/perfil/:id",
-      nome: "Perfil",
-      component: Perfil
+      name: "PerfilModelEdit",
+      component: PerfilModel
+    },
+    {
+      path: "/perfil/",
+      name: "PerfilModel",
+      component: PerfilModel
     },
     {
       path: "/avaliacoes",
-      nome: "Avaliacoes",
+      name: "Avaliacoes",
       component: Avaliacoes
     },
     {
       path: "/atletas",
-      nome: "Atletas",
+      name: "Atletas",
       component: Atletas
     },
     {
       path: "/categorias",
-      nome: "Categorias",
+      name: "Categorias",
       component: Categorias
     },
     {
       path: "/status",
-      nome: "Status",
+      name: "Status",
       component: Status
     },
     {
       path: "/treinadores",
-      nome: "Treinador",
+      name: "Treinador",
       component: Treinador
     },
     {
       path: "/permissoes",
-      nome: "Permissoes",
+      name: "Permissoes",
       component: Permissoes
     }
   ]

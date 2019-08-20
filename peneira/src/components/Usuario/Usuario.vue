@@ -3,7 +3,7 @@
     <Nav></Nav>
     <h1>Usuários do Sistema</h1>
     <div class="div-add">
-      <router-link to="/usuario">
+      <router-link to="/usuario/">
         <v-btn class="mx-2" fab dark xSmall color="primary">
           <v-icon dark medium>mdi-plus</v-icon>
         </v-btn>

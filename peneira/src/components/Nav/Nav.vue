@@ -5,10 +5,10 @@
         <img src="../../assets/logo-corinthians.png" height="50px" alt />
       </v-toolbar-title>
       <div style="margin: 0 auto; display: inline-flex">
-        <router-link :to="avaliacoes.route" tag="v-btn">
+        <router-link :to="avaliacoes.route" tag="button">
           <v-btn color="white" text>Avaliações</v-btn>
         </router-link>
-        <router-link :to="atletas.route" tag="v-btn">
+        <router-link :to="atletas.route" tag="button">
           <v-btn color="white" text>Atletas</v-btn>
         </router-link>
         <div class="text-center">
@@ -52,7 +52,7 @@ export default {
       { title: "Status", route: "/status" },
       { title: "Categorias", route: "/categorias" },
       { title: "Usuários", route: "/usuarios" },
-      { title: "Perfil", route: "/perfil" }
+      { title: "Perfis", route: "/perfis" }
     ]
   })
 };
