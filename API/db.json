@@ -173,5 +173,22 @@
       "dtCadastro": "22/8/2019",
       "id": 6
     }
+  ],
+  "treinadores": [
+    {
+      "id": 1,
+      "nome": "José",
+      "dtCadastro": "22/8/2019"
+    },
+    {
+      "nome": "Luiz",
+      "dtCadastro": "22/8/2019",
+      "id": 2
+    },
+    {
+      "nome": "Caique",
+      "dtCadastro": "22/8/2019",
+      "id": 3
+    }
   ]
 }

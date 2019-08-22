@@ -8,7 +8,8 @@ import Avaliacoes from "./components/Avaliacoes/Avaliacoes.vue";
 import Atletas from "./components/Atletas/Atletas.vue";
 import Categorias from "./components/Categorias/Categorias.vue";
 import CategoriasModel from "./components/Categorias/CategoriasModel.vue";
-import Treinador from "./components/Treinador/Treinador.vue";
+import Treinadores from "./components/Treinadores/Treinadores.vue";
+import TreinadoresModel from "./components/Treinadores/TreinadoresModel.vue";
 import Status from "./components/Status/Status.vue";
 import StatusModel from "./components/Status/StatusModel.vue";
 import Permissoes from "./components/Permissoes/Permissoes.vue";
@@ -21,6 +22,11 @@ Vue.use(Router);
 export default new Router({
   mode: "history",
   routes: [
+    {
+      path: "/",
+      name: "LoginInicio",
+      component: Login
+    },
     {
       path: "/login",
       name: "Login",
@@ -100,11 +106,6 @@ export default new Router({
       component: StatusModel
     },
     {
-      path: "/treinadores",
-      name: "Treinador",
-      component: Treinador
-    },
-    {
       path: "/permissoes",
       name: "Permissoes",
       component: Permissoes
@@ -123,6 +124,21 @@ export default new Router({
       path: "/posicaoModel",
       name: "PosicaoModel",
       component: PosicoesModel
+    },
+    {
+      path: "/treinadores",
+      name: "Treinadores",
+      component: Treinadores
+    },
+    {
+      path: "/treinador/:id",
+      name: "TreinadorModelEdit",
+      component: TreinadoresModel
+    },
+    {
+      path: "/treinador",
+      name: "TreinadorModel",
+      component: TreinadoresModel
     }
   ]
 });

@@ -1,7 +1,7 @@
 <template>
   <div>
     <Nav></Nav>
-    <h1>Usuários</h1>
+    <h1>Usuários do Sistema</h1>
     <div class="divForm">
       <v-form class="form">
         <v-text-field v-if="this.id" v-model="usuario.id" label="ID" disable readonly></v-text-field>
