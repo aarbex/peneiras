@@ -5,7 +5,12 @@
     <div class="div-add">
       <router-link to="/usuario/">
         <v-btn class="mx-2" fab dark xSmall color="primary">
-          <v-icon dark medium>mdi-plus</v-icon>
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon medium dark v-on="on">mdi-plus</v-icon>
+            </template>
+            <span>Adicionar</span>
+          </v-tooltip>
         </v-btn>
       </router-link>
     </div>
@@ -18,35 +23,45 @@
         <th class="text-center">Ações</th>
       </thead>
       <tbody v-if="usuarios.length">
-        <tr v-for="(usuario, index) in usuarios" :key="index">
-          <td class="text-center">{{usuario.nome}}</td>
-          <td class="text-center">{{usuario.email}}</td>
-          <td class="text-center">{{usuario.perfil.nome}}</td>
-          <td class="text-center">{{usuario.dataCadastro}}</td>
+        <tr v-for="(u, index) in usuarios" :key="index">
+          <td class="text-center">{{u.nome}}</td>
+          <td class="text-center">{{u.email}}</td>
+          <td class="text-center">{{u.perfil.nome}}</td>
+          <td class="text-center">{{u.dtCadastro}}</td>
           <td class="text-center" style="width: 20%">
-            <router-link :to="'/usuario/' + usuario.id">
+            <router-link :to="'/usuario/' + u.id">
               <v-btn class="mx-2" fab dark xSmall color="primary">
-                <v-icon dark>mdi-pencil</v-icon>
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-icon medium dark v-on="on">mdi-pencil</v-icon>
+                  </template>
+                  <span>Editar</span>
+                </v-tooltip>
               </v-btn>
             </router-link>
-            <v-btn class="mx-2" fab dark xSmall color="error" @click.stop="dialog1 = true">
-              <v-icon dark>mdi-trash-can</v-icon>
+            <v-btn class="mx-2" fab dark xSmall color="error" @click="usuario = u;dialog1 = true">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-icon medium dark v-on="on">mdi-trash-can</v-icon>
+                </template>
+                <span>Excluir</span>
+              </v-tooltip>
             </v-btn>
-            <v-dialog v-model="dialog1" max-width="290">
-              <v-card>
-                <v-card-title class="headline">Atenção!</v-card-title>
-                <v-card-text>Deseja realmente excluir o item?</v-card-text>
-                <v-card-actions>
-                  <v-spacer></v-spacer>
-                  <v-btn color="error" text @click="dialog1 = false">Cancelar</v-btn>
-                  <v-btn color="success" text @click="dialog1 = false">Confirmar</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
           </td>
         </tr>
       </tbody>
     </v-simple-table>
+    <v-dialog v-model="dialog1" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+        <v-card-text>Deseja realmente excluir o usuário {{usuario.nome}}?</v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="error" text @click="dialog1 = false">Cancelar</v-btn>
+          <v-btn color="success" text @click="removerUsuario(usuario)">Confirmar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -90,22 +105,21 @@ export default {
   },
 
   created() {
-    if (this.id) {
-      this.$http
-        .get("http://localhost:3000/usuarios/" + this.id)
-        .then(res => res.json())
-        .then(usuario => (this.usuario = usuario));
-    } else {
-      this.$http
-        .get("http://localhost:3000/usuarios/")
-        .then(res => res.json())
-        .then(usuarios => (this.usuarios = usuarios));
-    }
+    this.$http
+      .get("http://localhost:3000/usuarios/")
+      .then(res => res.json())
+      .then(usuarios => (this.usuarios = usuarios));
 
     this.$http
       .get("http://localhost:3000/perfis")
       .then(res => res.json())
       .then(perfil => (this.perfis = perfil));
+  },
+  beforeMount() {
+    this.$http
+      .get("http://localhost:3000/usuarios/")
+      .then(res => res.json())
+      .then(usuarios => (this.usuarios = usuarios));
   },
 
   computed: {
@@ -128,6 +142,17 @@ export default {
       this.email = "";
       this.select = null;
       this.checkbox = false;
+    },
+
+    removerUsuario(usuario) {
+      this.$http
+        .delete(`http://localhost:3000/usuarios/${usuario.id}`)
+        .then(() => {
+          let indice = this.usuarios.indexOf(usuario);
+          this.usuarios.splice(indice, 1);
+          //this.usuarios = this.usuarios.filter(u => u.id != usuario.id);
+          this.dialog1 = false;
+        });
     }
   }
 };

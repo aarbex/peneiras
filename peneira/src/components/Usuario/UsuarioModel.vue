@@ -5,20 +5,51 @@
     <div class="divForm">
       <v-form class="form">
         <v-text-field v-if="this.id" v-model="usuario.id" label="ID" disable readonly></v-text-field>
-        <v-text-field v-model="usuario.nome" label="Nome" required></v-text-field>
-        <v-text-field v-model="usuario.email" label="E-mail" required></v-text-field>
+        <v-text-field v-if="this.id" v-model="usuario.nome" label="Nome" required></v-text-field>
+        <v-text-field v-else v-model="nome" label="Nome" required></v-text-field>
+        <v-text-field v-if="this.id" v-model="usuario.email" label="E-mail" required></v-text-field>
+        <v-text-field v-else v-model="email" label="E-mail" required></v-text-field>
         <v-select
           v-if="this.id"
-          v-model="usuario.perfil.id"
+          name="perfil"
+          v-model="usuario.perfil"
           :items="perfis"
+          item-text="nome"
+          item-value="id"
           label="Perfil"
           required
         ></v-select>
-        <v-select v-else v-model="usuario.perfil" :items="perfis" label="Perfil" required></v-select>
-        <v-text-field v-model="usuario.senha" label="Senha" type="password" required></v-text-field>
-        <v-text-field v-model="usuario.senha" label="Repetir senha" type="password" required></v-text-field>
-        <v-btn class="mr-4" @click="submit" color="success">Salvar</v-btn>
-        <v-btn @click="clear" color="error">Cancelar</v-btn>
+        <v-select
+          v-else
+          v-model="perfil"
+          :items="perfis"
+          item-text="nome"
+          item-value="perfil"
+          label="Perfil"
+          name="perfil"
+          required
+        ></v-select>
+        <v-text-field
+          v-if="this.id"
+          v-model="usuario.senhaAux1"
+          label="Senha"
+          type="password"
+          required
+        ></v-text-field>
+        <v-text-field v-else v-model="senhaAux1" label="Senha" type="password" required></v-text-field>
+        <v-text-field
+          v-if="this.id"
+          v-model="usuario.senhaAux2"
+          label="Repetir senha"
+          type="password"
+          required
+        ></v-text-field>
+        <v-text-field v-else v-model="senhaAux2" label="Repetir senha" type="password" required></v-text-field>
+        <v-btn v-if="this.id" class="mr-4" @click="editarUsuario(usuario)" color="success">Editar</v-btn>
+        <v-btn v-else class="mr-4" @click="addUsuario()" color="success">Salvar</v-btn>
+        <router-link to="/usuarios" tag="button">
+          <v-btn color="error">Cancelar</v-btn>
+        </router-link>
       </v-form>
     </div>
   </div>
@@ -33,8 +64,15 @@ export default {
   },
   data() {
     return {
+      nome: "",
+      email: "",
+      dtCadastro: "",
       usuario: {},
+      perfil: {},
       perfis: [],
+      senhaAux1: "",
+      senhaAux2: "",
+      senha: "",
       id: this.$route.params.id
     };
   },
@@ -51,8 +89,68 @@ export default {
       .get("http://localhost:3000/perfis")
       .then(res => res.json())
       .then(perfis => {
-        this.perfis = perfis.map(x => ({ text: x.nome, value: x.id }));
+        this.perfis = perfis;
+        //.map(x => ({ text: x.nome, value: x.id }));
       });
+  },
+
+  methods: {
+    addUsuario() {
+      let now = new Date();
+      this.dtCadastro =
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      let _senha = "";
+      if (this.senha1 === this.senha2) {
+        _senha = this.senha1;
+      }
+      let _usuario = {
+        nome: this.nome,
+        email: this.email,
+        senha: _senha,
+        dtCadastro: this.dtCadastro,
+        perfil: this.perfil,
+        senhaAux1: this.senhaAux1,
+        senhaAux2: this.senhaAux2
+      };
+      this.$http
+        .post("http://localhost:3000/usuarios", _usuario)
+        .then(res => res.json())
+        .then(
+          (this.nome = ""),
+          (this.email = ""),
+          (this.dtCadastro = ""),
+          (this.perfil = {}),
+          (this.senha = ""),
+          (this.senhaAux1 = ""),
+          (this.senhaAux2 = ""),
+          this.$router.push("/usuarios")
+        );
+    },
+
+    editarUsuario(_usuario) {
+      let now = new Date();
+      this.dtCadastro =
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      let _senha = "";
+      if (_usuario.senhaAux1 === _usuario.senhaAux2) {
+        _senha = _usuario.senhaAux1;
+      }
+
+      let _usuarioEditar = {
+        nome: _usuario.nome,
+        email: _usuario.email,
+        senha: _senha,
+        senhaAux1: _usuario.senhaAux1,
+        senhaAux2: _usuario.senhaAux2,
+        dtCadastro: this.dtCadastro,
+        perfil: _usuario.perfil
+      };
+      this.$http.put(
+        `http://localhost:3000/usuarios/${_usuario.id}`,
+        _usuarioEditar
+      );
+      this.$router.push("/usuarios");
+    }
   }
 };
 </script>

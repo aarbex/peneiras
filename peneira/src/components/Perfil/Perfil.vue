@@ -17,7 +17,7 @@
     </div>
     <v-simple-table class="text-center" style="width: 70%; margin: 0 auto">
       <thead class="text-center">
-        <th>ID</th>
+        <th class="text-center">ID</th>
         <th class="text-center">Nome</th>
         <th class="text-center">Data Cadastro</th>
         <th class="text-center">Ações</th>
@@ -105,6 +105,13 @@ export default {
   },
 
   created() {
+    this.$http
+      .get("http://localhost:3000/perfis")
+      .then(res => res.json())
+      .then(perfis => (this.perfis = perfis));
+  },
+
+  beforeMounted() {
     this.$http
       .get("http://localhost:3000/perfis")
       .then(res => res.json())

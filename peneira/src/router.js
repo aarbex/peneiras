@@ -7,8 +7,10 @@ import Login from "./components/Login/Login.vue";
 import Avaliacoes from "./components/Avaliacoes/Avaliacoes.vue";
 import Atletas from "./components/Atletas/Atletas.vue";
 import Categorias from "./components/Categorias/Categorias.vue";
+import CategoriasModel from "./components/Categorias/CategoriasModel.vue";
 import Treinador from "./components/Treinador/Treinador.vue";
 import Status from "./components/Status/Status.vue";
+import StatusModel from "./components/Status/StatusModel.vue";
 import Permissoes from "./components/Permissoes/Permissoes.vue";
 import UsuarioModel from "./components/Usuario/UsuarioModel.vue";
 
@@ -71,9 +73,29 @@ export default new Router({
       component: Categorias
     },
     {
+      path: "/categoria",
+      name: "CategoriasModel",
+      component: CategoriasModel
+    },
+    {
+      path: "/categoria/:id",
+      name: "CategoriasModelEdit",
+      component: CategoriasModel
+    },
+    {
       path: "/status",
       name: "Status",
       component: Status
+    },
+    {
+      path: "/statusModel",
+      name: "StatusModel",
+      component: StatusModel
+    },
+    {
+      path: "/statusmodel/:id",
+      name: "StatusModelEdit",
+      component: StatusModel
     },
     {
       path: "/treinadores",
