@@ -52,7 +52,8 @@ export default {
       { title: "Status", route: "/status" },
       { title: "Categorias", route: "/categorias" },
       { title: "Usuários", route: "/usuarios" },
-      { title: "Perfis", route: "/perfis" }
+      { title: "Perfis", route: "/perfis" },
+      { title: "Posições", route: "/posicoes" },
     ]
   })
 };

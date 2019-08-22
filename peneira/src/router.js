@@ -13,6 +13,8 @@ import Status from "./components/Status/Status.vue";
 import StatusModel from "./components/Status/StatusModel.vue";
 import Permissoes from "./components/Permissoes/Permissoes.vue";
 import UsuarioModel from "./components/Usuario/UsuarioModel.vue";
+import Posicoes from "./components/Posicoes/Posicoes.vue";
+import PosicoesModel from "./components/Posicoes/PosicoesModel.vue";
 
 Vue.use(Router);
 
@@ -106,6 +108,21 @@ export default new Router({
       path: "/permissoes",
       name: "Permissoes",
       component: Permissoes
+    },
+    {
+      path: "/posicoes",
+      name: "Posicoes",
+      component: Posicoes
+    },
+    {
+      path: "/posicaoModel/:id",
+      name: "PosicaoModelEdit",
+      component: PosicoesModel
+    },
+    {
+      path: "/posicaoModel",
+      name: "PosicaoModel",
+      component: PosicoesModel
     }
   ]
 });

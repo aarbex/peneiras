@@ -141,5 +141,37 @@
       "dtCadastro": "21/8/2019",
       "id": 3
     }
+  ],
+  "posicoes": [
+    {
+      "id": 1,
+      "nome": "Goleiro",
+      "dtCadastro": "22/08/2019"
+    },
+    {
+      "nome": "Atacante",
+      "dtCadastro": "22/8/2019",
+      "id": 2
+    },
+    {
+      "nome": "Centro-Avante",
+      "dtCadastro": "22/8/2019",
+      "id": 3
+    },
+    {
+      "nome": "Lateral Direito",
+      "dtCadastro": "22/8/2019",
+      "id": 4
+    },
+    {
+      "nome": "Lateral Esquerdo",
+      "dtCadastro": "22/8/2019",
+      "id": 5
+    },
+    {
+      "nome": "Zagueiro",
+      "dtCadastro": "22/8/2019",
+      "id": 6
+    }
   ]
 }
