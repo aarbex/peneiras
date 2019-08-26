@@ -21,12 +21,12 @@
       "id": 5
     },
     {
-      "nome": "Tadeu",
+      "nome": "Tadeu Melo",
       "email": "tadeu@pontualsys.com.br",
       "senha": "1234",
       "senhaAux1": "1234",
       "senhaAux2": "1234",
-      "dtCadastro": "21/8/2019",
+      "dtCadastro": "26/8/2019",
       "perfil": 3,
       "id": 6
     }
@@ -172,6 +172,11 @@
       "nome": "Zagueiro",
       "dtCadastro": "22/8/2019",
       "id": 6
+    },
+    {
+      "nome": "Meio-campo",
+      "dtCadastro": "26/8/2019",
+      "id": 7
     }
   ],
   "treinadores": [
@@ -189,6 +194,60 @@
       "nome": "Caique",
       "dtCadastro": "22/8/2019",
       "id": 3
+    }
+  ],
+  "atletas": [
+    {
+      "id": 1,
+      "nome": "André Elias Alves Arbex",
+      "email": "arbex.andre@gmail.com",
+      "cpf": "305.263.238-84",
+      "rg": "27.524.173-7",
+      "endereco": "Rua Júlio Sayago",
+      "num": 115,
+      "bairro": "Vila Ré",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "celular": "(11)97466-4075",
+      "tel": "(11)2791-5506",
+      "escolaridade": "Superios Completo",
+      "nomeEscola": "EEPSG Maria Aparecida de Castro Masiero",
+      "pai": "Nadra Elias Arbex Junior",
+      "mae": "Rosely Alves Arbex",
+      "posicao": {
+        "id": 2,
+        "nome": "Atacante"
+      },
+      "indicacao": "João Silva",
+      "federado": true,
+      "federacao": "Acme Futebol Clube",
+      "dtCadastro": "26/8/2019"
+    },
+    {
+      "id": 2,
+      "nome": "Victor Alves Arbex",
+      "email": "arbex.victor@gmail.com",
+      "cpf": "305.263.238-84",
+      "rg": "27.524.173-7",
+      "endereco": "Rua Júlio Sayago",
+      "num": 115,
+      "bairro": "Vila Ré",
+      "cidade": "São Paulo",
+      "uf": "SP",
+      "celular": "(11)97466-4075",
+      "tel": "(11)2791-5506",
+      "escolaridade": "Ensino Fundamental",
+      "nomeEscola": "Universitário Leste",
+      "pai": "André Elias Alves Arbex",
+      "mae": "Marcia Alves Arbex",
+      "posicao": {
+        "id": 7,
+        "nome": "Meio-campo"
+      },
+      "indicacao": "José Alves",
+      "federado": false,
+      "federacao": "",
+      "dtCadastro": "26/8/2019"
     }
   ]
 }
