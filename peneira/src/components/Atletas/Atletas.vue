@@ -2,7 +2,8 @@
     <div>
         <Nav />
         <h1>Atletas</h1>
-        <div class="div-add">
+        <div style="padding: 0 20px">
+          <div class="div-add">
       <router-link to="/atleta/">
         <v-btn class="mx-2" fab dark xSmall color="primary">
           <v-tooltip top>
@@ -33,6 +34,16 @@
           <td class="text-center">{{a.posicao.nome}}</td>
           <td class="text-center">{{a.dtCadastro}}</td>
           <td class="text-center" style="width: 20%">
+            <router-link :to="'/atleta/detalhe/' + a.id" tag="button">
+              <v-btn class="mx-2" fab dark xSmall color="black">
+                <v-tooltip top>
+                  <template v-slot:activator="{ on }">
+                    <v-icon medium dark v-on="on">mdi-eye</v-icon>
+                  </template>
+                  <span>Detalhes</span>
+                </v-tooltip>
+              </v-btn>
+            </router-link>
             <router-link :to="'/atleta/' + a.id">
               <v-btn class="mx-2" fab dark xSmall color="primary">
                 <v-tooltip top>
@@ -55,6 +66,7 @@
         </tr>
       </tbody>
     </v-simple-table>
+        </div>
     <v-dialog v-model="dialog1" max-width="290">
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>

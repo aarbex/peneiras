@@ -1,9 +1,9 @@
 <template>
   <div>
     <Nav></Nav>
-    <h1>Atleta: {{atleta.nome}}</h1>
+    <h1>Atleta</h1>
     <div class="div-main">
-      <div style="width:20%;">
+      <div style="width:15%;">
         <picture-input
           ref="pictureInput"
           class="foto"
@@ -16,7 +16,7 @@
       }"
         ></picture-input>
       </div>
-      <div style="width: 80%">
+      <div style="width: 85%">
         <div style="padding-right: 20px;">
           <v-text-field v-if="this.id" v-model="atleta.nome" label="Nome" required></v-text-field>
           <v-text-field v-else v-model="nome" label="Nome" required></v-text-field>
@@ -37,7 +37,7 @@
         </div>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 83%; margin-right:4%">
         <v-text-field
           v-if="this.id"
@@ -52,7 +52,7 @@
         <v-text-field v-else v-model="num" label="Número" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 41.5%; margin-right:4%">
         <v-text-field v-if="this.id" v-model="atleta.bairro" label="Bairro" required></v-text-field>
         <v-text-field v-else v-model="bairro" label="Bairro" required></v-text-field>
@@ -66,7 +66,7 @@
         <v-text-field v-else v-model="uf" label="UF" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 48%; margin-right:4%">
         <v-text-field v-if="this.id" v-model="atleta.celular" label="Telefone Celular"></v-text-field>
         <v-text-field v-else v-model="celular" label="Telefone Celular" required></v-text-field>
@@ -76,52 +76,94 @@
         <v-text-field v-else v-model="tel" label="Telefone Fixo" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 28%; margin-right:4%">
-        <v-text-field v-if="this.id" v-model="atleta.escolaridade" label="Escolariade"></v-text-field>
-        <v-text-field v-else v-model="escolaridade" label="Escolaridade" required></v-text-field>
+        <v-select
+          v-if="this.id"
+          name="escolaridade"
+          v-model="atleta.escolaridade"
+          :items="escolaridades"
+          label="Escolaridade"
+          required
+        ></v-select>
+        <v-select
+          v-else
+          name="escolaridade"
+          v-model="escolaridade"
+          :items="escolaridades"
+          label="Escolaridade"
+          required
+        ></v-select>
       </div>
       <div style="width: 68%">
         <v-text-field v-if="this.id" v-model="atleta.nomeEscola" label="Nome da Escola"></v-text-field>
         <v-text-field v-else v-model="nomeEscola" label="Nome da Escola" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 100%;">
         <v-text-field v-if="this.id" v-model="atleta.pai" label="Nome do Pai"></v-text-field>
         <v-text-field v-else v-model="pai" label="Nome do Pai" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 100%;">
         <v-text-field v-if="this.id" v-model="atleta.mae" label="Nome da Mãe"></v-text-field>
         <v-text-field v-else v-model="mae" label="Nome da Mãe" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 48%; margin-right:4%">
-        <v-text-field v-if="this.id" v-model="atleta.posicao" label="Posição"></v-text-field>
-        <v-text-field v-else v-model="posicao" label="Posição" required></v-text-field>
+        <v-select
+          v-if="this.id"
+          name="posicao"
+          v-model="atleta.posicao"
+          :items="posicoes"
+          item-text="nome"
+          item-value="id"
+          label="posicao"
+          required
+        ></v-select>
+        <v-select
+          v-else
+          v-model="posicao"
+          :items="posicoes"
+          item-text="nome"
+          item-value="posicao"
+          label="posicao"
+          name="posicao"
+          required
+        ></v-select>
       </div>
       <div style="width: 48%">
         <v-text-field v-if="this.id" v-model="atleta.indicacao" label="Indicação"></v-text-field>
         <v-text-field v-else v-model="indicacao" label="Indicação" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
-      <div style="width: 23%; margin-right:4%">
-        <v-radio-group v-model="atleta.federado" row label="Federado?">
-          <v-radio label="Sim" value="sim"></v-radio>
-          <v-radio label="Não" value="não"></v-radio>
-        </v-radio-group>
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
+      <div style="width: 12%; margin-right:4%; margin-top: 15px">
+        <v-checkbox
+        v-if="this.id"
+          v-model="atleta.federado"
+          label="Atleta Federado"
+          hide-details
+          class="shrink mr-2 mt-0"
+        ></v-checkbox>
+        <v-checkbox
+        v-else
+          v-model="federado"
+          label="Atleta Federado"
+          hide-details
+          class="shrink mr-2 mt-0"
+        ></v-checkbox>        
       </div>
-      <div style="width: 73%">
-        <v-text-field v-if="this.id" v-model="atleta.federacao" label="Se sim, qual?"></v-text-field>
-        <v-text-field v-else v-model="federacao" label="Se sim, qual?" required></v-text-field>
+      <div style="width: 84%">
+        <v-text-field :disabled="!atleta.federado" v-if="this.id" v-model="atleta.federacao" label="Qual Federação?"></v-text-field>
+        <v-text-field :disabled="!federado" v-else v-model="federacao" label="Qual Federação?" required></v-text-field>
       </div>
     </div>
-    <div style="padding-right: 20px; display: flex; ">
-      <div style="width: 100%; margin: 0 auto; text-align: center">
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
+      <div style="width: 100%; margin: 0 auto; margin-bottom: 20px; text-align: center;">
         <v-btn v-if="this.id" class="mr-4" @click="editarAtleta(atleta)" color="success">Editar</v-btn>
         <v-btn v-else class="mr-4" @click="addAtleta()" color="success">Salvar</v-btn>
         <router-link to="/atletas" tag="button">
@@ -158,18 +200,31 @@ export default {
       pai:"",
       mae:"",      
       indicacao:"",
-      federado:false,
+      federado: "",
       federacao:"",
       dtCadastro: "",
       atleta: {},
       posicao: {},
       posicoes: [],
-      id: this.$route.params.id
+      id: this.$route.params.id,
+      escolaridades:[
+        "Ensino Fundamental - Incompleto",
+        "Ensino Fundamental - Completo",
+        "Ensino Médio - Incompleto",
+        "Ensino Médio - Completo",
+        "Ensino Superior - Incompleto",
+        "Ensino Superior - Completo",
+        "Pós-graduação (Lato senso) - Incompleto",
+        "Pós-graduação (Lato senso) - Completo",
+        "Pós-graduação (Stricto sensu, nível mestrado) - Incompleto",
+        "Pós-graduação (Stricto sensu, nível mestrado) - Completo",
+        "Pós-graduação (Stricto sensu, nível doutor) - Incompleto",
+        "Pós-graduação (Stricto sensu, nível doutor) - Completo"
+      ]
     };
   },
 
-  methods: {
-    created() {
+  created() {
     if (this.id) {
       this.$http
         .get("http://localhost:3000/atletas/" + this.id)
@@ -186,34 +241,64 @@ export default {
       });
     },
 
+    beforeMount() {
+    if (this.id) {
+      this.$http
+        .get("http://localhost:3000/atletas/" + this.id)
+        .then(res => res.json())
+        .then(atleta => (this.atleta = atleta));
+    }
+    },
+
+  methods: {
     addAtleta() {
       let now = new Date();
       this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
-      let _senha = "";
-      if (this.senha1 === this.senha2) {
-        _senha = this.senha1;
-      }
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();      
       let _atleta = {
         nome: this.nome,
         email: this.email,
-        senha: _senha,
-        dtCadastro: this.dtCadastro,
-        perfil: this.perfil,
-        senhaAux1: this.senhaAux1,
-        senhaAux2: this.senhaAux2
+        cpf:this.cpf,
+        rg:this.rg,
+        endereco:this.endereco,
+        num:this.num,
+        bairro:this.bairro,
+        cidade:this.cidade,
+        uf:this.uf,
+        celular:this.celular,
+        tel:this.tel,
+        escolaridade:this.escolaridade,
+        nomeEscola:this.nomeEscola,
+        pai:this.pai,
+        mae:this.mae,      
+        indicacao:this.indicacao,
+        federado:this.federado,
+        federacao:this.federacao,
+        dtCadastro: this.dtCadastro             
       };
       this.$http
         .post("http://localhost:3000/atletas", _atleta)
         .then(res => res.json())
         .then(
-          (this.nome = ""),
-          (this.email = ""),
-          (this.dtCadastro = ""),
-          (this.perfil = {}),
-          (this.senha = ""),
-          (this.senhaAux1 = ""),
-          (this.senhaAux2 = ""),
+          this.nome = "",
+        this.email = "",
+          this.cpf = "",
+          this.rg = "",
+          this.endereco = "",
+          this.num = "",
+          this.bairro = "",
+          this.cidade = "",
+          this.uf = "",
+          this.celular = "",
+          this.tel = "",
+          this.escolaridade = "",
+          this.nomeEscola = "",
+          this.pai = "",
+          this.mae = "",      
+          this.indicacao = "",
+          this.federado = "",
+          this.federacao = "",
+          this.dtCadastro = "" ,
           this.$router.push("/atletas")
         );
     },
@@ -234,7 +319,7 @@ export default {
         senhaAux1: _atleta.senhaAux1,
         senhaAux2: _atleta.senhaAux2,
         dtCadastro: this.dtCadastro,
-        perfil: _atleta.perfil
+        posicao: _atleta.posicao
       };
       this.$http.put(
         `http://localhost:3000/atletas/${_atleta.id}`,

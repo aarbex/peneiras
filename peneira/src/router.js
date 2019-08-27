@@ -7,6 +7,7 @@ import Login from "./components/Login/Login.vue";
 import Avaliacoes from "./components/Avaliacoes/Avaliacoes.vue";
 import Atletas from "./components/Atletas/Atletas.vue";
 import AtletasModel from "./components/Atletas/AtletasModel.vue";
+import AtletasDetalhes from "./components/Atletas/AtletasDetalhes.vue";
 import Categorias from "./components/Categorias/Categorias.vue";
 import CategoriasModel from "./components/Categorias/CategoriasModel.vue";
 import Treinadores from "./components/Treinadores/Treinadores.vue";
@@ -85,6 +86,11 @@ export default new Router({
       path: "/atleta/:id",
       name: "AtletasModelEdit",
       component: AtletasModel
+    },
+    {
+      path: "/atleta/detalhe/:id",
+      name: "AtletasDetalhes",
+      component: AtletasDetalhes
     },
     {
       path: "/categorias",
