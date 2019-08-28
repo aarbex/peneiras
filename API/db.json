@@ -203,9 +203,11 @@
       "email": "arbex.andre@gmail.com",
       "cpf": "305.263.238-84",
       "rg": "27.524.173-7",
+      "dtNascimento": "13/09/1981",
       "endereco": "Rua Júlio Sayago",
       "num": 115,
       "bairro": "Vila Ré",
+      "cep": "03669-010",
       "cidade": "São Paulo",
       "uf": "SP",
       "celular": "(11)97466-4075",
@@ -227,11 +229,13 @@
       "id": 2,
       "nome": "Victor Alves Arbex",
       "email": "arbex.victor@gmail.com",
-      "cpf": "305.263.238-84",
+      "cpf": "123.456.789.01",
       "rg": "27.524.173-7",
+      "dtNascimento": "12/08/2010",
       "endereco": "Rua Júlio Sayago",
       "num": 115,
       "bairro": "Vila Ré",
+      "cep": "03669-010",
       "cidade": "São Paulo",
       "uf": "SP",
       "celular": "(11)97466-4075",
@@ -254,9 +258,11 @@
       "email": "arbex.arthur@gmail.com",
       "cpf": "305.263.238-84",
       "rg": "27.524.173-7",
+      "dtNascimento": "01/08/2014",
       "endereco": "Rua Júlio Sayago",
       "num": "115",
       "bairro": "Vila Ré",
+      "cep": "03669-010",
       "cidade": "São Paulo",
       "uf": "SP",
       "celular": "(11) 97466-4075",
@@ -275,6 +281,114 @@
       "federacao": "RSoccer",
       "dtCadastro": "27/8/2019",
       "id": 3
+    }
+  ],
+  "avaliacoes":[
+    {
+      "id": 1,
+      "atleta":{
+        "id": 1,
+        "nome": "André Elias Alves Arbex",
+        "email": "arbex.andre@gmail.com",
+        "cpf": "305.263.238-84",
+        "rg": "27.524.173-7",
+        "dtNascimento": "13/09/1981",
+        "endereco": "Rua Júlio Sayago",
+        "num": 115,
+        "bairro": "Vila Ré",
+        "cep": "03669-010",
+        "cidade": "São Paulo",
+        "uf": "SP",
+        "celular": "(11)97466-4075",
+        "tel": "(11)2791-5506",
+        "escolaridade": "Superior Completo",
+        "nomeEscola": "EEPSG Maria Aparecida de Castro Masiero",
+        "pai": "Nadra Elias Arbex Junior",
+        "mae": "Rosely Alves Arbex",
+        "posicao": {
+          "id": 2,
+          "nome": "Atacante"
+        },
+        "indicacao": "João Silva",
+        "federado": true,
+        "federacao": "Acme Futebol Clube",
+        "dtCadastro": "26/8/2019"
+      },
+      "treinador": {
+        "id": 1,
+        "nome": "José",
+        "dtCadastro": "22/8/2019"
+      },
+      "categoria":{
+        "nome": "Sub-20",
+        "dtCadastro": "21/8/2019",
+        "id": 5
+      },
+      "status": {
+        "nome": "Em avaliação",
+        "dtCadastro": "21/8/2019",
+        "id": 2
+      },
+      "dtInicio":"01/08/2019",
+      "dtDispensa": "",
+      "nota":"8.5",
+      "observacao":"",
+      "cadastradoPor":"Fabrício Sanches",
+      "dtCadastro": "28/08/2019"
+
+    },
+    {
+      "id": 2,
+      "atleta":{
+        "id": 2,
+        "nome": "Victor Alves Arbex",
+        "email": "arbex.victor@gmail.com",
+        "cpf": "123.456.789.01",
+        "rg": "27.524.173-7",
+        "dtNascimento": "12/08/2010",
+        "endereco": "Rua Júlio Sayago",
+        "num": 115,
+        "bairro": "Vila Ré",
+        "cep": "03669-010",
+        "cidade": "São Paulo",
+        "uf": "SP",
+        "celular": "(11)97466-4075",
+        "tel": "(11)2791-5506",
+        "escolaridade": "Ensino Fundamental",
+        "nomeEscola": "Universitário Leste",
+        "pai": "André Elias Alves Arbex",
+        "mae": "Marcia Alves Arbex",
+        "posicao": {
+          "id": 7,
+          "nome": "Meio-campo"
+        },
+        "indicacao": "José Alves",
+        "federado": false,
+        "federacao": "",
+        "dtCadastro": "26/8/2019"
+      },
+      "treinador": {
+        "nome": "Luiz",
+        "dtCadastro": "22/8/2019",
+        "id": 2
+      },
+      "categoria":{
+        "id": 1,
+        "nome": "Sub-11",
+        "dtCadastro": "21/8/2019"
+      },
+      "status": {
+        "id": 1,
+        "nome": "Em espera",
+        "dtCadastro": "21/8/2019"
+      },
+      "dtInicio":"30/08/2019",
+      "dtDispensa": "",
+      "nota":"",
+      "observacao":"",
+      "cadastradoPor":"Fabrício Sanches",
+      "dtCadastro": "28/08/2019"
+
     }
   ]
 }

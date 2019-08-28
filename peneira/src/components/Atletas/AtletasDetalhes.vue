@@ -56,13 +56,16 @@
       </div>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 41.5%; margin-right:4%">
+      <div style="width: 34%; margin-right:4%">
         <v-text-field v-model="atleta.bairro" label="Bairro" readonly filled></v-text-field>
       </div>
-      <div style="width: 41.5%; margin-right:4%">
+      <div style="width: 12%; margin-right:4%">
+        <v-text-field v-model="atleta.cep" label="CEP" readonly filled></v-text-field>
+      </div>
+      <div style="width: 40%; margin-right:4%">
         <v-text-field v-model="atleta.cidade" label="Cidade" readonly filled></v-text-field>
       </div>
-      <div style="width: 13%">
+      <div style="width: 6%">
         <v-text-field v-model="atleta.uf" label="UF" readonly filled></v-text-field>
       </div>
     </div>

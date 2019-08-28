@@ -20,7 +20,7 @@
         <th class="text-center">Nome</th>
         <th class="text-center">Email</th>
         <th class="text-center">CPF</th>
-        <th class="text-center">RG</th>
+        <th class="text-center">Data de Nascimento</th>
         <th class="text-center">Posição</th>
         <th class="text-center">Data de Cadastro</th>
         <th class="text-center">Ações</th>
@@ -30,7 +30,7 @@
           <td class="text-center">{{a.nome}}</td>
           <td class="text-center">{{a.email}}</td>
           <td class="text-center">{{a.cpf}}</td>
-          <td class="text-center">{{a.rg}}</td>
+          <td class="text-center">{{a.dtNascimento}}</td>
           <td class="text-center">{{a.posicao.nome}}</td>
           <td class="text-center">{{a.dtCadastro}}</td>
           <td class="text-center" style="width: 20%">

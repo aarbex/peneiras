@@ -26,13 +26,17 @@
           <v-text-field v-else v-model="email" label="E-mail" required></v-text-field>
         </div>
         <div style="padding-right: 20px; display: flex; ">
-          <div style="width: 48%; margin-right:4%">
-            <v-text-field v-if="this.id" v-model="atleta.cpf" label="CPF" required></v-text-field>
-            <v-text-field v-else v-model="cpf" label="CPF" required></v-text-field>
+          <div style="width: 38%; margin-right:4%">
+            <v-text-field v-if="this.id" v-mask="cpfMask" v-model="atleta.cpf" label="CPF" required></v-text-field>
+            <v-text-field v-else v-mask="cpfMask" v-model="cpf" label="CPF" required></v-text-field>
           </div>
-          <div style="width: 48%">
-            <v-text-field v-if="this.id" v-model="atleta.rg" label="RG" required></v-text-field>
-            <v-text-field v-else v-model="rg" label="RG" required></v-text-field>
+          <div style="width: 38%; margin-right:4%">
+            <v-text-field v-if="this.id" v-mask="rgMask" v-model="atleta.rg" label="RG" required></v-text-field>
+            <v-text-field v-else v-model="rg" v-mask="rgMask" label="RG" required></v-text-field>
+          </div>
+          <div style="width: 16%">
+            <v-text-field v-if="this.id" v-mask="dataMask" v-model="atleta.dtNascimento" label="Data de Nascimento" required></v-text-field>
+            <v-text-field v-else v-mask="dataMask" v-model="dtNascimento" label="Data de Nascimento" required></v-text-field>
           </div>
         </div>
       </div>
@@ -53,27 +57,48 @@
       </div>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 41.5%; margin-right:4%">
+      <div style="width: 34%; margin-right:4%">
         <v-text-field v-if="this.id" v-model="atleta.bairro" label="Bairro" required></v-text-field>
         <v-text-field v-else v-model="bairro" label="Bairro" required></v-text-field>
       </div>
-      <div style="width: 41.5%; margin-right:4%">
+      <div style="width: 8%;">
+        <v-text-field v-if="this.id" v-mask="cepMask" v-model="atleta.cep" label="CEP" required></v-text-field>
+        <v-text-field v-else v-model="cep" v-mask="cepMask" label="CEP" required></v-text-field>        
+      </div>
+      <div style="width: 4%; margin-right:4%; display: flex">        
+          <v-icon style="vertical-align:middle">mdi-magnify</v-icon>        
+        </div>
+      <div style="width: 40%; margin-right:4%">
         <v-text-field v-if="this.id" v-model="atleta.cidade" label="Cidade" required></v-text-field>
         <v-text-field v-else v-model="cidade" label="Cidade" required></v-text-field>
       </div>
-      <div style="width: 13%">
-        <v-text-field v-if="this.id" v-model="atleta.uf" label="UF" required></v-text-field>
-        <v-text-field v-else v-model="uf" label="UF" required></v-text-field>
+      <div style="width: 6%">
+        <v-select
+          v-if="this.id"
+          name="uf"
+          v-model="atleta.uf"
+          :items="ufs"
+          label="UF"
+          required
+        ></v-select>
+        <v-select
+          v-else
+          name="uf"
+          v-model="uf"
+          :items="ufs"
+          label="UF"
+          required
+        ></v-select>
       </div>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 48%; margin-right:4%">
-        <v-text-field v-if="this.id" v-model="atleta.celular" label="Telefone Celular"></v-text-field>
-        <v-text-field v-else v-model="celular" label="Telefone Celular" required></v-text-field>
+        <v-text-field v-if="this.id" v-mask="celMask" v-model="atleta.celular" label="Telefone Celular"></v-text-field>
+        <v-text-field v-else v-mask="celMask" v-model="celular" label="Telefone Celular" required></v-text-field>
       </div>
       <div style="width: 48%">
-        <v-text-field v-if="this.id" v-model="atleta.tel" label="Telefone Fixo"></v-text-field>
-        <v-text-field v-else v-model="tel" label="Telefone Fixo" required></v-text-field>
+        <v-text-field v-if="this.id" v-mask="telMask" v-model="atleta.tel" label="Telefone Fixo"></v-text-field>
+        <v-text-field v-else v-model="tel" v-mask="telMask" label="Telefone Fixo" required></v-text-field>
       </div>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
@@ -177,20 +202,26 @@
 <script>
 import Nav from "../Nav/Nav";
 import PictureInput from "vue-picture-input";
+import { mask } from 'vue-the-mask'
 export default {
   components: {
     Nav,
     PictureInput
   },
+  directives: {
+      mask,
+    },
   data() {
     return {
       nome: "",
       email: "",
       cpf:"",
       rg:"",
+      dtNascimento:"",
       endereco:"",
       num:"",
       bairro:"",
+      cep: "",
       cidade:"",
       uf:"",
       celular:"",
@@ -220,7 +251,42 @@ export default {
         "Pós-graduação (Stricto sensu, nível mestrado) - Completo",
         "Pós-graduação (Stricto sensu, nível doutor) - Incompleto",
         "Pós-graduação (Stricto sensu, nível doutor) - Completo"
-      ]
+      ],
+      ufs:[
+        "AC",
+        "AL",
+        "AM",
+        "AP",
+        "BA",
+        "CE",
+        "DF",
+        "ES",
+        "GO",
+        "MA",
+        "MG",
+        "MS",
+        "MT",
+        "PA",
+        "PB",
+        "PE",
+        "PI",
+        "PR",
+        "RJ",
+        "RN",
+        "RO",
+        "RR",
+        "RS",
+        "SC",
+        "SE",
+        "SP",
+        "TO"
+      ],
+      cpfMask: '###.###.###-##',
+      rgMask: '##.###.###-#',
+      dataMask: '##/##/####',
+      celMask: '(##) #####-####',
+      telMask: '(##) ####-####',
+      cepMask: '##.###-###'
     };
   },
 
@@ -263,6 +329,7 @@ export default {
         endereco:this.endereco,
         num:this.num,
         bairro:this.bairro,
+        cep: this.cep,
         cidade:this.cidade,
         uf:this.uf,
         celular:this.celular,
@@ -281,12 +348,13 @@ export default {
         .then(res => res.json())
         .then(
           this.nome = "",
-        this.email = "",
+          this.email = "",
           this.cpf = "",
           this.rg = "",
           this.endereco = "",
           this.num = "",
           this.bairro = "",
+          this.cep = "",
           this.cidade = "",
           this.uf = "",
           this.celular = "",
@@ -306,19 +374,29 @@ export default {
     editarAtleta(_atleta) {
       let now = new Date();
       this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
-      let _senha = "";
-      if (_atleta.senhaAux1 === _atleta.senhaAux2) {
-        _senha = _atleta.senhaAux1;
-      }
-
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();   
       let _atletaEditar = {
-        nome: _atleta.nome,
-        email: _atleta.email,
-        senha: _senha,
-        senhaAux1: _atleta.senhaAux1,
-        senhaAux2: _atleta.senhaAux2,
-        dtCadastro: this.dtCadastro,
+        id: _atletaEditar.id,
+        nome: _atletaEditar.nome,
+        email: _atletaEditar.email,
+        cpf:_atletaEditar.cpf,
+        rg:_atletaEditar.rg,
+        endereco:_atletaEditar.endereco,
+        num:_atletaEditar.num,
+        bairro:_atletaEditar.bairro,
+        cep: _atletaEditar.cep,
+        cidade:_atletaEditar.cidade,
+        uf:_atletaEditar.uf,
+        celular:_atletaEditar.celular,
+        tel:_atletaEditar.tel,
+        escolaridade:_atletaEditar.escolaridade,
+        nomeEscola:_atletaEditar.nomeEscola,
+        pai:_atletaEditar.pai,
+        mae:_atletaEditar.mae,      
+        indicacao:_atletaEditar.indicacao,
+        federado:_atletaEditar.federado,
+        federacao:_atletaEditar.federacao,
+        dtCadastro: _atletaEditar.dtCadastro,        
         posicao: _atleta.posicao
       };
       this.$http.put(
