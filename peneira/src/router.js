@@ -5,6 +5,8 @@ import Perfil from "./components/Perfil/Perfil.vue";
 import PerfilModel from "./components/Perfil/PerfilModel.vue";
 import Login from "./components/Login/Login.vue";
 import Avaliacoes from "./components/Avaliacoes/Avaliacoes.vue";
+import AvaliacoesModel from "./components/Avaliacoes/AvaliacoesModel.vue";
+import AvaliacoesDetalhes from "./components/Avaliacoes/AvaliacoesDetalhes.vue";
 import Atletas from "./components/Atletas/Atletas.vue";
 import AtletasModel from "./components/Atletas/AtletasModel.vue";
 import AtletasDetalhes from "./components/Atletas/AtletasDetalhes.vue";
@@ -71,6 +73,21 @@ export default new Router({
       path: "/avaliacoes",
       name: "Avaliacoes",
       component: Avaliacoes
+    },
+    {
+      path: "/avaliacao",
+      name: "AvaliacoesModel",
+      component: AvaliacoesModel
+    },
+    {
+      path: "/avaliacao/:id",
+      name: "AvaliacoesModelEdit",
+      component: AvaliacoesModel
+    },
+    {
+      path: "/avaliacao/detalhe/:id",
+      name: "AvaliacoesDetalhes",
+      component: AvaliacoesDetalhes
     },
     {
       path: "/atletas",

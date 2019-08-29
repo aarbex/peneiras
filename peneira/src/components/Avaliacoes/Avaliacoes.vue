@@ -1,11 +1,12 @@
 <template>
   <div>
     <Nav />
-    <h1>Avaliações</h1>    
+    <h1>Avaliações</h1>
     <div>
       <v-data-table
         :headers="headers"
         :items="avaliacoes"
+        sort-by="dtInicio"
         item-key="id"
         class="elevation-1"
         :search="search"
@@ -13,26 +14,48 @@
       >
         <template v-slot:top>
           <div style="display:flex">
-            <div style="width:30%"> 
-              <v-text-field
-                v-model="search"
-                label="Buscar..."
-                class="mx-4"
-              ></v-text-field>
-            </div> 
+            <div style="width:30%">
+              <v-text-field v-model="search" label="Buscar..." class="mx-4"></v-text-field>
+            </div>
             <div class="div-add">
-      <router-link to="/atleta/">
-        <v-btn class="mx-2" fab dark xSmall color="primary">
-          <v-tooltip top>
-            <template v-slot:activator="{ on }">
-              <v-icon medium dark v-on="on">mdi-plus</v-icon>
-            </template>
-            <span>Adicionar</span>
-          </v-tooltip>
-        </v-btn>
-      </router-link>
-    </div>         
+              <router-link to="/avaliacao/">
+                <v-btn class="mx-2" fab dark xSmall color="primary">
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <v-icon medium dark v-on="on">mdi-plus</v-icon>
+                    </template>
+                    <span>Adicionar</span>
+                  </v-tooltip>
+                </v-btn>
+              </router-link>
+            </div>
           </div>
+        </template>
+        <template v-slot:item.action="{ item }">
+          <v-btn class="mx-2" fab dark xSmall color="black">
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon medium dark v-on="on">mdi-eye</v-icon>
+              </template>
+              <span>Detalhes</span>
+            </v-tooltip>
+          </v-btn>
+          <v-btn class="mx-2" fab dark xSmall color="primary">
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon medium dark v-on="on">mdi-pencil</v-icon>
+              </template>
+              <span>Editar</span>
+            </v-tooltip>
+          </v-btn>
+          <v-btn class="mx-2" fab dark xSmall color="error" @click="atleta = a;dialog1 = true">
+            <v-tooltip top>
+              <template v-slot:activator="{ on }">
+                <v-icon medium dark v-on="on">mdi-trash-can</v-icon>
+              </template>
+              <span>Excluir</span>
+            </v-tooltip>
+          </v-btn>
         </template>
         <template v-slot:body.append>
           <tr>
@@ -69,15 +92,14 @@ export default {
           value: "atleta.nome"
         },
         { text: "CPF", value: "atleta.cpf" },
-        { text: "Data de Nascimento", value: "atleta.dtNascimento" },
         { text: "Categoria", value: "categoria.nome" },
         { text: "Treinador", value: "treinador.nome" },
         { text: "Posição", value: "atleta.posicao.nome" },
         { text: "Data Início", value: "dtInicio" },
         { text: "Data Dispensa", value: "dtDispensa" },
         { text: "Status", value: "status.nome" },
-        { text: "Indicação", value: "atleta.indicacao" },
-        { text: "Nota", value: "nota" }
+        { text: "Nota", value: "nota" },
+        { text: "Ações", value: "action", align: "center", sortable: false}
       ];
     }
   },

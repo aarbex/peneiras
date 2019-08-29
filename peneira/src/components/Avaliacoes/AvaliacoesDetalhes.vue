@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h1>Avaliação</h1>
+        <h1>Detalhes da Avaliação</h1>
     </div>
 </template>
 
