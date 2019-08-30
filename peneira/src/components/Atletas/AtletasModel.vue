@@ -26,18 +26,40 @@
           <v-text-field v-else v-model="email" label="E-mail" required></v-text-field>
         </div>
         <div style="padding-right: 20px; display: flex; ">
-          <div style="width: 38%; margin-right:4%">
+          <div style="width: 36%; margin-right:4%">
             <v-text-field v-if="this.id" v-mask="cpfMask" v-model="atleta.cpf" label="CPF" required></v-text-field>
             <v-text-field v-else v-mask="cpfMask" v-model="cpf" label="CPF" required></v-text-field>
           </div>
-          <div style="width: 38%; margin-right:4%">
+          <div style="width: 36%; margin-right:4%">
             <v-text-field v-if="this.id" v-mask="rgMask" v-model="atleta.rg" label="RG" required></v-text-field>
             <v-text-field v-else v-model="rg" v-mask="rgMask" label="RG" required></v-text-field>
           </div>
-          <div style="width: 16%">
-            <v-text-field v-if="this.id" v-mask="dataMask" v-model="atleta.dtNascimento" label="Data de Nascimento" required></v-text-field>
-            <v-text-field v-else v-mask="dataMask" v-model="dtNascimento" label="Data de Nascimento" required></v-text-field>
-          </div>
+          <div style="width: 20%;">
+        <v-menu
+          ref="menu"
+          v-model="menu"
+          :close-on-content-click="false"
+          :return-value.sync="date"
+          transition="scale-transition"
+          offset-y
+          full-width
+          min-width="290px"
+        >
+          <template v-slot:activator="{ on }">
+            <v-text-field
+              v-model="date"
+              label="Data de Nascimento"
+              prepend-icon="mdi-calendar-month"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker v-model="date" no-title scrollable>
+            <div class="flex-grow-1"></div>
+            <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
+            <v-btn text color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+          </v-date-picker>
+        </v-menu>
+      </div>
         </div>
       </div>
     </div>
@@ -281,6 +303,8 @@ export default {
         "SP",
         "TO"
       ],
+      date: new Date().toISOString().substr(0, 10),
+      menu: false,
       cpfMask: '###.###.###-##',
       rgMask: '##.###.###-#',
       dataMask: '##/##/####',

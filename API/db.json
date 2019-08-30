@@ -6,8 +6,8 @@
       "senha": "123",
       "senhaAux1": "123",
       "senhaAux2": "123",
-      "dtCadastro": "21/8/2019",
-      "perfil": 2,
+      "dtCadastro": "29/8/2019",
+      "perfil": 1,
       "id": 1
     },
     {
@@ -177,6 +177,11 @@
       "nome": "Meio-campo",
       "dtCadastro": "26/8/2019",
       "id": 7
+    },
+    {
+      "id": 8,
+      "nome": "Ponta-Direita",
+      "dtCadastro": "29/8/2019"
     }
   ],
   "treinadores": [
@@ -283,10 +288,10 @@
       "id": 3
     }
   ],
-  "avaliacoes":[
+  "avaliacoes": [
     {
       "id": 1,
-      "atleta":{
+      "atleta": {
         "id": 1,
         "nome": "André Elias Alves Arbex",
         "email": "arbex.andre@gmail.com",
@@ -319,7 +324,7 @@
         "nome": "José",
         "dtCadastro": "22/8/2019"
       },
-      "categoria":{
+      "categoria": {
         "nome": "Sub-20",
         "dtCadastro": "21/8/2019",
         "id": 5
@@ -329,17 +334,16 @@
         "dtCadastro": "21/8/2019",
         "id": 2
       },
-      "dtInicio":"01/08/2019",
+      "dtInicio": "01/08/2019",
       "dtDispensa": "",
-      "nota":"8.5",
-      "observacao":"",
-      "cadastradoPor":"Fabrício Sanches",
+      "nota": "8.5",
+      "observacao": "",
+      "cadastradoPor": "Fabrício Sanches",
       "dtCadastro": "28/08/2019"
-
     },
     {
       "id": 2,
-      "atleta":{
+      "atleta": {
         "id": 2,
         "nome": "Victor Alves Arbex",
         "email": "arbex.victor@gmail.com",
@@ -372,7 +376,7 @@
         "dtCadastro": "22/8/2019",
         "id": 2
       },
-      "categoria":{
+      "categoria": {
         "id": 1,
         "nome": "Sub-11",
         "dtCadastro": "21/8/2019"
@@ -382,13 +386,12 @@
         "nome": "Em espera",
         "dtCadastro": "21/8/2019"
       },
-      "dtInicio":"30/08/2019",
+      "dtInicio": "30/08/2019",
       "dtDispensa": "",
-      "nota":"",
-      "observacao":"",
-      "cadastradoPor":"Fabrício Sanches",
+      "nota": "",
+      "observacao": "",
+      "cadastradoPor": "Fabrício Sanches",
       "dtCadastro": "28/08/2019"
-
     }
   ]
 }
