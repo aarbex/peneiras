@@ -19,7 +19,7 @@
             </div>
             <div class="div-add">
               <router-link to="/avaliacao/">
-                <v-btn class="mx-2" fab dark xSmall color="primary">
+                <v-btn class="mx-2" fab dark xSmall color="primary" style="margin: 15px">
                   <v-tooltip top>
                     <template v-slot:activator="{ on }">
                       <v-icon medium dark v-on="on">mdi-plus</v-icon>
@@ -32,23 +32,34 @@
           </div>
         </template>
         <template v-slot:item.action="{ item }">
-          <v-btn class="mx-2" fab dark xSmall color="black">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-icon medium dark v-on="on">mdi-eye</v-icon>
-              </template>
-              <span>Detalhes</span>
-            </v-tooltip>
-          </v-btn>
-          <v-btn class="mx-2" fab dark xSmall color="primary">
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-icon medium dark v-on="on">mdi-pencil</v-icon>
-              </template>
-              <span>Editar</span>
-            </v-tooltip>
-          </v-btn>
-          <v-btn class="mx-2" fab dark xSmall color="error" @click="atleta = a;dialog1 = true">
+          <router-link :to="'/avaliacao/detalhe/' + item.id" tag="button">
+            <v-btn class="mx-2" fab dark xSmall color="black">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-icon medium dark v-on="on">mdi-eye</v-icon>
+                </template>
+                <span>Detalhes</span>
+              </v-tooltip>
+            </v-btn>
+          </router-link>
+          <router-link :to="'/avaliacao/' + item.id" tag="button">
+            <v-btn class="mx-2" fab dark xSmall color="primary">
+              <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                  <v-icon medium dark v-on="on">mdi-pencil</v-icon>
+                </template>
+                <span>Editar</span>
+              </v-tooltip>
+            </v-btn>
+          </router-link>
+          <v-btn
+            class="mx-2"
+            fab
+            dark
+            xSmall
+            color="error"
+            @click="removerAvaliacao(item); dialog1 = true"
+          >
             <v-tooltip top>
               <template v-slot:activator="{ on }">
                 <v-icon medium dark v-on="on">mdi-trash-can</v-icon>
@@ -79,7 +90,7 @@ export default {
   data() {
     return {
       search: "",
-      avaliacoes: [],
+      avaliacoes: []
     };
   },
   computed: {
@@ -89,17 +100,17 @@ export default {
           text: "Atleta",
           align: "left",
           sortable: false,
-          value: "atleta.nome"
+          value: "nome"
         },
-        { text: "CPF", value: "atleta.cpf" },
+        { text: "CPF", value: "cpf" },
         { text: "Categoria", value: "categoria.nome" },
         { text: "Treinador", value: "treinador.nome" },
-        { text: "Posição", value: "atleta.posicao.nome" },
+        { text: "Posição", value: "posicao" },
         { text: "Data Início", value: "dtInicio" },
         { text: "Data Dispensa", value: "dtDispensa" },
         { text: "Status", value: "status.nome" },
         { text: "Nota", value: "nota" },
-        { text: "Ações", value: "action", align: "center", sortable: false}
+        { text: "Ações", value: "action", align: "center", sortable: false }
       ];
     }
   },
@@ -109,8 +120,21 @@ export default {
         value != null &&
         search != null &&
         typeof value === "string" &&
-        value.toString().indexOf(search) !== -1
+        value
+          .toString()
+          .toLowerCase()
+          .indexOf(search) !== -1
       );
+    },
+    removerAvaliacao(avaliacao) {
+      this.$http
+        .delete(`http://localhost:3000/avaliacoes/${avaliacao.id}`)
+        .then(() => {
+          let indice = this.avaliacoes.indexOf(avaliacao);
+          this.avaliacoes.splice(indice, 1);
+          //this.avaliacoes = this.avaliacoes.filter(u => u.id != avaliacao.id);
+          this.dialog1 = false;
+        });
     }
   },
   created() {
@@ -118,11 +142,6 @@ export default {
       .get("http://localhost:3000/avaliacoes/")
       .then(res => res.json())
       .then(avaliacoes => (this.avaliacoes = avaliacoes));
-
-    this.$http
-      .get("http://localhost:3000/status")
-      .then(res => res.json())
-      .then(status => (this.status = status));
   }
 };
 </script>

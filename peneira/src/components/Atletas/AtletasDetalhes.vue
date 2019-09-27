@@ -19,7 +19,7 @@
         <div style="padding-right: 20px; display:flex">
           <v-text-field
             style="font-size: 36px; font-weight: bold"
-                        v-model="atleta.nome"
+            v-model="atleta.nome"
             label="Nome"
             solo
             flat
@@ -44,12 +44,7 @@
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 83%; margin-right:4%">
-        <v-text-field
-                    v-model="atleta.endereco"
-          label="Endereço (Rua / Avenida)"
-          readonly
-          filled
-        ></v-text-field>
+        <v-text-field v-model="atleta.endereco" label="Endereço (Rua / Avenida)" readonly filled></v-text-field>
       </div>
       <div style="width: 13%">
         <v-text-field v-model="atleta.num" label="Número" readonly filled></v-text-field>
@@ -71,12 +66,7 @@
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 48%; margin-right:4%">
-        <v-text-field
-                    v-model="atleta.celular"
-          label="Telefone Celular"
-          readonly
-          filled
-        ></v-text-field>
+        <v-text-field v-model="atleta.celular" label="Telefone Celular" readonly filled></v-text-field>
       </div>
       <div style="width: 48%">
         <v-text-field v-model="atleta.tel" label="Telefone Fixo" readonly filled></v-text-field>
@@ -84,7 +74,7 @@
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 28%; margin-right:4%">
-        <v-text-field  v-model="atleta.escolaridade" label="Escolaridade" readonly filled></v-text-field>
+        <v-text-field v-model="atleta.escolaridade" label="Escolaridade" readonly filled></v-text-field>
       </div>
       <div style="width: 68%">
         <v-text-field label="Nome da Escola" v-model="atleta.nomeEscola" filled readonly></v-text-field>
@@ -102,7 +92,7 @@
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 48%; margin-right:4%">
-        <v-text-field v-model="atleta.posicao" label="Posição" readonly filled></v-text-field>
+        <v-text-field v-model="atleta.posicao.nome" label="Posição" readonly filled></v-text-field>
       </div>
       <div style="width: 48%">
         <v-text-field v-model="atleta.indicacao" label="Indicação" readonly filled></v-text-field>
@@ -111,7 +101,7 @@
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 12%; margin-right:4%; margin-top: 15px">
         <v-checkbox
-                    v-model="atleta.federado"
+          v-model="atleta.federado"
           label="Atleta Federado"
           hide-details
           readonly
@@ -122,7 +112,7 @@
       <div style="width: 84%">
         <v-text-field
           :disabled="!atleta.federado"
-                    filled
+          filled
           v-model="atleta.federacao"
           label="Qual Federação?"
           readonly

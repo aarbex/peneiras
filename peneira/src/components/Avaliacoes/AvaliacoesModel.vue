@@ -2,97 +2,95 @@
   <div>
     <Nav></Nav>
     <h1>Avaliação</h1>
-              <div v-if="this.id" class="div-add">
-      <router-link to="/atleta/detalhes/" + avaliacao.atleta.id>
+    <div v-if="this.id" class="div-add">
+      <router-link to="`/atleta/detalhe/ ${avaliacao.atleta.id}`">
         <v-btn class="mx-2" dark Small color="primary">VER DETALHES DO ATLETA</v-btn>
       </router-link>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 20%;">
+      <div style="width: 18%;">
         <v-text-field
           v-if="this.id"
           v-mask="cpfMask"
-          v-model="atleta.cpf"
+          v-model="avaliacao.cpf"
           label="CPF do Atleta"
           required
         ></v-text-field>
         <v-text-field v-else v-model="cpf" v-mask="cpfMask" label="CPF do Atleta" required></v-text-field>
       </div>
-      <div style="width: 4%; margin-right:4%; display: flex">
-        <v-icon style="vertical-align:middle">mdi-magnify</v-icon>
+      <div style="width: 4%; margin-right:2%; display: flex">
+        <v-icon
+          @click="carregarAtletaPorCPF()"
+          @keyup.enter="carregarAtletaPorCPF()"
+          style="vertical-align:middle"
+        >mdi-magnify</v-icon>
       </div>
-      <div style="width: 76%">
-        <v-text-field
+      <div style="width: 80%">
+        <v-combobox
           v-if="this.id"
-          v-model="avaliacao.atleta.nome"
-          label="Nome do Atleta"
-          required
-        ></v-text-field>
-        <v-text-field v-else v-model="atleta.nome" label="Nome do Atleta" required></v-text-field>
-      </div>
-    </div>
-
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 15%; margin-right:4%">
-        <v-menu
-          ref="menu1"
-          v-model="menu1"
-          :close-on-content-click="false"
-          :return-value.sync="date"
-          transition="scale-transition"
-          offset-y
-          full-width
-          min-width="290px"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              v-model="date1"
-              label="Data de Nascimento"
-              prepend-icon="mdi-calendar-month"
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker v-model="date1" no-title scrollable>
-            <div class="flex-grow-1"></div>
-            <v-btn text color="primary" @click="menu1 = false">Cancel</v-btn>
-            <v-btn text color="primary" @click="$refs.menu1.save(date)">OK</v-btn>
-          </v-date-picker>
-        </v-menu>
-      </div>
-      <div style="width: 37%; margin-right:4%">
-        <v-select
-          v-if="this.id"
-          name="posicao"
-          v-model="avaliacao.atleta.posicao"
-          :items="posicoes"
+          v-model="avaliacao.nome"
+          :items="atletas"
           item-text="nome"
           item-value="id"
-          label="posicao"
-          required
-        ></v-select>
-        <v-select
+          label="Nome do Atleta"
+          @change="carregarAtletaPorNome(atleta.nome)"
+        ></v-combobox>
+        <v-combobox
           v-else
-          v-model="atleta.posicao"
-          :items="posicoes"
+          v-model="atleta.nome"
+          :items="atletas"
           item-text="nome"
-          item-value="posicao"
-          label="Posição"
-          name="posicao"
-          required
-        ></v-select>
-      </div>
-      <div style="width: 40%">
-        <v-text-field v-if="this.id" v-model="atleta.indicacao" label="Indicação"></v-text-field>
-        <v-text-field v-else v-model="indicacao" label="Indicação" required></v-text-field>
+          item-value="id"
+          label="Nome do Atleta"
+          @change="carregarAtletaPorNome(atleta.nome)"
+          auto-select-first
+        ></v-combobox>
       </div>
     </div>
 
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 48%; margin-right:4%">
+      <div style="width: 20%; margin-right:4%">
+        <v-text-field
+          prepend-icon="mdi-calendar-month"
+          v-if="this.id"
+          v-model="avaliacao.dtNascimento"
+          label="Data de Nascimento"
+          filled
+          readonly
+        ></v-text-field>
+        <v-text-field
+          prepend-icon="mdi-calendar-month"
+          v-else
+          v-model="dtNascimento"
+          label="Data de Nascimento"
+          filled
+          readonly
+        ></v-text-field>
+      </div>
+      <div style="width: 30%; margin-right:4%">
+        <div>
+          <v-text-field v-if="this.id" v-model="avaliacao.posicao" label="Posição" filled readonly></v-text-field>
+          <v-text-field v-else v-model="posicao" label="Posição" filled readonly></v-text-field>
+        </div>
+      </div>
+      <div style="width: 47%">
+        <v-text-field
+          v-if="this.id"
+          v-model="avaliacao.indicacao"
+          label="Indicação"
+          filled
+          readonly
+        ></v-text-field>
+        <v-text-field v-else v-model="indicacao" label="Indicação" filled readonly></v-text-field>
+      </div>
+    </div>
+
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
+      <div style="width: 30%; margin-right:4%">
         <v-select
           v-if="this.id"
           name="categoria"
-          v-model="avaliacao.categoria"
+          v-model="avaliacao.categoria.id"
           :items="categorias"
           item-text="nome"
           item-value="id"
@@ -101,20 +99,20 @@
         ></v-select>
         <v-select
           v-else
-          v-model="atleta.categoria"
+          v-model="categoria.id"
           :items="categorias"
           item-text="nome"
-          item-value="categoria"
+          item-value="id"
           label="Categoria"
           name="categoria"
           required
         ></v-select>
       </div>
-      <div style="width: 48%;">
+      <div style="width: 38%; margin-right:4%">
         <v-select
           v-if="this.id"
-          name="posicao"
-          v-model="avaliacao.treinador"
+          name="treinador"
+          v-model="avaliacao.treinador.id"
           :items="treinadores"
           item-text="nome"
           item-value="id"
@@ -123,12 +121,34 @@
         ></v-select>
         <v-select
           v-else
-          v-model="treinador"
+          v-model="treinador.id"
           :items="treinadores"
           item-text="nome"
           item-value="id"
           label="Treinador"
           name="treinador"
+          required
+        ></v-select>
+      </div>
+      <div style="width: 24%">
+        <v-select
+          v-if="this.id"
+          name="status"
+          v-model="avaliacao.status.id"
+          :items="statusList"
+          item-text="nome"
+          item-value="id"
+          label="Status"
+          required
+        ></v-select>
+        <v-select
+          v-else
+          v-model="status.id"
+          :items="statusList"
+          item-text="nome"
+          item-value="id"
+          label="Status"
+          name="status"
           required
         ></v-select>
       </div>
@@ -139,7 +159,7 @@
           ref="menu2"
           v-model="menu2"
           :close-on-content-click="false"
-          :return-value.sync="date"
+          :return-value.sync="avaliacao.dtInicio"
           transition="scale-transition"
           offset-y
           full-width
@@ -147,7 +167,7 @@
         >
           <template v-slot:activator="{ on }">
             <v-text-field
-              v-model="date2"
+              v-model="avaliacao.dtInicio"
               label="Data de Início"
               prepend-icon="mdi-calendar-month"
               v-on="on"
@@ -156,7 +176,7 @@
           <v-date-picker v-model="date2" no-title scrollable>
             <div class="flex-grow-1"></div>
             <v-btn text color="primary" @click="menu2 = false">Cancel</v-btn>
-            <v-btn text color="primary" @click="$refs.menu2.save(date)">OK</v-btn>
+            <v-btn text color="primary" @click="$refs.menu2.save(date2)">OK</v-btn>
           </v-date-picker>
         </v-menu>
       </div>
@@ -165,7 +185,7 @@
           ref="menu3"
           v-model="menu3"
           :close-on-content-click="false"
-          :return-value.sync="date"
+          :return-value.sync="avaliacao.dtDispensa"
           transition="scale-transition"
           offset-y
           full-width
@@ -173,7 +193,7 @@
         >
           <template v-slot:activator="{ on }">
             <v-text-field
-              v-model="date3"
+              v-model="avaliacao.dtDispensa"
               label="Data de Dispensa"
               prepend-icon="mdi-calendar-month"
               v-on="on"
@@ -182,32 +202,32 @@
           <v-date-picker v-model="date3" no-title scrollable>
             <div class="flex-grow-1"></div>
             <v-btn text color="primary" @click="menu3 = false">Cancel</v-btn>
-            <v-btn text color="primary" @click="$refs.menu3.save(date)">OK</v-btn>
+            <v-btn text color="primary" @click="$refs.menu3.save(date3)">OK</v-btn>
           </v-date-picker>
         </v-menu>
       </div>
       <div style="width: 20%; margin-right:4%">
-        <v-text-field v-if="this.id" v-mask="notaMask" v-model="avaliacao.nota.indicacao" label="Nota"></v-text-field>
+        <v-text-field v-if="this.id" v-mask="notaMask" v-model="avaliacao.nota" label="Nota"></v-text-field>
         <v-text-field v-else v-mask="notaMask" v-model="nota" label="Nota" required></v-text-field>
       </div>
       <div style="width: 32%;">
         <v-text-field v-model="avaliacao.cadastradoPor" label="Cadastrado por:" readonly filled></v-text-field>
-        
       </div>
-      </div>
-      <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <v-textarea
-          name="observacao"
-          label="Observação"
-          value=""
-        ></v-textarea>
-    </div>    
+    </div>
+    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
+      <v-textarea name="observacao" label="Observação" value></v-textarea>
+    </div>
 
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 100%; margin: 0 auto; margin-bottom: 20px; text-align: center;">
-        <v-btn v-if="this.id" class="mr-4" @click="editarAtleta(atleta)" color="success">Editar</v-btn>
-        <v-btn v-else class="mr-4" @click="addAtleta()" color="success">Salvar</v-btn>
-        <router-link to="/atletas" tag="button">
+        <v-btn
+          v-if="this.id"
+          class="mr-4"
+          @click="editarAvaliacao(avaliacao)"
+          color="success"
+        >Editar</v-btn>
+        <v-btn v-else class="mr-4" @click="addAvaliacao()" color="success">Salvar</v-btn>
+        <router-link to="/avaliacoes" tag="button">
           <v-btn color="error">Cancelar</v-btn>
         </router-link>
       </div>
@@ -227,24 +247,31 @@ export default {
   },
   data() {
     return {
+      atletas: [],
+      atleta: {},
       nome: "",
       cpf: "",
       dtNascimento: "",
       indicacao: "",
+      posicao: "",
       dtCadastro: "",
-      posicao: {},
       posicoes: [],
-      avaliacoes:[],
-      avaliacao:{},
+      statusList: [],
+      status: {},
+      avaliacoes: [],
+      avaliacao: {},
+      categorias: [],
+      categoria: {},
+      treinadores: [],
+      treinador: {},
+      nota: "",
       id: this.$route.params.id,
       cpfMask: "###.###.###-##",
       dataMask: "##/##/####",
       notaMask: "#,##",
-      atleta:{},
-      date1: new Date().toISOString().substr(0, 10),
-      date2: new Date().toISOString().substr(0, 10),
-      date3: new Date().toISOString().substr(0, 10),
-      menu1: false,
+      date: new Date().toISOString().substr(0, 10),
+      date2: "",
+      date3: "",
       menu2: false,
       menu3: false
     };
@@ -255,115 +282,195 @@ export default {
       this.$http
         .get("http://localhost:3000/avaliacoes/" + this.id)
         .then(res => res.json())
-        .then(atleta => (this.atleta = atleta));
+        .then(avaliacao => (this.avaliacao = avaliacao));
     }
+
+    this.$http
+      .get("http://localhost:3000/atletas/")
+      .then(res => res.json())
+      .then(atletas => (this.atletas = atletas));
 
     this.$http
       .get("http://localhost:3000/status")
       .then(res => res.json())
-      .then(posicoes => {
-        this.posicoes = posicoes;
+      .then(status => {
+        this.statusList = status;
+        //.map(x => ({ text: x.nome, value: x.id }));
+      });
+
+    this.$http
+      .get("http://localhost:3000/categorias")
+      .then(res => res.json())
+      .then(categorias => {
+        this.categorias = categorias;
+        //.map(x => ({ text: x.nome, value: x.id }));
+      });
+
+    this.$http
+      .get("http://localhost:3000/treinadores")
+      .then(res => res.json())
+      .then(treinadores => {
+        this.treinadores = treinadores;
         //.map(x => ({ text: x.nome, value: x.id }));
       });
   },
 
-  beforeMount() {
-    if (this.id) {
-      this.$http
-        .get("http://localhost:3000/atletas/" + this.id)
-        .then(res => res.json())
-        .then(atleta => (this.atleta = atleta));
-    }
-  },
-
   methods: {
-    addAtleta() {
+    addAvaliacao() {
       let now = new Date();
       this.dtCadastro =
         now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
-      let _atleta = {
+      this.categoria = this.categorias.filter(
+        x => x.id == this.categoria.id
+      )[0];
+      this.treinador = this.treinadores.filter(
+        x => x.id == this.treinador.id
+      )[0];
+      this.status = this.statusList.filter(x => x.id == this.status.id)[0];
+      if (this.date2) {
+        let dataInicio = new Date(this.date2);
+        this.dtInicio =
+          dataInicio.getDate() +
+          "/" +
+          (dataInicio.getMonth() + 1) +
+          "/" +
+          dataInicio.getFullYear();
+      }
+      if (this.date3) {
+        let dataDispensa = new Date(this.date3);
+        this.dtDispensa =
+          dataDispensa.getDate() +
+          "/" +
+          (dataDispensa.getMonth() + 1) +
+          "/" +
+          dataDispensa.getFullYear();
+      }
+      let _avaliacao = {
         nome: this.nome,
-        email: this.email,
         cpf: this.cpf,
-        rg: this.rg,
-        endereco: this.endereco,
-        num: this.num,
-        bairro: this.bairro,
-        cep: this.cep,
-        cidade: this.cidade,
-        uf: this.uf,
-        celular: this.celular,
-        tel: this.tel,
-        escolaridade: this.escolaridade,
-        nomeEscola: this.nomeEscola,
-        pai: this.pai,
-        mae: this.mae,
+        dtNascimento: this.dtNascimento,
+        posicao: this.posicao,
         indicacao: this.indicacao,
-        federado: this.federado,
-        federacao: this.federacao,
-        dtCadastro: this.dtCadastro
+        nota: this.nota,
+        treinador: {
+          id: this.treinador.id,
+          nome: this.treinador.nome
+        },
+        categoria: {
+          id: this.categoria.id,
+          nome: this.categoria.nome
+        },
+        status: {
+          id: this.status.id,
+          nome: this.status.nome
+        },
+        dtInicio: this.dtInicio,
+        dtDispensa: this.dtDispensa,
+        dtCadastro: this.dtCadastro,
+        cadastradoPor: this.cadastradoPor,
+        observacao: this.observacao
       };
       this.$http
-        .post("http://localhost:3000/atletas", _atleta)
+        .post("http://localhost:3000/avaliacoes", _avaliacao)
         .then(res => res.json())
         .then(
           (this.nome = ""),
-          (this.email = ""),
           (this.cpf = ""),
-          (this.rg = ""),
-          (this.endereco = ""),
-          (this.num = ""),
-          (this.bairro = ""),
-          (this.cep = ""),
-          (this.cidade = ""),
-          (this.uf = ""),
-          (this.celular = ""),
-          (this.tel = ""),
-          (this.escolaridade = ""),
-          (this.nomeEscola = ""),
-          (this.pai = ""),
-          (this.mae = ""),
+          (this.dtNascimento = ""),
           (this.indicacao = ""),
-          (this.federado = ""),
-          (this.federacao = ""),
+          (this.posicao = ""),
+          (this.nota = ""),
+          (this.treinador = ""),
+          (this.categoria = ""),
+          (this.dtInicio = ""),
+          (this.dtDispensa = ""),
           (this.dtCadastro = ""),
-          this.$router.push("/atletas")
+          (this.cadastradoPor = ""),
+          (this.status = ""),
+          this.$router.push("/avaliacoes")
         );
     },
 
-    editarAtleta(_atleta) {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
-      let _atletaEditar = {
-        id: _atletaEditar.id,
-        nome: _atletaEditar.nome,
-        email: _atletaEditar.email,
-        cpf: _atletaEditar.cpf,
-        rg: _atletaEditar.rg,
-        endereco: _atletaEditar.endereco,
-        num: _atletaEditar.num,
-        bairro: _atletaEditar.bairro,
-        cep: _atletaEditar.cep,
-        cidade: _atletaEditar.cidade,
-        uf: _atletaEditar.uf,
-        celular: _atletaEditar.celular,
-        tel: _atletaEditar.tel,
-        escolaridade: _atletaEditar.escolaridade,
-        nomeEscola: _atletaEditar.nomeEscola,
-        pai: _atletaEditar.pai,
-        mae: _atletaEditar.mae,
-        indicacao: _atletaEditar.indicacao,
-        federado: _atletaEditar.federado,
-        federacao: _atletaEditar.federacao,
-        dtCadastro: _atletaEditar.dtCadastro,
-        posicao: _atleta.posicao
+    editarAvaliacao(_avaliacao) {
+      this.categoria = this.categorias.filter(
+        x => x.id == _avaliacao.categoria.id
+      )[0];
+      this.treinador = this.treinadores.filter(
+        x => x.id == _avaliacao.treinador.id
+      )[0];
+      this.status = this.statusList.filter(
+        x => x.id == _avaliacao.status.id
+      )[0];
+      if (this.date2) {
+        let dataInicio = new Date(this.date2);
+        this.dtInicio =
+          dataInicio.getDate() +
+          1 +
+          "/" +
+          (dataInicio.getMonth() + 1) +
+          "/" +
+          dataInicio.getFullYear();
+      }
+      if (this.date3) {
+        let dataDispensa = new Date(this.date3);
+        this.dtDispensa =
+          dataDispensa.getDate() +
+          1 +
+          "/" +
+          (dataDispensa.getMonth() + 1) +
+          "/" +
+          dataDispensa.getFullYear();
+      }
+      let _avaliacaoEditar = {
+        nome: _avaliacao.nome,
+        cpf: _avaliacao.cpf,
+        indicacao: _avaliacao.indicacao,
+        treinador: {
+          id: this.treinador.id,
+          nome: this.treinador.nome
+        },
+        categoria: {
+          id: this.categoria.id,
+          nome: this.categoria.nome
+        },
+        nota: _avaliacao.nota,
+        dtNascimento: _avaliacao.dtNascimento,
+        dtInicio: _avaliacao.dtInicio,
+        dtDispensa: _avaliacao.dtDispensa,
+        posicao: _avaliacao.posicao,
+        status: {
+          id: this.status.id,
+          nome: this.status.nome
+        }
       };
       this.$http.put(
-        `http://localhost:3000/atletas/${_atleta.id}`,
-        _atletaEditar
+        `http://localhost:3000/avaliacoes/${_avaliacao.id}`,
+        _avaliacaoEditar
       );
-      this.$router.push("/atletas");
+      this.$router.push("/avaliacoes");
+    },
+    carregarAtletaPorCPF() {
+      this.$http
+        .get("http://localhost:3000/atletas")
+        .then(res => res.json())
+        .then(atletas => (this.atletas = atletas));
+      this.atleta = this.atletas.filter(x => x.cpf == this.cpf)[0];
+      this.nome = this.atleta.nome;
+      this.posicao = this.atleta.posicao.nome;
+      this.dtNascimento = this.atleta.dtNascimento;
+      this.indicacao = this.atleta.indicacao;
+    },
+    carregarAtletaPorNome(atleta) {
+      this.$http
+        .get("http://localhost:3000/atletas")
+        .then(res => res.json())
+        .then(atletas => (this.atletas = atletas));
+      this.atleta = this.atletas.filter(x => x.nome === atleta.nome)[0];
+      this.cpf = this.atleta.cpf;
+      this.nome = this.atleta.nome;
+      this.posicao = this.atleta.posicao.nome;
+      this.dtNascimento = this.atleta.dtNascimento;
+      this.indicacao = this.atleta.indicacao;
     }
   }
 };

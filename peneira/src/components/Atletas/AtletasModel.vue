@@ -35,31 +35,31 @@
             <v-text-field v-else v-model="rg" v-mask="rgMask" label="RG" required></v-text-field>
           </div>
           <div style="width: 20%;">
-        <v-menu
-          ref="menu"
-          v-model="menu"
-          :close-on-content-click="false"
-          :return-value.sync="date"
-          transition="scale-transition"
-          offset-y
-          full-width
-          min-width="290px"
-        >
-          <template v-slot:activator="{ on }">
-            <v-text-field
-              v-model="date"
-              label="Data de Nascimento"
-              prepend-icon="mdi-calendar-month"
-              v-on="on"
-            ></v-text-field>
-          </template>
-          <v-date-picker v-model="date" no-title scrollable>
-            <div class="flex-grow-1"></div>
-            <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
-            <v-btn text color="primary" @click="$refs.menu.save(date)">OK</v-btn>
-          </v-date-picker>
-        </v-menu>
-      </div>
+            <v-menu
+              ref="menu"
+              v-model="menu"
+              :close-on-content-click="false"
+              :return-value.sync="atleta.dtNascimento"
+              transition="scale-transition"
+              offset-y
+              full-width
+              min-width="290px"
+            >
+              <template v-slot:activator="{ on }">
+                <v-text-field
+                  v-model="atleta.dtNascimento"
+                  label="Data de Nascimento"
+                  prepend-icon="mdi-calendar-month"
+                  v-on="on"
+                ></v-text-field>
+              </template>
+              <v-date-picker v-model="date" no-title scrollable>
+                <div class="flex-grow-1"></div>
+                <v-btn text color="primary" @click="menu = false">Cancel</v-btn>
+                <v-btn text color="primary" @click="$refs.menu.save(date)">OK</v-btn>
+              </v-date-picker>
+            </v-menu>
+          </div>
         </div>
       </div>
     </div>
@@ -85,37 +85,28 @@
       </div>
       <div style="width: 8%;">
         <v-text-field v-if="this.id" v-mask="cepMask" v-model="atleta.cep" label="CEP" required></v-text-field>
-        <v-text-field v-else v-model="cep" v-mask="cepMask" label="CEP" required></v-text-field>        
+        <v-text-field v-else v-model="cep" v-mask="cepMask" label="CEP" required></v-text-field>
       </div>
-      <div style="width: 4%; margin-right:4%; display: flex">        
-          <v-icon style="vertical-align:middle">mdi-magnify</v-icon>        
-        </div>
+      <div style="width: 4%; margin-right:4%; display: flex">
+        <v-icon style="vertical-align:middle">mdi-magnify</v-icon>
+      </div>
       <div style="width: 40%; margin-right:4%">
         <v-text-field v-if="this.id" v-model="atleta.cidade" label="Cidade" required></v-text-field>
         <v-text-field v-else v-model="cidade" label="Cidade" required></v-text-field>
       </div>
       <div style="width: 6%">
-        <v-select
-          v-if="this.id"
-          name="uf"
-          v-model="atleta.uf"
-          :items="ufs"
-          label="UF"
-          required
-        ></v-select>
-        <v-select
-          v-else
-          name="uf"
-          v-model="uf"
-          :items="ufs"
-          label="UF"
-          required
-        ></v-select>
+        <v-select v-if="this.id" name="uf" v-model="atleta.uf" :items="ufs" label="UF" required></v-select>
+        <v-select v-else name="uf" v-model="uf" :items="ufs" label="UF" required></v-select>
       </div>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 48%; margin-right:4%">
-        <v-text-field v-if="this.id" v-mask="celMask" v-model="atleta.celular" label="Telefone Celular"></v-text-field>
+        <v-text-field
+          v-if="this.id"
+          v-mask="celMask"
+          v-model="atleta.celular"
+          label="Telefone Celular"
+        ></v-text-field>
         <v-text-field v-else v-mask="celMask" v-model="celular" label="Telefone Celular" required></v-text-field>
       </div>
       <div style="width: 48%">
@@ -164,7 +155,7 @@
         <v-select
           v-if="this.id"
           name="posicao"
-          v-model="atleta.posicao"
+          v-model="atleta.posicao.id"
           :items="posicoes"
           item-text="nome"
           item-value="id"
@@ -173,10 +164,10 @@
         ></v-select>
         <v-select
           v-else
-          v-model="posicao"
+          v-model="posicao.id"
           :items="posicoes"
           item-text="nome"
-          item-value="posicao"
+          item-value="id"
           label="posicao"
           name="posicao"
           required
@@ -190,23 +181,34 @@
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 12%; margin-right:4%; margin-top: 15px">
         <v-checkbox
-        v-if="this.id"
+          v-if="this.id"
           v-model="atleta.federado"
           label="Atleta Federado"
           hide-details
           class="shrink mr-2 mt-0"
         ></v-checkbox>
         <v-checkbox
-        v-else
+          v-else
           v-model="federado"
           label="Atleta Federado"
           hide-details
           class="shrink mr-2 mt-0"
-        ></v-checkbox>        
+        ></v-checkbox>
       </div>
       <div style="width: 84%">
-        <v-text-field :disabled="!atleta.federado" v-if="this.id" v-model="atleta.federacao" label="Qual Federação?"></v-text-field>
-        <v-text-field :disabled="!federado" v-else v-model="federacao" label="Qual Federação?" required></v-text-field>
+        <v-text-field
+          :disabled="!atleta.federado"
+          v-if="this.id"
+          v-model="atleta.federacao"
+          label="Qual Federação?"
+        ></v-text-field>
+        <v-text-field
+          :disabled="!federado"
+          v-else
+          v-model="federacao"
+          label="Qual Federação?"
+          required
+        ></v-text-field>
       </div>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
@@ -224,43 +226,44 @@
 <script>
 import Nav from "../Nav/Nav";
 import PictureInput from "vue-picture-input";
-import { mask } from 'vue-the-mask'
+import { mask } from "vue-the-mask";
 export default {
   components: {
     Nav,
     PictureInput
   },
   directives: {
-      mask,
-    },
+    mask
+  },
   data() {
     return {
       nome: "",
       email: "",
-      cpf:"",
-      rg:"",
-      dtNascimento:"",
-      endereco:"",
-      num:"",
-      bairro:"",
+      cpf: "",
+      rg: "",
+      vmodelDtNascimento: "13/09/1988",
+      dtNascimento: "",
+      endereco: "",
+      num: "",
+      bairro: "",
       cep: "",
-      cidade:"",
-      uf:"",
-      celular:"",
-      tel:"",
-      escolaridade:"",
-      nomeEscola:"",
-      pai:"",
-      mae:"",      
-      indicacao:"",
+      cidade: "",
+      uf: "",
+      celular: "",
+      tel: "",
+      escolaridade: "",
+      nomeEscola: "",
+      pai: "",
+      mae: "",
+      indicacao: "",
       federado: "",
-      federacao:"",
+      federacao: "",
       dtCadastro: "",
       atleta: {},
       posicao: {},
       posicoes: [],
       id: this.$route.params.id,
-      escolaridades:[
+      escolaridades: [
         "Ensino Fundamental - Incompleto",
         "Ensino Fundamental - Completo",
         "Ensino Médio - Incompleto",
@@ -274,7 +277,7 @@ export default {
         "Pós-graduação (Stricto sensu, nível doutor) - Incompleto",
         "Pós-graduação (Stricto sensu, nível doutor) - Completo"
       ],
-      ufs:[
+      ufs: [
         "AC",
         "AL",
         "AM",
@@ -305,12 +308,12 @@ export default {
       ],
       date: new Date().toISOString().substr(0, 10),
       menu: false,
-      cpfMask: '###.###.###-##',
-      rgMask: '##.###.###-#',
-      dataMask: '##/##/####',
-      celMask: '(##) #####-####',
-      telMask: '(##) ####-####',
-      cepMask: '##.###-###'
+      cpfMask: "###.###.###-##",
+      rgMask: "##.###.###-#",
+      dataMask: "##/##/####",
+      celMask: "(##) #####-####",
+      telMask: "(##) ####-####",
+      cepMask: "##.###-###"
     };
   },
 
@@ -329,68 +332,87 @@ export default {
         this.posicoes = posicoes;
         //.map(x => ({ text: x.nome, value: x.id }));
       });
-    },
+  },
 
-    beforeMount() {
+  beforeMount() {
     if (this.id) {
       this.$http
         .get("http://localhost:3000/atletas/" + this.id)
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }
-    },
+  },
 
   methods: {
     addAtleta() {
       let now = new Date();
       this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();      
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.posicao = this.posicoes.filter(x => x.id == this.posicao.id)[0];
+      let data = new Date(this.date);
+      this.dtNascimento =
+        data.getDate() +
+        1 +
+        "/" +
+        (data.getMonth() + 1) +
+        "/" +
+        data.getFullYear();
       let _atleta = {
         nome: this.nome,
         email: this.email,
-        cpf:this.cpf,
-        rg:this.rg,
-        endereco:this.endereco,
-        num:this.num,
-        bairro:this.bairro,
+        cpf: this.cpf,
+        rg: this.rg,
+        endereco: this.endereco,
+        num: this.num,
+        bairro: this.bairro,
         cep: this.cep,
-        cidade:this.cidade,
-        uf:this.uf,
-        celular:this.celular,
-        tel:this.tel,
-        escolaridade:this.escolaridade,
-        nomeEscola:this.nomeEscola,
-        pai:this.pai,
-        mae:this.mae,      
-        indicacao:this.indicacao,
-        federado:this.federado,
-        federacao:this.federacao,
-        dtCadastro: this.dtCadastro             
+        cidade: this.cidade,
+        uf: this.uf,
+        celular: this.celular,
+        tel: this.tel,
+        escolaridade: this.escolaridade,
+        nomeEscola: this.nomeEscola,
+        pai: this.pai,
+        mae: this.mae,
+        posicao: {
+          id: this.posicao.id,
+          nome: this.posicao.nome
+        },
+        indicacao: this.indicacao,
+        federado: this.federado,
+        federacao: this.federacao,
+        dtCadastro: this.dtCadastro,
+        dtNascimento: this.dtNascimento
       };
       this.$http
         .post("http://localhost:3000/atletas", _atleta)
         .then(res => res.json())
         .then(
-          this.nome = "",
-          this.email = "",
-          this.cpf = "",
-          this.rg = "",
-          this.endereco = "",
-          this.num = "",
-          this.bairro = "",
-          this.cep = "",
-          this.cidade = "",
-          this.uf = "",
-          this.celular = "",
-          this.tel = "",
-          this.escolaridade = "",
-          this.nomeEscola = "",
-          this.pai = "",
-          this.mae = "",      
-          this.indicacao = "",
-          this.federado = "",
-          this.federacao = "",
-          this.dtCadastro = "" ,
+          (this.nome = ""),
+          (this.email = ""),
+          (this.cpf = ""),
+          (this.rg = ""),
+          (this.endereco = ""),
+          (this.num = ""),
+          (this.bairro = ""),
+          (this.cep = ""),
+          (this.cidade = ""),
+          (this.uf = ""),
+          (this.celular = ""),
+          (this.tel = ""),
+          (this.escolaridade = ""),
+          (this.nomeEscola = ""),
+          (this.posicao = {
+            id: "",
+            nome: ""
+          }),
+          (this.pai = ""),
+          (this.mae = ""),
+          (this.indicacao = ""),
+          (this.federado = ""),
+          (this.federacao = ""),
+          (this.dtCadastro = ""),
+          (this.dtNascimento = ""),
           this.$router.push("/atletas")
         );
     },
@@ -398,30 +420,42 @@ export default {
     editarAtleta(_atleta) {
       let now = new Date();
       this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();   
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      let data = new Date(this.date);
+      let dataNascimento =
+        data.getDate() +
+        1 +
+        "/" +
+        (data.getMonth() + 1) +
+        "/" +
+        data.getFullYear();
+      this.posicao = this.posicoes.filter(x => x.id == _atleta.posicao.id)[0];
       let _atletaEditar = {
-        id: _atletaEditar.id,
-        nome: _atletaEditar.nome,
-        email: _atletaEditar.email,
-        cpf:_atletaEditar.cpf,
-        rg:_atletaEditar.rg,
-        endereco:_atletaEditar.endereco,
-        num:_atletaEditar.num,
-        bairro:_atletaEditar.bairro,
-        cep: _atletaEditar.cep,
-        cidade:_atletaEditar.cidade,
-        uf:_atletaEditar.uf,
-        celular:_atletaEditar.celular,
-        tel:_atletaEditar.tel,
-        escolaridade:_atletaEditar.escolaridade,
-        nomeEscola:_atletaEditar.nomeEscola,
-        pai:_atletaEditar.pai,
-        mae:_atletaEditar.mae,      
-        indicacao:_atletaEditar.indicacao,
-        federado:_atletaEditar.federado,
-        federacao:_atletaEditar.federacao,
-        dtCadastro: _atletaEditar.dtCadastro,        
-        posicao: _atleta.posicao
+        nome: _atleta.nome,
+        email: _atleta.email,
+        cpf: _atleta.cpf,
+        rg: _atleta.rg,
+        endereco: _atleta.endereco,
+        num: _atleta.num,
+        bairro: _atleta.bairro,
+        cep: _atleta.cep,
+        cidade: _atleta.cidade,
+        uf: _atleta.uf,
+        celular: _atleta.celular,
+        tel: _atleta.tel,
+        escolaridade: _atleta.escolaridade,
+        nomeEscola: _atleta.nomeEscola,
+        pai: _atleta.pai,
+        mae: _atleta.mae,
+        indicacao: _atleta.indicacao,
+        federado: _atleta.federado,
+        federacao: _atleta.federacao,
+        dtCadastro: _atleta.dtCadastro,
+        posicao: {
+          id: this.posicao.id,
+          nome: this.posicao.nome
+        },
+        dtNascimento: dataNascimento
       };
       this.$http.put(
         `http://localhost:3000/atletas/${_atleta.id}`,
@@ -430,9 +464,7 @@ export default {
       this.$router.push("/atletas");
     }
   }
-
-  }
-
+};
 </script>
 
 <style lang="scss" scoped>

@@ -7,7 +7,10 @@
       "senhaAux1": "123",
       "senhaAux2": "123",
       "dtCadastro": "29/8/2019",
-      "perfil": 1,
+      "perfil": {
+        "nome": "Administrador",
+        "id": 1
+      },
       "id": 1
     },
     {
@@ -16,8 +19,11 @@
       "senha": "12345",
       "senhaAux1": "12345",
       "senhaAux2": "12345",
-      "dtCadastro": "21/8/2019",
-      "perfil": 2,
+      "dtCadastro": "25/9/2019",
+      "perfil": {
+        "id": 1,
+        "nome": "Treinador"
+      },
       "id": 5
     },
     {
@@ -27,8 +33,23 @@
       "senhaAux1": "1234",
       "senhaAux2": "1234",
       "dtCadastro": "26/8/2019",
-      "perfil": 3,
+      "perfil": {
+        "nome": "Somente Leitura",
+        "id": 3
+      },
       "id": 6
+    },
+    {
+      "nome": "Teste",
+      "email": "Teste@email.com",
+      "dtCadastro": "27/9/2019",
+      "perfil": {
+        "id": 3,
+        "nome": "Somente Leitura"
+      },
+      "senhaAux1": "teste",
+      "senhaAux2": "teste",
+      "id": 7
     }
   ],
   "perfis": [
@@ -123,6 +144,11 @@
       "nome": "Sub-20",
       "dtCadastro": "21/8/2019",
       "id": 5
+    },
+    {
+      "nome": "Veteranos",
+      "dtCadastro": "27/9/2019",
+      "id": 6
     }
   ],
   "status": [
@@ -169,19 +195,19 @@
       "id": 5
     },
     {
-      "nome": "Zagueiro",
-      "dtCadastro": "22/8/2019",
+      "nome": "Meio-campo",
+      "dtCadastro": "26/8/2019",
       "id": 6
     },
     {
-      "nome": "Meio-campo",
-      "dtCadastro": "26/8/2019",
-      "id": 7
-    },
-    {
-      "id": 8,
+      "id": 7,
       "nome": "Ponta-Direita",
       "dtCadastro": "29/8/2019"
+    },
+    {
+      "nome": "Zagueiro",
+      "dtCadastro": "27/9/2019",
+      "id": 8
     }
   ],
   "treinadores": [
@@ -199,6 +225,16 @@
       "nome": "Caique",
       "dtCadastro": "22/8/2019",
       "id": 3
+    },
+    {
+      "nome": "Rafael",
+      "dtCadastro": "27/9/2019",
+      "id": 4
+    },
+    {
+      "nome": "Tadeu",
+      "dtCadastro": "27/9/2019",
+      "id": 5
     }
   ],
   "atletas": [
@@ -231,43 +267,42 @@
       "dtCadastro": "26/8/2019"
     },
     {
-      "id": 2,
       "nome": "Victor Alves Arbex",
       "email": "arbex.victor@gmail.com",
-      "cpf": "123.456.789.01",
+      "cpf": "123.456.789-01",
       "rg": "27.524.173-7",
-      "dtNascimento": "12/08/2010",
       "endereco": "Rua Júlio Sayago",
       "num": 115,
       "bairro": "Vila Ré",
-      "cep": "03669-010",
+      "cep": "03.669-010",
       "cidade": "São Paulo",
       "uf": "SP",
-      "celular": "(11)97466-4075",
-      "tel": "(11)2791-5506",
+      "celular": "(11) 97466-4075",
+      "tel": "(11) 2791-5506",
       "escolaridade": "Ensino Fundamental",
       "nomeEscola": "Universitário Leste",
       "pai": "André Elias Alves Arbex",
       "mae": "Marcia Alves Arbex",
+      "indicacao": "José Alves",
+      "federado": false,
+      "federacao": "",
+      "dtCadastro": "26/8/2019",
       "posicao": {
         "id": 7,
         "nome": "Meio-campo"
       },
-      "indicacao": "José Alves",
-      "federado": false,
-      "federacao": "",
-      "dtCadastro": "26/8/2019"
+      "dtNascimento": "26/9/2019",
+      "id": 2
     },
     {
       "nome": "Arthur Alves Arbex",
       "email": "arbex.arthur@gmail.com",
       "cpf": "305.263.238-84",
       "rg": "27.524.173-7",
-      "dtNascimento": "01/08/2014",
       "endereco": "Rua Júlio Sayago",
       "num": "115",
       "bairro": "Vila Ré",
-      "cep": "03669-010",
+      "cep": "03.669-010",
       "cidade": "São Paulo",
       "uf": "SP",
       "celular": "(11) 97466-4075",
@@ -276,122 +311,190 @@
       "nomeEscola": "Universitário Leste",
       "pai": "André Elias Alves Arbex",
       "mae": "Marcia Alves Arbex",
-      "posicao": {
-        "nome": "Centro-Avante",
-        "dtCadastro": "22/8/2019",
-        "id": 3
-      },
       "indicacao": "Ari Alberto",
       "federado": false,
       "federacao": "RSoccer",
       "dtCadastro": "27/8/2019",
+      "posicao": {
+        "id": 8,
+        "nome": "Ponta-Direita"
+      },
+      "dtNascimento": "27/9/2019",
       "id": 3
+    },
+    {
+      "nome": "Ari Alberto",
+      "email": "ari.alberto@gmail.com",
+      "cpf": "123.456.789-12",
+      "rg": "12.345.678-9",
+      "endereco": "Rua Julio Sayago",
+      "num": "115",
+      "bairro": "",
+      "cep": "03.669-010",
+      "cidade": "São Paulo",
+      "uf": "BA",
+      "celular": "(11) 97466-4075",
+      "tel": "",
+      "escolaridade": "Ensino Fundamental - Completo",
+      "nomeEscola": "ANDRE ELIAS",
+      "pai": "ARBEX",
+      "mae": "aaaaa",
+      "indicacao": "aaaaaa",
+      "federado": "",
+      "federacao": "",
+      "dtCadastro": "23/9/2019",
+      "posicao": {
+        "id": 4,
+        "nome": "Lateral Direito"
+      },
+      "dtNascimento": "27/9/2019",
+      "id": 4
+    },
+    {
+      "nome": "Guilherme Dias Vasconcelos",
+      "email": "guilherme@e-mail.com",
+      "cpf": "123.456.789-78",
+      "rg": "27.758.963-4",
+      "endereco": "Rua Julio Sayago",
+      "num": "115",
+      "bairro": "Jabaquara",
+      "cep": "03.669-010",
+      "cidade": "São Paulo",
+      "uf": "AP",
+      "celular": "(11) 97466-4075",
+      "tel": "(11) 2781-9536",
+      "escolaridade": "Ensino Médio - Completo",
+      "nomeEscola": "ANDRE ELIAS",
+      "pai": "Marcelo",
+      "mae": "Bete",
+      "indicacao": "Tio André",
+      "federado": true,
+      "federacao": "Vila Ré FC",
+      "dtCadastro": "25/9/2019",
+      "posicao": {
+        "id": 3,
+        "nome": "Centro-Avante"
+      },
+      "dtNascimento": "25/9/2019",
+      "id": 5
     }
   ],
   "avaliacoes": [
     {
-      "id": 1,
-      "atleta": {
-        "id": 1,
-        "nome": "André Elias Alves Arbex",
-        "email": "arbex.andre@gmail.com",
-        "cpf": "305.263.238-84",
-        "rg": "27.524.173-7",
-        "dtNascimento": "13/09/1981",
-        "endereco": "Rua Júlio Sayago",
-        "num": 115,
-        "bairro": "Vila Ré",
-        "cep": "03669-010",
-        "cidade": "São Paulo",
-        "uf": "SP",
-        "celular": "(11)97466-4075",
-        "tel": "(11)2791-5506",
-        "escolaridade": "Superior Completo",
-        "nomeEscola": "EEPSG Maria Aparecida de Castro Masiero",
-        "pai": "Nadra Elias Arbex Junior",
-        "mae": "Rosely Alves Arbex",
-        "posicao": {
-          "id": 2,
-          "nome": "Atacante"
-        },
-        "indicacao": "João Silva",
-        "federado": true,
-        "federacao": "Acme Futebol Clube",
-        "dtCadastro": "26/8/2019"
-      },
+      "nome": "André Elias Alves Arbex",
+      "cpf": "305.263.238-84",
+      "dtNascimento": "13/09/1981",
+      "posicao": "Atacante",
+      "indicacao": "João Silva",
+      "nota": "9,9",
       "treinador": {
-        "id": 1,
-        "nome": "José",
-        "dtCadastro": "22/8/2019"
+        "id": 2,
+        "nome": "Luiz"
       },
       "categoria": {
-        "nome": "Sub-20",
-        "dtCadastro": "21/8/2019",
-        "id": 5
+        "id": 5,
+        "nome": "Sub-20"
       },
       "status": {
-        "nome": "Em avaliação",
-        "dtCadastro": "21/8/2019",
-        "id": 2
+        "id": 3,
+        "nome": "Dispensado"
       },
-      "dtInicio": "01/08/2019",
-      "dtDispensa": "",
-      "nota": "8.5",
-      "observacao": "",
-      "cadastradoPor": "Fabrício Sanches",
-      "dtCadastro": "28/08/2019"
+      "dtInicio": "31/08/2018",
+      "dtDispensa": "29/09/2019",
+      "dtCadastro": "27/9/2019",
+      "id": 1
     },
     {
-      "id": 2,
-      "atleta": {
-        "id": 2,
-        "nome": "Victor Alves Arbex",
-        "email": "arbex.victor@gmail.com",
-        "cpf": "123.456.789.01",
-        "rg": "27.524.173-7",
-        "dtNascimento": "12/08/2010",
-        "endereco": "Rua Júlio Sayago",
-        "num": 115,
-        "bairro": "Vila Ré",
-        "cep": "03669-010",
-        "cidade": "São Paulo",
-        "uf": "SP",
-        "celular": "(11)97466-4075",
-        "tel": "(11)2791-5506",
-        "escolaridade": "Ensino Fundamental",
-        "nomeEscola": "Universitário Leste",
-        "pai": "André Elias Alves Arbex",
-        "mae": "Marcia Alves Arbex",
-        "posicao": {
-          "id": 7,
-          "nome": "Meio-campo"
-        },
-        "indicacao": "José Alves",
-        "federado": false,
-        "federacao": "",
-        "dtCadastro": "26/8/2019"
-      },
+      "nome": "Victor Alves Arbex",
+      "cpf": "123.456.789-01",
+      "dtNascimento": "26/9/2019",
+      "posicao": "Meio-campo",
+      "indicacao": "José Alves",
+      "nota": "",
       "treinador": {
-        "nome": "Luiz",
-        "dtCadastro": "22/8/2019",
-        "id": 2
+        "id": 3,
+        "nome": "Caique"
       },
       "categoria": {
         "id": 1,
-        "nome": "Sub-11",
-        "dtCadastro": "21/8/2019"
+        "nome": "Sub-11"
       },
       "status": {
         "id": 1,
-        "nome": "Em espera",
-        "dtCadastro": "21/8/2019"
+        "nome": "Em espera"
       },
-      "dtInicio": "30/08/2019",
-      "dtDispensa": "",
+      "dtInicio": "01/09/2019",
+      "dtCadastro": "27/9/2019",
+      "id": 2
+    },
+    {
+      "nome": "Ari Alberto",
+      "cpf": "123.456.789-12",
+      "indicacao": "aaaaaa",
+      "treinador": {
+        "id": 2,
+        "nome": "Luiz"
+      },
+      "categoria": {
+        "id": 5,
+        "nome": "Sub-20"
+      },
       "nota": "",
-      "observacao": "",
-      "cadastradoPor": "Fabrício Sanches",
-      "dtCadastro": "28/08/2019"
+      "dtNascimento": "17/9/2019",
+      "dtInicio": "20/9/2019",
+      "posicao": "Meio-campo",
+      "status": {
+        "id": 2,
+        "nome": "Em avaliação"
+      },
+      "id": 3
+    },
+    {
+      "nome": "Arthur Alves Arbex",
+      "cpf": "305.263.238-84",
+      "dtNascimento": "01/08/2014",
+      "posicao": "Centro-Avante",
+      "indicacao": "Ari Alberto",
+      "nota": "",
+      "treinador": {
+        "id": 2,
+        "nome": "Luiz"
+      },
+      "categoria": {
+        "id": 2,
+        "nome": "Sub-13"
+      },
+      "status": {
+        "id": 2,
+        "nome": "Em avaliação"
+      },
+      "dtInicio": "13/9/2019",
+      "dtCadastro": "27/9/2019",
+      "id": 4
+    },
+    {
+      "nome": "Guilherme Dias Vasconcelos",
+      "cpf": "123.456.789-78",
+      "dtNascimento": "25/9/2019",
+      "posicao": "Centro-Avante",
+      "indicacao": "Tio André",
+      "nota": "9,5",
+      "treinador": {
+        "id": 2,
+        "nome": "Luiz"
+      },
+      "categoria": {
+        "id": 3,
+        "nome": "Sub-15"
+      },
+      "status": {
+        "id": 2,
+        "nome": "Em avaliação"
+      },
+      "dtInicio": "25/9/2019",
+      "dtDispensa": "27/9/2019",
+      "dtCadastro": "27/9/2019",
+      "id": 6
     }
   ]
 }

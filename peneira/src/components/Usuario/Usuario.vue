@@ -99,23 +99,11 @@ export default {
       select: null,
       usuarios: [],
       usuario: {},
-      perfis: [],
       id: this.$route.params.id
     };
   },
 
   created() {
-    this.$http
-      .get("http://localhost:3000/usuarios/")
-      .then(res => res.json())
-      .then(usuarios => (this.usuarios = usuarios));
-
-    this.$http
-      .get("http://localhost:3000/perfis")
-      .then(res => res.json())
-      .then(perfil => (this.perfis = perfil));
-  },
-  beforeMount() {
     this.$http
       .get("http://localhost:3000/usuarios/")
       .then(res => res.json())

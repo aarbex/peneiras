@@ -12,7 +12,7 @@
         <v-select
           v-if="this.id"
           name="perfil"
-          v-model="usuario.perfil"
+          v-model="usuario.perfil.id"
           :items="perfis"
           item-text="nome"
           item-value="id"
@@ -21,10 +21,10 @@
         ></v-select>
         <v-select
           v-else
-          v-model="perfil"
+          v-model="perfil.id"
           :items="perfis"
           item-text="nome"
-          item-value="perfil"
+          item-value="id"
           label="Perfil"
           name="perfil"
           required
@@ -94,6 +94,15 @@ export default {
       });
   },
 
+  beforeMount() {
+    if (this.id) {
+      this.$http
+        .get("http://localhost:3000/usuarios/" + this.id)
+        .then(res => res.json())
+        .then(usuario => (this.usuario = usuario));
+    }
+  },
+
   methods: {
     addUsuario() {
       let now = new Date();
@@ -103,12 +112,16 @@ export default {
       if (this.senha1 === this.senha2) {
         _senha = this.senha1;
       }
+      this.perfil = this.perfis.filter(x => x.id == this.perfil.id)[0];
       let _usuario = {
         nome: this.nome,
         email: this.email,
         senha: _senha,
         dtCadastro: this.dtCadastro,
-        perfil: this.perfil,
+        perfil: {
+          id: this.perfil.id,
+          nome: this.perfil.nome
+        },
         senhaAux1: this.senhaAux1,
         senhaAux2: this.senhaAux2
       };
@@ -135,7 +148,7 @@ export default {
       if (_usuario.senhaAux1 === _usuario.senhaAux2) {
         _senha = _usuario.senhaAux1;
       }
-
+      this.perfil = this.perfis.filter(x => x.id == this.usuario.perfil.id)[0];
       let _usuarioEditar = {
         nome: _usuario.nome,
         email: _usuario.email,
@@ -143,7 +156,10 @@ export default {
         senhaAux1: _usuario.senhaAux1,
         senhaAux2: _usuario.senhaAux2,
         dtCadastro: this.dtCadastro,
-        perfil: _usuario.perfil
+        perfil: {
+          id: this.perfil.id,
+          nome: this.perfil.nome
+        }
       };
       this.$http.put(
         `http://localhost:3000/usuarios/${_usuario.id}`,
