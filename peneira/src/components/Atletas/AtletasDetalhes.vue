@@ -125,7 +125,7 @@
           <v-btn style="margin: 0 5px" color="primary">Visualizar Avaliações</v-btn>
         </router-link>
         <router-link :to="'/atleta/' + atleta.id" tag="button">
-          <v-btn style="margin: 0 5px" color="success">Editar</v-btn>
+          <v-btn style="margin: 0 5px" color="primary">Editar</v-btn>
         </router-link>
         <router-link to="/atletas" tag="button">
           <v-btn style="margin: 0 5px" color="error">Voltar</v-btn>
@@ -153,13 +153,13 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/atletas/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" + this.id)
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }
 
     this.$http
-      .get("http://localhost:3000/posicoes")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes")
       .then(res => res.json())
       .then(posicoes => {
         this.posicoes = posicoes;
@@ -170,7 +170,7 @@ export default {
   beforeMount() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/atletas/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" + this.id)
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }

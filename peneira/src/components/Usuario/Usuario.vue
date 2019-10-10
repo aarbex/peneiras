@@ -58,7 +58,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="error" text @click="dialog1 = false">Cancelar</v-btn>
-          <v-btn color="success" text @click="removerUsuario(usuario)">Confirmar</v-btn>
+          <v-btn color="primary" text @click="removerUsuario(usuario)">Confirmar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -105,7 +105,7 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/usuarios/")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/")
       .then(res => res.json())
       .then(usuarios => (this.usuarios = usuarios));
   },
@@ -134,7 +134,7 @@ export default {
 
     removerUsuario(usuario) {
       this.$http
-        .delete(`http://localhost:3000/usuarios/${usuario.id}`)
+        .delete(`https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/${usuario.id}`)
         .then(() => {
           let indice = this.usuarios.indexOf(usuario);
           this.usuarios.splice(indice, 1);

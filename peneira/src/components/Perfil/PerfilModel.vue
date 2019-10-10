@@ -21,8 +21,8 @@
           autofocus
           v-on:keyup.enter="addPerfil()"
         ></v-text-field>
-        <v-btn v-if="this.id" class="mr-4" @click="editarPerfil(perfil)" color="success">Editar</v-btn>
-        <v-btn v-else class="mr-4" @click="addPerfil()" color="success">Salvar</v-btn>
+        <v-btn v-if="this.id" class="mr-4" @click="editarPerfil(perfil)" color="primary">Editar</v-btn>
+        <v-btn v-else class="mr-4" @click="addPerfil()" color="primary">Salvar</v-btn>
         <router-link to="/perfis" tag="button">
           <v-btn color="error">Cancelar</v-btn>
         </router-link>
@@ -50,7 +50,7 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/perfis/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/" + this.id)
         .then(res => res.json())
         .then(perfil => (this.perfil = perfil));
     }
@@ -67,7 +67,7 @@ export default {
       };
       if (this.nome.length > 0) {
         this.$http
-          .post("http://localhost:3000/perfis/", _perfil)
+          .post("https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/", _perfil)
           .then(res => res.json());
         this.nome = "";
         this.dtCadastro = "";
@@ -85,7 +85,7 @@ export default {
         dtCadastro: this.dtCadastro
       };
       this.$http.put(
-        `http://localhost:3000/perfis/${_perfilEditar.id}`,
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/${_perfilEditar.id}`,
         _perfilEditar
       );
       this.$router.push("/perfis");

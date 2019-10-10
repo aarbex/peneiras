@@ -93,14 +93,14 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/categorias")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias")
       .then(res => res.json())
       .then(categorias => (this.categorias = categorias));
   },
 
   beforeMount() {
     this.$http
-      .get("http://localhost:3000/categorias")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias")
       .then(res => res.json())
       .then(categorias => (this.categorias = categorias));
   },
@@ -108,7 +108,7 @@ export default {
   methods: {
     removerCategoria(categoria) {
       this.$http
-        .delete(`http://localhost:3000/categorias/${categoria.id}`)
+        .delete(`https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/${categoria.id}`)
         .then(() => {
           let indice = this.categorias.indexOf(categoria);
           this.categorias.splice(indice, 1);

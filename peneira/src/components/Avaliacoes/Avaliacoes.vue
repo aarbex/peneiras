@@ -14,11 +14,11 @@
       >
         <template v-slot:top>
           <div style="display:flex">
-            <div style="width:30%">
+            <div style="width:1000%">
               <v-text-field v-model="search" label="Buscar..." class="mx-4"></v-text-field>
             </div>
-            <div class="div-add">
-              <router-link to="/avaliacao/">
+            <!--div-- class="div-add">
+              
                 <v-btn class="mx-2" fab dark xSmall color="primary" style="margin: 15px">
                   <v-tooltip top>
                     <template v-slot:activator="{ on }">
@@ -27,11 +27,11 @@
                     <span>Adicionar</span>
                   </v-tooltip>
                 </v-btn>
-              </router-link>
-            </div>
+                
+            </!--div-->
           </div>
         </template>
-        <template v-slot:item.action="{ item }">
+        <!--template-- v-slot:item.action="{ item }">
           <router-link :to="'/avaliacao/detalhe/' + item.id" tag="button">
             <v-btn class="mx-2" fab dark xSmall color="black">
               <v-tooltip top>
@@ -67,11 +67,41 @@
               <span>Excluir</span>
             </v-tooltip>
           </v-btn>
+        </!--template-->
+        <template v-slot:item.action="{ item }">
+          <v-menu>
+            <template v-slot:activator="{ on }">
+              <v-btn light icon v-on="on">
+                <v-icon primary>mdi-dots-vertical</v-icon>
+              </v-btn>
+            </template>
+
+            <v-list bottom>
+              <router-link :to="'/avaliacao/detalhe/' + item.id" tag="button">
+                <v-list-item>
+                  <v-list-item-title xSmall>Detalhes</v-list-item-title>
+                </v-list-item>
+              </router-link>
+              <br />
+              <router-link :to="'/avaliacao/' + item.id" tag="button">
+                <v-list-item>
+                  <v-list-item-title>Editar</v-list-item-title>
+                </v-list-item>
+              </router-link>
+              <v-list-item>
+                <v-list-item-title @click="removerAvaliacao(item); dialog1 = true">Excluir</v-list-item-title>
+              </v-list-item>
+            </v-list>
+          </v-menu>
         </template>
         <template v-slot:body.append>
           <tr>
             <td></td>
-
+            <router-link to="/avaliacao/">
+              <v-btn absolute dark fab small right color="primary">
+                <v-icon>mdi-plus</v-icon>
+              </v-btn>
+            </router-link>
             <td colspan="4"></td>
           </tr>
         </template>
@@ -91,6 +121,7 @@ export default {
     return {
       search: "",
       avaliacoes: []
+      
     };
   },
   computed: {
@@ -114,6 +145,16 @@ export default {
       ];
     }
   },
+
+  beforeMount() {
+    this.$http
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/"
+      )
+      .then(res => res.json())
+      .then(avaliacoes => (this.avaliacoes = avaliacoes));
+  },
+
   methods: {
     filterOnlyCapsText(value, search) {
       return (
@@ -128,7 +169,9 @@ export default {
     },
     removerAvaliacao(avaliacao) {
       this.$http
-        .delete(`http://localhost:3000/avaliacoes/${avaliacao.id}`)
+        .delete(
+          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/${avaliacao.id}`
+        )
         .then(() => {
           let indice = this.avaliacoes.indexOf(avaliacao);
           this.avaliacoes.splice(indice, 1);
@@ -136,12 +179,6 @@ export default {
           this.dialog1 = false;
         });
     }
-  },
-  created() {
-    this.$http
-      .get("http://localhost:3000/avaliacoes/")
-      .then(res => res.json())
-      .then(avaliacoes => (this.avaliacoes = avaliacoes));
   }
 };
 </script>

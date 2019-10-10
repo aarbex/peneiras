@@ -1,18 +1,16 @@
 <template>
   <div>
-    <v-app-bar text-center color="black">
+    <v-app-bar text-left dark>
       <v-toolbar-title
-        :justify="center"
+        :justify="left"
         align="center"
         cols="12"
         md="12"
-        class="headline text-uppercase"
-      >
-        <img src="../../assets/logo-corinthians.png" height="50px" alt />
-      </v-toolbar-title>
+        class="title text-uppercase font-weight-medium"
+      >SISTEMA DE PENEIRAS</v-toolbar-title>
     </v-app-bar>
-    <h1>SISTEMA DE GESTÃO DE PENEIRAS</h1>
-    <div style="width: 30%; align-content: center; margin: 0 auto;">
+    <!--h2 class="py-10" align="center">SISTEMA DE GESTÃO DE PENEIRAS</!--h2>
+    <div-- style="width: 30%; align-content: center; margin: 0 auto;">
       <h2>Login</h2>
       <form>
         <v-text-field
@@ -39,10 +37,27 @@
           label="Primeiro Acesso?"
           @change="$v.checkbox.$touch()"
           @blur="$v.checkbox.$touch()"
-        ></v-checkbox>        
-          <v-btn class="mr-4 success" @click="submit" :to="avaliacoes.route" >Entrar</v-btn>        
+        ></v-checkbox>
+        <v-btn class="mr-4 primary" @click="submit" :to="avaliacoes.route">Entrar</v-btn>
       </form>
-    </div>
+    </div-->
+    <v-card class="mx-auto mt-12" max-width="500" flex align="right">
+      <v-toolbar dark>
+        <v-toolbar-title dense>Entrar</v-toolbar-title>
+      </v-toolbar>
+      <v-text-field label="Usuário" prepend-inner-icon="mdi-account" class="mx-5 mt-5" required></v-text-field>
+      <v-text-field
+        label="Senha"
+        prepend-inner-icon="mdi-lock"
+        class="mx-5"
+        :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="show ? 'text' : 'password'"
+        @click:append="show = !show"
+        required
+      ></v-text-field>
+      <v-divider></v-divider>
+      <v-btn dark text-color="white" class="ma-2" :to="boasVindas.route">Entrar</v-btn>
+    </v-card>
   </div>
 </template>
 
@@ -72,8 +87,8 @@ export default {
       emailMatch: () => "The email and password you entered don't match"
     },
     checkbox: false,
-    avaliacoes: {
-      route: "/avaliacoes"
+    boasVindas: {
+      route: "/boas-vindas"
     }
   }),
 

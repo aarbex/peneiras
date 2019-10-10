@@ -55,7 +55,7 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/categorias/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/" + this.id)
         .then(res => res.json())
         .then(categoria => (this.categoria = categoria));
     }
@@ -72,7 +72,7 @@ export default {
       };
       if (this.nome.length > 0) {
         this.$http
-          .post("http://localhost:3000/categorias/", _categoria)
+          .post("https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/", _categoria)
           .then(res => res.json());
         this.nome = "";
         this.dtCadastro = "";
@@ -90,7 +90,7 @@ export default {
         dtCadastro: this.dtCadastro
       };
       this.$http.put(
-        `http://localhost:3000/categorias/${_categoriaEditar.id}`,
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/${_categoriaEditar.id}`,
         _categoriaEditar
       );
       this.$router.push("/categorias");

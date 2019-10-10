@@ -67,7 +67,7 @@
 
           <v-btn color="error" text @click="dialog2 = false">Cancelar</v-btn>
 
-          <v-btn color="success" text @click="removerPosicao(posicao)">Confirmar</v-btn>
+          <v-btn color="primary" text @click="removerPosicao(posicao)">Confirmar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -93,14 +93,14 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/posicoes")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes")
       .then(res => res.json())
       .then(posicoes => (this.posicoes = posicoes));
   },
 
   beforeMount() {
     this.$http
-      .get("http://localhost:3000/posicoes")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes")
       .then(res => res.json())
       .then(posicoes => (this.posicoes = posicoes));
   },
@@ -108,7 +108,7 @@ export default {
   methods: {
     removerPosicao(posicao) {
       this.$http
-        .delete(`http://localhost:3000/posicoes/${posicao.id}`)
+        .delete(`https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes/${posicao.id}`)
         .then(() => {
           let indice = this.posicoes.indexOf(posicao);
           this.posicoes.splice(indice, 1);

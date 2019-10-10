@@ -21,8 +21,8 @@
           autofocus
           v-on:keyup.enter="addStatus()"
         ></v-text-field>
-        <v-btn v-if="this.id" class="mr-4" @click="editarStatus(status)" color="success">Editar</v-btn>
-        <v-btn v-else class="mr-4" @click="addStatus()" color="success">Salvar</v-btn>
+        <v-btn v-if="this.id" class="mr-4" @click="editarStatus(status)" color="primary">Editar</v-btn>
+        <v-btn v-else class="mr-4" @click="addStatus()" color="primary">Salvar</v-btn>
         <router-link to="/status" tag="button">
           <v-btn color="error">Cancelar</v-btn>
         </router-link>
@@ -50,7 +50,7 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/status/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status/" + this.id)
         .then(res => res.json())
         .then(status => (this.status = status));
     }
@@ -67,7 +67,7 @@ export default {
       };
       if (this.nome.length > 0) {
         this.$http
-          .post("http://localhost:3000/status/", _status)
+          .post("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status/", _status)
           .then(res => res.json());
         this.nome = "";
         this.dtCadastro = "";
@@ -85,7 +85,7 @@ export default {
         dtCadastro: this.dtCadastro
       };
       this.$http.put(
-        `http://localhost:3000/status/${_statusEditar.id}`,
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/status/${_statusEditar.id}`,
         _statusEditar
       );
       this.$router.push("/status");

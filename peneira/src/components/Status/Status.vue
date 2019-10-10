@@ -67,7 +67,7 @@
 
           <v-btn color="error" text @click="dialog2 = false">Cancelar</v-btn>
 
-          <v-btn color="success" text @click="removerStatus(status)">Confirmar</v-btn>
+          <v-btn color="primary" text @click="removerStatus(status)">Confirmar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -93,14 +93,14 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/status")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
       .then(res => res.json())
       .then(status => (this.listaStatus = status));
   },
 
   beforeMount() {
     this.$http
-      .get("http://localhost:3000/status")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
       .then(res => res.json())
       .then(status => (this.listaStatus = status));
   },
@@ -108,7 +108,7 @@ export default {
   methods: {
     removerStatus(status) {
       this.$http
-        .delete(`http://localhost:3000/status/${status.id}`)
+        .delete(`https://my-json-server.typicode.com/rafafcasado/peneirasccp/status/${status.id}`)
         .then(() => {
           //let indice = this.status.indexOf(status);
           //this.status.splice(indice, 1);

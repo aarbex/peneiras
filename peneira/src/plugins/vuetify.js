@@ -1,16 +1,30 @@
-import '@mdi/font/css/materialdesignicons.css'
-import Vue from 'vue';
-import Vuetify from 'vuetify/lib';
+import "@mdi/font/css/materialdesignicons.css";
+import Vue from "vue";
+import Vuetify from "vuetify/lib";
 
 Vue.use(Vuetify);
 
-export default new Vuetify({  
+import pt from "vuetify/es5/locale/pt";
+
+Vue.component("my-component", {
+  methods: {
+    changeLocale() {
+      this.$vuetify.lang.current = pt;
+    }
+  }
+});
+
+export default new Vuetify({
   theme: {
     options: {
-      customProperties: true,
-    },
+      customProperties: true
+    }
   },
   icons: {
-    iconfont: 'mdi',
+    iconfont: "mdi"
   },
+  lang: {
+    locales: { pt },
+    current: pt
+  }
 });

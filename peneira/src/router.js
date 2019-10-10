@@ -20,6 +20,7 @@ import Permissoes from "./components/Permissoes/Permissoes.vue";
 import UsuarioModel from "./components/Usuario/UsuarioModel.vue";
 import Posicoes from "./components/Posicoes/Posicoes.vue";
 import PosicoesModel from "./components/Posicoes/PosicoesModel.vue";
+import BoasVindas from "./components/BoasVindas/BoasVindas.vue";
 
 Vue.use(Router);
 
@@ -35,6 +36,11 @@ export default new Router({
       path: "/login",
       name: "Login",
       component: Login
+    },
+    {
+      path: "/boas-vindas",
+      name: "BoasVindas",
+      component: BoasVindas
     },
     {
       path: "/usuarios",

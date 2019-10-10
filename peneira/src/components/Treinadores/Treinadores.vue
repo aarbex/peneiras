@@ -67,7 +67,7 @@
 
           <v-btn color="error" text @click="dialog2 = false">Cancelar</v-btn>
 
-          <v-btn color="success" text @click="removerTreinador(treinador)">Confirmar</v-btn>
+          <v-btn color="primary" text @click="removerTreinador(treinador)">Confirmar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -93,14 +93,14 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/treinadores")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores")
       .then(res => res.json())
       .then(treinadores => (this.treinadores = treinadores));
   },
 
   beforeMount() {
     this.$http
-      .get("http://localhost:3000/treinadores")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores")
       .then(res => res.json())
       .then(treinadores => (this.treinadores = treinadores));
   },
@@ -108,7 +108,7 @@ export default {
   methods: {
     removerTreinador(treinador) {
       this.$http
-        .delete(`http://localhost:3000/treinadores/${treinador.id}`)
+        .delete(`https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores/${treinador.id}`)
         .then(() => {
           let indice = this.treinadores.indexOf(treinador);
           this.treinadores.splice(indice, 1);

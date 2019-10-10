@@ -78,7 +78,7 @@
 
           <v-btn color="error" text @click="dialog2 = false">Cancelar</v-btn>
 
-          <v-btn color="success" text @click="removerPerfil(perfil)">Confirmar</v-btn>
+          <v-btn color="primary" text @click="removerPerfil(perfil)">Confirmar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -106,14 +106,14 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/perfis")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis")
       .then(res => res.json())
       .then(perfis => (this.perfis = perfis));
   },
 
   beforeMounted() {
     this.$http
-      .get("http://localhost:3000/perfis")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis")
       .then(res => res.json())
       .then(perfis => (this.perfis = perfis));
   },
@@ -121,7 +121,7 @@ export default {
   methods: {
     removerPerfil(perfil) {
       this.$http
-        .delete(`http://localhost:3000/perfis/${perfil.id}`)
+        .delete(`https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/${perfil.id}`)
         .then(() => {
           let indice = this.perfis.indexOf(perfil);
           this.perfis.splice(indice, 1);

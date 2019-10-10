@@ -45,8 +45,8 @@
           required
         ></v-text-field>
         <v-text-field v-else v-model="senhaAux2" label="Repetir senha" type="password" required></v-text-field>
-        <v-btn v-if="this.id" class="mr-4" @click="editarUsuario(usuario)" color="success">Editar</v-btn>
-        <v-btn v-else class="mr-4" @click="addUsuario()" color="success">Salvar</v-btn>
+        <v-btn v-if="this.id" class="mr-4" @click="editarUsuario(usuario)" color="primary">Editar</v-btn>
+        <v-btn v-else class="mr-4" @click="addUsuario()" color="primary">Salvar</v-btn>
         <router-link to="/usuarios" tag="button">
           <v-btn color="error">Cancelar</v-btn>
         </router-link>
@@ -80,13 +80,13 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/usuarios/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/" + this.id)
         .then(res => res.json())
         .then(usuario => (this.usuario = usuario));
     }
 
     this.$http
-      .get("http://localhost:3000/perfis")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis")
       .then(res => res.json())
       .then(perfis => {
         this.perfis = perfis;
@@ -97,7 +97,7 @@ export default {
   beforeMount() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/usuarios/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/" + this.id)
         .then(res => res.json())
         .then(usuario => (this.usuario = usuario));
     }
@@ -126,7 +126,7 @@ export default {
         senhaAux2: this.senhaAux2
       };
       this.$http
-        .post("http://localhost:3000/usuarios", _usuario)
+        .post("https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios", _usuario)
         .then(res => res.json())
         .then(
           (this.nome = ""),
@@ -162,7 +162,7 @@ export default {
         }
       };
       this.$http.put(
-        `http://localhost:3000/usuarios/${_usuario.id}`,
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/${_usuario.id}`,
         _usuarioEditar
       );
       this.$router.push("/usuarios");

@@ -146,7 +146,7 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/avaliacoes/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/" + this.id)
         .then(res => res.json())
         .then(avaliacao => (this.avaliacao = avaliacao));
     }

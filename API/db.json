@@ -381,30 +381,6 @@
   ],
   "avaliacoes": [
     {
-      "nome": "André Elias Alves Arbex",
-      "cpf": "305.263.238-84",
-      "dtNascimento": "13/09/1981",
-      "posicao": "Atacante",
-      "indicacao": "João Silva",
-      "nota": "9,9",
-      "treinador": {
-        "id": 2,
-        "nome": "Luiz"
-      },
-      "categoria": {
-        "id": 5,
-        "nome": "Sub-20"
-      },
-      "status": {
-        "id": 3,
-        "nome": "Dispensado"
-      },
-      "dtInicio": "31/08/2018",
-      "dtDispensa": "29/09/2019",
-      "dtCadastro": "27/9/2019",
-      "id": 1
-    },
-    {
       "nome": "Victor Alves Arbex",
       "cpf": "123.456.789-01",
       "dtNascimento": "26/9/2019",
@@ -432,8 +408,8 @@
       "cpf": "123.456.789-12",
       "indicacao": "aaaaaa",
       "treinador": {
-        "id": 2,
-        "nome": "Luiz"
+        "id": 5,
+        "nome": "Tadeu"
       },
       "categoria": {
         "id": 5,
@@ -452,49 +428,24 @@
     {
       "nome": "Arthur Alves Arbex",
       "cpf": "305.263.238-84",
-      "dtNascimento": "01/08/2014",
-      "posicao": "Centro-Avante",
       "indicacao": "Ari Alberto",
-      "nota": "",
       "treinador": {
-        "id": 2,
-        "nome": "Luiz"
+        "id": 4,
+        "nome": "Rafael"
       },
       "categoria": {
         "id": 2,
         "nome": "Sub-13"
       },
-      "status": {
-        "id": 2,
-        "nome": "Em avaliação"
-      },
+      "nota": "",
+      "dtNascimento": "01/08/2014",
       "dtInicio": "13/9/2019",
-      "dtCadastro": "27/9/2019",
-      "id": 4
-    },
-    {
-      "nome": "Guilherme Dias Vasconcelos",
-      "cpf": "123.456.789-78",
-      "dtNascimento": "25/9/2019",
       "posicao": "Centro-Avante",
-      "indicacao": "Tio André",
-      "nota": "9,5",
-      "treinador": {
-        "id": 2,
-        "nome": "Luiz"
-      },
-      "categoria": {
-        "id": 3,
-        "nome": "Sub-15"
-      },
       "status": {
         "id": 2,
         "nome": "Em avaliação"
       },
-      "dtInicio": "25/9/2019",
-      "dtDispensa": "27/9/2019",
-      "dtCadastro": "27/9/2019",
-      "id": 6
+      "id": 4
     }
   ]
 }

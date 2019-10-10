@@ -224,9 +224,9 @@
           v-if="this.id"
           class="mr-4"
           @click="editarAvaliacao(avaliacao)"
-          color="success"
+          color="primary"
         >Editar</v-btn>
-        <v-btn v-else class="mr-4" @click="addAvaliacao()" color="success">Salvar</v-btn>
+        <v-btn v-else class="mr-4" @click="addAvaliacao()" color="primary">Salvar</v-btn>
         <router-link to="/avaliacoes" tag="button">
           <v-btn color="error">Cancelar</v-btn>
         </router-link>
@@ -280,18 +280,23 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/avaliacoes/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/" +
+            this.id
+        )
         .then(res => res.json())
         .then(avaliacao => (this.avaliacao = avaliacao));
     }
 
     this.$http
-      .get("http://localhost:3000/atletas/")
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/"
+      )
       .then(res => res.json())
       .then(atletas => (this.atletas = atletas));
 
     this.$http
-      .get("http://localhost:3000/status")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
       .then(res => res.json())
       .then(status => {
         this.statusList = status;
@@ -299,7 +304,9 @@ export default {
       });
 
     this.$http
-      .get("http://localhost:3000/categorias")
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias"
+      )
       .then(res => res.json())
       .then(categorias => {
         this.categorias = categorias;
@@ -307,7 +314,9 @@ export default {
       });
 
     this.$http
-      .get("http://localhost:3000/treinadores")
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores"
+      )
       .then(res => res.json())
       .then(treinadores => {
         this.treinadores = treinadores;
@@ -371,7 +380,10 @@ export default {
         observacao: this.observacao
       };
       this.$http
-        .post("http://localhost:3000/avaliacoes", _avaliacao)
+        .post(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes",
+          _avaliacao
+        )
         .then(res => res.json())
         .then(
           (this.nome = ""),
@@ -444,14 +456,16 @@ export default {
         }
       };
       this.$http.put(
-        `http://localhost:3000/avaliacoes/${_avaliacao.id}`,
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/${_avaliacao.id}`,
         _avaliacaoEditar
       );
       this.$router.push("/avaliacoes");
     },
     carregarAtletaPorCPF() {
       this.$http
-        .get("http://localhost:3000/atletas")
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas"
+        )
         .then(res => res.json())
         .then(atletas => (this.atletas = atletas));
       this.atleta = this.atletas.filter(x => x.cpf == this.cpf)[0];
@@ -462,7 +476,9 @@ export default {
     },
     carregarAtletaPorNome(atleta) {
       this.$http
-        .get("http://localhost:3000/atletas")
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas"
+        )
         .then(res => res.json())
         .then(atletas => (this.atletas = atletas));
       this.atleta = this.atletas.filter(x => x.nome === atleta.nome)[0];

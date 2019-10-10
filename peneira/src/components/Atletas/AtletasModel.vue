@@ -213,8 +213,8 @@
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 100%; margin: 0 auto; margin-bottom: 20px; text-align: center;">
-        <v-btn v-if="this.id" class="mr-4" @click="editarAtleta(atleta)" color="success">Editar</v-btn>
-        <v-btn v-else class="mr-4" @click="addAtleta()" color="success">Salvar</v-btn>
+        <v-btn v-if="this.id" class="mr-4" @click="editarAtleta(atleta)" color="primary">Editar</v-btn>
+        <v-btn v-else class="mr-4" @click="addAtleta()" color="primary">Salvar</v-btn>
         <router-link to="/atletas" tag="button">
           <v-btn color="error">Cancelar</v-btn>
         </router-link>
@@ -306,7 +306,7 @@ export default {
         "SP",
         "TO"
       ],
-      date: new Date().toISOString().substr(0, 10),
+      date: new Date().toLocaleString().substr(0, 10),
       menu: false,
       cpfMask: "###.###.###-##",
       rgMask: "##.###.###-#",
@@ -320,13 +320,18 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/atletas/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" +
+            this.id
+        )
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }
 
     this.$http
-      .get("http://localhost:3000/posicoes")
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes"
+      )
       .then(res => res.json())
       .then(posicoes => {
         this.posicoes = posicoes;
@@ -337,7 +342,10 @@ export default {
   beforeMount() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/atletas/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" +
+            this.id
+        )
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }
@@ -385,7 +393,10 @@ export default {
         dtNascimento: this.dtNascimento
       };
       this.$http
-        .post("http://localhost:3000/atletas", _atleta)
+        .post(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas",
+          _atleta
+        )
         .then(res => res.json())
         .then(
           (this.nome = ""),
@@ -458,7 +469,7 @@ export default {
         dtNascimento: dataNascimento
       };
       this.$http.put(
-        `http://localhost:3000/atletas/${_atleta.id}`,
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${_atleta.id}`,
         _atletaEditar
       );
       this.$router.push("/atletas");

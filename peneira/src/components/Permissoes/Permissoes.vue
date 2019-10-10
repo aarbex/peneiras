@@ -40,7 +40,7 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/permissoes")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/permissoes")
       .then(res => res.json())
       .then(permissao => (this.permissoes = permissao));
   }

@@ -25,9 +25,9 @@
           v-if="this.id"
           class="mr-4"
           @click="editarTreinador(treinador)"
-          color="success"
+          color="primary"
         >Editar</v-btn>
-        <v-btn v-else class="mr-4" @click="addTreinador()" color="success">Salvar</v-btn>
+        <v-btn v-else class="mr-4" @click="addTreinador()" color="primary">Salvar</v-btn>
         <router-link to="/treinadores" tag="button">
           <v-btn color="error">Cancelar</v-btn>
         </router-link>
@@ -55,7 +55,7 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("http://localhost:3000/treinadores/" + this.id)
+        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores/" + this.id)
         .then(res => res.json())
         .then(treinador => (this.treinador = treinador));
     }
@@ -72,7 +72,7 @@ export default {
       };
       if (this.nome.length > 0) {
         this.$http
-          .post("http://localhost:3000/treinadores/", _treinador)
+          .post("https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores/", _treinador)
           .then(res => res.json());
         this.nome = "";
         this.dtCadastro = "";
@@ -90,7 +90,7 @@ export default {
         dtCadastro: this.dtCadastro
       };
       this.$http.put(
-        `http://localhost:3000/treinadores/${_treinadorEditar.id}`,
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores/${_treinadorEditar.id}`,
         _treinadorEditar
       );
       this.$router.push("/treinadores");

@@ -74,7 +74,7 @@
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="error" text @click="dialog1 = false">Cancelar</v-btn>
-          <v-btn color="success" text @click="removerAtleta(atleta)">Confirmar</v-btn>
+          <v-btn color="primary" text @click="removerAtleta(atleta)">Confirmar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -109,18 +109,18 @@ export default {
 
   created() {
     this.$http
-      .get("http://localhost:3000/atletas/")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/")
       .then(res => res.json())
       .then(atletas => (this.atletas = atletas));
 
     this.$http
-      .get("http://localhost:3000/posicoes")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes")
       .then(res => res.json())
       .then(posicoes => (this.posicoes = posicoes));
   },
   beforeMount() {
     this.$http
-      .get("http://localhost:3000/atletas/")
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/")
       .then(res => res.json())
       .then(atletas => (this.atletas = atletas));
   },
@@ -128,7 +128,7 @@ export default {
   methods: {
     removerAtleta(atleta) {
       this.$http
-        .delete(`http://localhost:3000/atletas/${atleta.id}`)
+        .delete(`https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${atleta.id}`)
         .then(() => {
           let indice = this.atletas.indexOf(atleta);
           this.atletas.splice(indice, 1);
