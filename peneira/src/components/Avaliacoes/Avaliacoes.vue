@@ -1,35 +1,28 @@
 <template>
   <div>
     <Nav />
-    <h1>Avaliações</h1>
+    <v-row class="my-5">
+      <h2 class="mx-auto">Avaliações</h2>
+    </v-row>
     <div>
       <v-data-table
         :headers="headers"
         :items="avaliacoes"
         sort-by="dtInicio"
         item-key="id"
-        class="elevation-1"
+        class="elevation-1 px-5"
         :search="search"
         :custom-filter="filterOnlyCapsText"
       >
         <template v-slot:top>
-          <div style="display:flex">
-            <div style="width:1000%">
-              <v-text-field v-model="search" label="Buscar..." class="mx-4"></v-text-field>
-            </div>
-            <!--div-- class="div-add">
-              
-                <v-btn class="mx-2" fab dark xSmall color="primary" style="margin: 15px">
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                      <v-icon medium dark v-on="on">mdi-plus</v-icon>
-                    </template>
-                    <span>Adicionar</span>
-                  </v-tooltip>
-                </v-btn>
-                
-            </!--div-->
-          </div>
+          <v-col cols="12">
+            <v-text-field
+              v-model="search"
+              label="Pesquisar em avaliações cadastradas"
+              prepend-inner-icon="mdi-magnify"
+              filled
+            ></v-text-field>
+          </v-col>
         </template>
         <!--template-- v-slot:item.action="{ item }">
           <router-link :to="'/avaliacao/detalhe/' + item.id" tag="button">
@@ -82,14 +75,11 @@
                   <v-list-item-title xSmall>Detalhes</v-list-item-title>
                 </v-list-item>
               </router-link>
-              <br />
-              <router-link :to="'/avaliacao/' + item.id" tag="button">
-                <v-list-item>
-                  <v-list-item-title>Editar</v-list-item-title>
-                </v-list-item>
-              </router-link>
               <v-list-item>
-                <v-list-item-title @click="removerAvaliacao(item); dialog1 = true">Excluir</v-list-item-title>
+                <v-list-item-title @click="dialog = true; avaliacao = item">Editar</v-list-item-title>
+              </v-list-item>
+              <v-list-item>
+                <v-list-item-title @click="dialog1 = true; avaliacao = item">Excluir</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -97,15 +87,255 @@
         <template v-slot:body.append>
           <tr>
             <td></td>
-            <router-link to="/avaliacao/">
-              <v-btn absolute dark fab small right color="primary">
-                <v-icon>mdi-plus</v-icon>
-              </v-btn>
-            </router-link>
+
             <td colspan="4"></td>
           </tr>
         </template>
       </v-data-table>
+    </div>
+
+    <div class="flex-grow-1"></div>
+    <v-dialog v-model="dialog" width="80%">
+      <template v-slot:activator="{ on }">
+        <v-btn
+          style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
+          color="primary"
+          class="ms-5 mb-5"
+          fab
+          dark
+          small
+          v-on="on"
+          @click="limparFormulario()"
+        >
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon small dark v-on="on">mdi-plus</v-icon>
+            </template>
+            <span>Adicionar</span>
+          </v-tooltip>
+        </v-btn>
+      </template>
+      <v-card>
+        <v-toolbar v-if="avaliacao.id" dark color="primary">Editar Avaliação</v-toolbar>
+        <v-toolbar v-else dark color="primary">Cadastrar Avaliação</v-toolbar>
+        <v-card-text>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12">
+                <v-text-field
+                  v-if="avaliacao.id"
+                  v-mask="cpfMask"
+                  v-model="avaliacao.cpf"
+                  label="CPF do Atleta"
+                  required
+                  append-icon="mdi-magnify"
+                  filled
+                  readonly
+                ></v-text-field>
+                <v-text-field
+                  v-else
+                  v-model="cpf"
+                  v-mask="cpfMask"
+                  label="CPF do Atleta"
+                  append-icon="mdi-magnify"
+                  required
+                  @click:append="carregarAtletaPorCPF()"
+                ></v-text-field>
+              </v-col>
+
+              <v-col cols="12">
+                <v-combobox
+                  v-if="avaliacao.id"
+                  v-model="avaliacao.nome"
+                  :items="atletas"
+                  item-text="nome"
+                  item-value="id"
+                  label="Nome do Atleta"
+                  filled
+                  readonly
+                ></v-combobox>
+                <v-combobox
+                  v-else
+                  v-model="atleta.nome"
+                  :items="atletas"
+                  item-text="nome"
+                  item-value="id"
+                  label="Nome do Atleta"
+                  @change="carregarAtletaPorNome(atleta.nome)"
+                  auto-select-first
+                ></v-combobox>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-if="avaliacao.id"
+                  name="categoria"
+                  v-model="avaliacao.categoria.id"
+                  :items="categorias"
+                  item-text="nome"
+                  item-value="id"
+                  label="Categoria"
+                  required
+                ></v-select>
+                <v-select
+                  v-else
+                  v-model="categoria.id"
+                  :items="categorias"
+                  item-text="nome"
+                  item-value="id"
+                  label="Categoria"
+                  name="categoria"
+                  required
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-if="avaliacao.id"
+                  name="treinador"
+                  v-model="avaliacao.treinador.id"
+                  :items="treinadores"
+                  item-text="nome"
+                  item-value="id"
+                  label="Treinador"
+                  required
+                ></v-select>
+                <v-select
+                  v-else
+                  v-model="treinador.id"
+                  :items="treinadores"
+                  item-text="nome"
+                  item-value="id"
+                  label="Treinador"
+                  name="treinador"
+                  required
+                ></v-select>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-if="avaliacao.id"
+                  name="status"
+                  v-model="avaliacao.status.id"
+                  :items="statusList"
+                  item-text="nome"
+                  item-value="id"
+                  label="Status"
+                  required
+                ></v-select>
+                <v-select
+                  v-else
+                  v-model="status.id"
+                  :items="statusList"
+                  item-text="nome"
+                  item-value="id"
+                  label="Status"
+                  name="status"
+                  required
+                ></v-select>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-menu
+                  ref="menu2"
+                  v-model="menu2"
+                  :close-on-content-click="false"
+                  :return-value.sync="avaliacao.dtInicio"
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on }">
+                    <v-text-field
+                      v-model="avaliacao.dtInicio"
+                      label="Data de Início"
+                      prepend-icon="mdi-calendar-month"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="date2" no-title scrollable>
+                    <div class="flex-grow-1"></div>
+                    <v-btn text color="primary" @click="menu2 = false">Cancel</v-btn>
+                    <v-btn text color="primary" @click="$refs.menu2.save(date2)">OK</v-btn>
+                  </v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-menu
+                  ref="menu3"
+                  v-model="menu3"
+                  :close-on-content-click="false"
+                  :return-value.sync="avaliacao.dtDispensa"
+                  transition="scale-transition"
+                  offset-y
+                  full-width
+                  min-width="290px"
+                >
+                  <template v-slot:activator="{ on }">
+                    <v-text-field
+                      v-model="avaliacao.dtDispensa"
+                      label="Data de Dispensa"
+                      prepend-icon="mdi-calendar-month"
+                      v-on="on"
+                    ></v-text-field>
+                  </template>
+                  <v-date-picker v-model="date3" no-title scrollable>
+                    <div class="flex-grow-1"></div>
+                    <v-btn text color="primary" @click="menu3 = false">Cancel</v-btn>
+                    <v-btn text color="primary" @click="$refs.menu3.save(date3)">OK</v-btn>
+                  </v-date-picker>
+                </v-menu>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field
+                  v-if="avaliacao.id"
+                  v-mask="notaMask"
+                  v-model="avaliacao.nota"
+                  label="Nota"
+                ></v-text-field>
+                <v-text-field v-else v-mask="notaMask" v-model="nota" label="Nota" required></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field
+                  v-model="avaliacao.cadastradoPor"
+                  label="Cadastrado por:"
+                  readonly
+                  filled
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-textarea
+                  v-if="avaliacao.id"
+                  name="observacao"
+                  v-model="avaliacao.observacao"
+                  label="Observação"
+                  value
+                ></v-textarea>
+                <v-textarea v-else name="observacao" v-model="observacao" label="Observação" value></v-textarea>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
+          <v-btn color="blue darken-1" text @click="adicionarOuEditar(avaliacao)">Salvar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog1" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Deseja realmente excluir a Avaliação de {{avaliacao.nome}}?</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
+          <v-btn color="primary" text @click="removerAvaliacao(avaliacao); dialog1=false">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <div class="flex-grow-1">
+      <small class="mx-5">Sport Club Corinthians Paulista © 2019 - Todos os direitos reservados</small>
     </div>
   </div>
 </template>
@@ -113,15 +343,49 @@
 <script>
 import Nav from "../Nav/Nav";
 
+import { mask } from "vue-the-mask";
+
 export default {
   components: {
     Nav
   },
+
+  directives: {
+    mask
+  },
+
   data() {
     return {
       search: "",
-      avaliacoes: []
-      
+      atletas: [],
+      atleta: {},
+      nome: "",
+      cpf: "",
+      dtNascimento: "",
+      indicacao: "",
+      posicao: "",
+      dtCadastro: "",
+      posicoes: [],
+      statusList: [],
+      status: {},
+      avaliacoes: [],
+      avaliacao: {},
+      categorias: [],
+      categoria: {},
+      treinadores: [],
+      treinador: {},
+      nota: "",
+      id: this.$route.params.id,
+      cpfMask: "###.###.###-##",
+      dataMask: "##/##/####",
+      notaMask: "#,##",
+      date: new Date().toISOString().substr(0, 10),
+      date2: "",
+      date3: "",
+      menu2: false,
+      menu3: false,
+      dialog: false,
+      dialog1: false
     };
   },
   computed: {
@@ -130,7 +394,6 @@ export default {
         {
           text: "Atleta",
           align: "left",
-          sortable: false,
           value: "nome"
         },
         { text: "CPF", value: "cpf" },
@@ -144,6 +407,43 @@ export default {
         { text: "Ações", value: "action", align: "center", sortable: false }
       ];
     }
+  },
+
+  created() {
+    this.$http
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/"
+      )
+      .then(res => res.json())
+      .then(atletas => (this.atletas = atletas));
+
+    this.$http
+      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
+      .then(res => res.json())
+      .then(status => {
+        this.statusList = status;
+        //.map(x => ({ text: x.nome, value: x.id }));
+      });
+
+    this.$http
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias"
+      )
+      .then(res => res.json())
+      .then(categorias => {
+        this.categorias = categorias;
+        //.map(x => ({ text: x.nome, value: x.id }));
+      });
+
+    this.$http
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores"
+      )
+      .then(res => res.json())
+      .then(treinadores => {
+        this.treinadores = treinadores;
+        //.map(x => ({ text: x.nome, value: x.id }));
+      });
   },
 
   beforeMount() {
@@ -167,6 +467,13 @@ export default {
           .indexOf(search) !== -1
       );
     },
+    adicionarOuEditar(avaliacao) {
+      if (avaliacao.id) {
+        this.addAvaliacao();
+      } else {
+        this.editarAvaliacao(avaliacao);
+      }
+    },
     removerAvaliacao(avaliacao) {
       this.$http
         .delete(
@@ -178,6 +485,177 @@ export default {
           //this.avaliacoes = this.avaliacoes.filter(u => u.id != avaliacao.id);
           this.dialog1 = false;
         });
+    },
+    addAvaliacao() {
+      let now = new Date();
+      this.dtCadastro =
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.categoria = this.categorias.filter(
+        x => x.id == this.categoria.id
+      )[0];
+      this.treinador = this.treinadores.filter(
+        x => x.id == this.treinador.id
+      )[0];
+      this.status = this.statusList.filter(x => x.id == this.status.id)[0];
+      if (this.date2) {
+        let dataInicio = new Date(this.date2);
+        this.dtInicio =
+          dataInicio.getDate() +
+          "/" +
+          (dataInicio.getMonth() + 1) +
+          "/" +
+          dataInicio.getFullYear();
+      }
+      if (this.date3) {
+        let dataDispensa = new Date(this.date3);
+        this.dtDispensa =
+          dataDispensa.getDate() +
+          "/" +
+          (dataDispensa.getMonth() + 1) +
+          "/" +
+          dataDispensa.getFullYear();
+      }
+      let _avaliacao = {
+        nome: this.nome,
+        cpf: this.cpf,
+        nota: this.nota,
+        treinador: {
+          id: this.treinador.id,
+          nome: this.treinador.nome
+        },
+        categoria: {
+          id: this.categoria.id,
+          nome: this.categoria.nome
+        },
+        status: {
+          id: this.status.id,
+          nome: this.status.nome
+        },
+        dtInicio: this.dtInicio,
+        dtDispensa: this.dtDispensa,
+        dtCadastro: this.dtCadastro,
+        cadastradoPor: this.cadastradoPor,
+        observacao: this.observacao
+      };
+      this.$http
+        .post(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes",
+          _avaliacao
+        )
+        .then(res => res.json())
+        .then(
+          (this.nome = ""),
+          (this.cpf = ""),
+          (this.nota = ""),
+          (this.treinador = ""),
+          (this.categoria = ""),
+          (this.dtInicio = ""),
+          (this.dtDispensa = ""),
+          (this.dtCadastro = ""),
+          (this.cadastradoPor = ""),
+          (this.status = ""),
+          (this.dialog = false),
+          this.$router.push("/avaliacoes")
+        );
+    },
+
+    editarAvaliacao(_avaliacao) {
+      this.categoria = this.categorias.filter(
+        x => x.id == _avaliacao.categoria.id
+      )[0];
+      this.treinador = this.treinadores.filter(
+        x => x.id == _avaliacao.treinador.id
+      )[0];
+      this.status = this.statusList.filter(
+        x => x.id == _avaliacao.status.id
+      )[0];
+      if (this.date2) {
+        let dataInicio = new Date(this.date2);
+        this.dtInicio =
+          dataInicio.getDate() +
+          1 +
+          "/" +
+          (dataInicio.getMonth() + 1) +
+          "/" +
+          dataInicio.getFullYear();
+      }
+      if (this.date3) {
+        let dataDispensa = new Date(this.date3);
+        this.dtDispensa =
+          dataDispensa.getDate() +
+          1 +
+          "/" +
+          (dataDispensa.getMonth() + 1) +
+          "/" +
+          dataDispensa.getFullYear();
+      }
+      let _avaliacaoEditar = {
+        nome: _avaliacao.nome,
+        cpf: _avaliacao.cpf,
+        treinador: {
+          id: this.treinador.id,
+          nome: this.treinador.nome
+        },
+        categoria: {
+          id: this.categoria.id,
+          nome: this.categoria.nome
+        },
+        nota: _avaliacao.nota,
+        dtNascimento: _avaliacao.dtNascimento,
+        dtInicio: _avaliacao.dtInicio,
+        dtDispensa: _avaliacao.dtDispensa,
+        posicao: _avaliacao.posicao,
+        status: {
+          id: this.status.id,
+          nome: this.status.nome
+        }
+      };
+      this.$http.put(
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/${_avaliacao.id}`,
+        _avaliacaoEditar
+      );
+      this.$router.push("/avaliacoes");
+    },
+    carregarAtletaPorCPF() {
+      this.$http
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas"
+        )
+        .then(res => res.json())
+        .then(atletas => (this.atletas = atletas));
+      this.atleta = this.atletas.filter(x => x.cpf == this.cpf)[0];
+      this.nome = this.atleta.nome;
+      this.posicao = this.atleta.posicao.nome;
+      this.dtNascimento = this.atleta.dtNascimento;
+      this.indicacao = this.atleta.indicacao;
+    },
+    carregarAtletaPorNome(atleta) {
+      this.$http
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas"
+        )
+        .then(res => res.json())
+        .then(atletas => (this.atletas = atletas));
+      this.atleta = this.atletas.filter(x => x.nome === atleta.nome)[0];
+      this.cpf = this.atleta.cpf;
+      this.nome = this.atleta.nome;
+      this.posicao = this.atleta.posicao.nome;
+      this.dtNascimento = this.atleta.dtNascimento;
+      this.indicacao = this.atleta.indicacao;
+    },
+    limparFormulario() {
+      this.nome = "";
+      this.cpf = "";
+      this.nota = "";
+      this.treinador = {};
+      this.categoria = {};
+      this.dtInicio = "";
+      this.dtDispensa = "";
+      this.dtCadastro = "";
+      this.cadastradoPor = "";
+      this.status = {};
+      this.avaliacao = {};
+      this.atleta = {};
     }
   }
 };

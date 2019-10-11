@@ -215,7 +215,14 @@
       </div>
     </div>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <v-textarea name="observacao" label="Observação" value></v-textarea>
+      <v-textarea
+        v-if="this.id"
+        name="observacao"
+        v-model="avaliacao.observacao"
+        label="Observação"
+        value
+      ></v-textarea>
+      <v-textarea v-else name="observacao" v-model="observacao" label="Observação" value></v-textarea>
     </div>
 
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">

@@ -9,6 +9,7 @@
           width="180"
           height="240"
           accept="image/jpeg, image/png"
+          z-index="0"
           :customStrings="{
         upload: '<h1>Bummer!</h1>',
         drag: 'Clique aqui ou arraste a foto para inseri-la!'
@@ -153,13 +154,18 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" +
+            this.id
+        )
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }
 
     this.$http
-      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes")
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes"
+      )
       .then(res => res.json())
       .then(posicoes => {
         this.posicoes = posicoes;
@@ -170,7 +176,10 @@ export default {
   beforeMount() {
     if (this.id) {
       this.$http
-        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/" +
+            this.id
+        )
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }

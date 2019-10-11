@@ -34,15 +34,15 @@
 
 <template>
   <nav>
-    <v-toolbar dark flex>
+    <v-app-bar dark app>
       <v-icon @click.stop="drawer = !drawer">mdi-menu</v-icon>
-      <v-toolbar-title
+      <v-app-bar-title
         :justify="left"
         align="center"
         cols="12"
         md="12"
         class="title text-uppercase font-weight-medium ps-5"
-      >SISTEMA DE PENEIRAS</v-toolbar-title>
+      >SISTEMA DE PENEIRAS</v-app-bar-title>
       <div class="flex-grow-1"></div>
       <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
         <template v-slot:activator="{ on }">
@@ -83,7 +83,7 @@
           </v-card-actions>
         </v-card>
       </v-menu>
-    </v-toolbar>
+    </v-app-bar>
     <v-navigation-drawer dense light absolute temporary v-model="drawer" class="px-2">
       <h3 class="my-3">SISTEMA DE PENEIRAS</h3>
 
