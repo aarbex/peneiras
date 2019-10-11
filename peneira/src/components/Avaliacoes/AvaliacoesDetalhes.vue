@@ -2,29 +2,17 @@
   <div>
     <Nav></Nav>
     <h1>Avaliação</h1>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 20%;">
+    <v-row class="mx-5">
+      <v-col cols="12" sm="6" md="3">
         <v-text-field v-model="avaliacao.cpf" label="CPF do Atleta" required readonly filled></v-text-field>
-      </div>
-      <div style="width: 4%; margin-right:4%; display: flex">
-        <v-icon style="vertical-align:middle">mdi-magnify</v-icon>
-      </div>
-      <div style="width: 76%">
+      </v-col>
+      <v-col cols="12" sm="6" md="9">
         <v-text-field v-model="avaliacao.nome" label="Nome do Atleta" required readonly filled></v-text-field>
-      </div>
-    </div>
-
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 15%; margin-right:4%">
-        <v-text-field
-          v-model="avaliacao.dtNascimento"
-          label="Data de Nascimento"
-          prepend-icon="mdi-calendar-month"
-          readonly
-          filled
-        ></v-text-field>
-      </div>
-      <div style="width: 37%; margin-right:4%">
+      </v-col>
+      <v-col cols="12" sm="6" md="2">
+        <v-text-field v-model="avaliacao.dtNascimento" label="Data de Nascimento" readonly filled></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6" md="5">
         <v-text-field
           name="posicao"
           v-model="avaliacao.posicao"
@@ -33,14 +21,11 @@
           readonly
           filled
         ></v-text-field>
-      </div>
-      <div style="width: 40%">
+      </v-col>
+      <v-col cols="12" sm="6" md="5">
         <v-text-field v-model="avaliacao.indicacao" readonly filled label="Indicação"></v-text-field>
-      </div>
-    </div>
-
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 48%; margin-right:4%">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field
           name="categoria"
           v-model="avaliacao.categoria.nome"
@@ -49,8 +34,8 @@
           readonly
           filled
         ></v-text-field>
-      </div>
-      <div style="width: 48%;">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field
           name="posicao"
           v-model="avaliacao.treinador.nome"
@@ -59,70 +44,36 @@
           readonly
           filled
         ></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 20%; margin-right:4%">
-        <v-text-field
-          v-if="avaliacao.dtInicio"
-          v-model="avaliacao.dtInicio"
-          label="Data de Início"
-          prepend-icon="mdi-calendar-month"
-          readonly
-          filled
-        ></v-text-field>
-        <v-text-field
-          v-else
-          label="Data de Início"
-          value=" "
-          prepend-icon="mdi-calendar-month"
-          readonly
-          filled
-        ></v-text-field>
-      </div>
-      <div style="width: 20%; margin-right:4%">
-        <v-text-field
-          v-if="avaliacao.dtDispensa"
-          v-model="avaliacao.dtDispensa"
-          label="Data de Dispensa"
-          prepend-icon="mdi-calendar-month"
-          readonly
-          filled
-        ></v-text-field>
-        <v-text-field
-          v-else
-          label="Data de Dispensa"
-          value=" "
-          prepend-icon="mdi-calendar-month"
-          readonly
-          filled
-        ></v-text-field>
-      </div>
-      <div style="width: 20%; margin-right:4%">
-        <v-text-field v-if="avaliacao.nota" v-model="avaliacao.nota" label="Nota" readonly filled></v-text-field>
-        <v-text-field v-else value=" " label="Nota" readonly filled></v-text-field>
-      </div>
-      <div style="width: 32%;">
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-text-field v-model="avaliacao.dtInicio" label="Data de Início" readonly filled></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-text-field v-model="avaliacao.dtDispensa" label="Data de Dispensa" readonly filled></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
+        <v-text-field v-model="avaliacao.nota" label="Nota" readonly filled></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6" md="3">
         <v-text-field v-model="avaliacao.cadastradoPor" label="Cadastrado por:" readonly filled></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <v-textarea
-        v-model="avaliacao.observacao"
-        name="observacao"
-        label="Observação"
-        readonly
-        filled
-      ></v-textarea>
-    </div>
-
+      </v-col>
+      <v-col cols="12">
+        <v-textarea
+          v-model="avaliacao.observacao"
+          name="observacao"
+          label="Observação"
+          readonly
+          filled
+        ></v-textarea>
+      </v-col>
+    </v-row>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 100%; margin: 0 auto; margin-bottom: 20px; text-align: center;">
-        <router-link :to="'/avaliacao/' + this.id" tag="button">
-          <v-btn class="mr-4" color="primary">Editar</v-btn>
-        </router-link>
         <router-link to="/avaliacoes" tag="button">
-          <v-btn color="error">Voltar</v-btn>
+          <v-btn color="black" text>Voltar</v-btn>
+        </router-link>
+        <router-link :to="'/avaliacao/' + this.id" tag="button">
+          <v-btn text class="mr-4" color="primary">Editar</v-btn>
         </router-link>
       </div>
     </div>
@@ -146,7 +97,10 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/" +
+            this.id
+        )
         .then(res => res.json())
         .then(avaliacao => (this.avaliacao = avaliacao));
     }

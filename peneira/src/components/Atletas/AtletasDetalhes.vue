@@ -1,106 +1,77 @@
 <template>
   <div>
     <Nav></Nav>
-    <div class="div-main">
-      <div style="width:20%; margin-top: 5px; margin-bottom:10px">
-        <picture-input
-          ref="pictureInput"
-          class="foto"
-          width="180"
-          height="240"
-          accept="image/jpeg, image/png"
-          z-index="0"
-          :customStrings="{
-        upload: '<h1>Bummer!</h1>',
-        drag: 'Clique aqui ou arraste a foto para inseri-la!'
-      }"
-        ></picture-input>
-      </div>
-      <div style="width: 80%">
-        <div style="padding-right: 20px; display:flex">
-          <v-text-field
-            style="font-size: 36px; font-weight: bold"
-            v-model="atleta.nome"
-            label="Nome"
-            solo
-            flat
-            readonly
-          ></v-text-field>
-          <router-link to="/atletas" tag="button">
-            <v-btn color="primary">Visualizar Avaliações</v-btn>
-          </router-link>
-        </div>
-        <div style="padding-right: 20px;">
-          <v-text-field v-model="atleta.email" label="E-mail" filled readonly></v-text-field>
-        </div>
-        <div style="padding-right: 20px; display: flex; ">
-          <div style="width: 48%; margin-right:4%">
-            <v-text-field v-model="atleta.cpf" label="CPF" filled readonly></v-text-field>
-          </div>
-          <div style="width: 48%">
-            <v-text-field v-model="atleta.rg" label="RG" filled readonly></v-text-field>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 83%; margin-right:4%">
+
+    <v-row class="mx-5" flex bottom>
+      <v-col cols="12" sm="6" md="2">
+        <img
+          center
+          width="120"
+          height="160"
+          src="http://kb-w.com/wp-content/uploads/2019/08/3x4-Placeholder.jpg"
+          alt
+        />
+      </v-col>
+      <v-col cols-12 sm="6" md="10">
+        <p class="display-2 mt-5">{{atleta.nome}}</p>
+      </v-col>
+      <v-col cols="12" sm="6" md="10">
+        <v-text-field v-model="atleta.email" label="E-mail" filled readonly></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6" md="2">
+        <v-text-field v-model="atleta.dtNascimento" label="Data de Nascimento" filled readonly></v-text-field>
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-text-field v-model="atleta.cpf" label="CPF" filled readonly></v-text-field>
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-text-field v-model="atleta.rg" label="RG" filled readonly></v-text-field>
+      </v-col>
+
+      <v-col cols="12" sm="6" md="10">
         <v-text-field v-model="atleta.endereco" label="Endereço (Rua / Avenida)" readonly filled></v-text-field>
-      </div>
-      <div style="width: 13%">
+      </v-col>
+      <v-col cols="12" sm="6" md="2">
         <v-text-field v-model="atleta.num" label="Número" readonly filled></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 34%; margin-right:4%">
+      </v-col>
+
+      <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="atleta.bairro" label="Bairro" readonly filled></v-text-field>
-      </div>
-      <div style="width: 12%; margin-right:4%">
+      </v-col>
+      <v-col cols="12" sm="6" md="2">
         <v-text-field v-model="atleta.cep" label="CEP" readonly filled></v-text-field>
-      </div>
-      <div style="width: 40%; margin-right:4%">
+      </v-col>
+      <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="atleta.cidade" label="Cidade" readonly filled></v-text-field>
-      </div>
-      <div style="width: 6%">
+      </v-col>
+      <v-col cols="12" sm="6" md="2">
         <v-text-field v-model="atleta.uf" label="UF" readonly filled></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 48%; margin-right:4%">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field v-model="atleta.celular" label="Telefone Celular" readonly filled></v-text-field>
-      </div>
-      <div style="width: 48%">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field v-model="atleta.tel" label="Telefone Fixo" readonly filled></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 28%; margin-right:4%">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field v-model="atleta.escolaridade" label="Escolaridade" readonly filled></v-text-field>
-      </div>
-      <div style="width: 68%">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field label="Nome da Escola" v-model="atleta.nomeEscola" filled readonly></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 100%;">
+      </v-col>
+      <v-col cols="12">
         <v-text-field v-model="atleta.pai" label="Nome do Pai" readonly filled></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 100%;">
+      </v-col>
+      <v-col cols="12">
         <v-text-field v-model="atleta.mae" label="Nome da Mãe" readonly filled></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 48%; margin-right:4%">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field v-model="atleta.posicao.nome" label="Posição" readonly filled></v-text-field>
-      </div>
-      <div style="width: 48%">
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field v-model="atleta.indicacao" label="Indicação" readonly filled></v-text-field>
-      </div>
-    </div>
-    <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
-      <div style="width: 12%; margin-right:4%; margin-top: 15px">
+      </v-col>
+      <v-col cols="12" sm="6" md="2">
         <v-checkbox
           v-model="atleta.federado"
           label="Atleta Federado"
@@ -109,8 +80,8 @@
           filled
           class="shrink mr-2 mt-0"
         ></v-checkbox>
-      </div>
-      <div style="width: 84%">
+      </v-col>
+      <v-col cols="12" sm="6" md="10">
         <v-text-field
           :disabled="!atleta.federado"
           filled
@@ -118,18 +89,18 @@
           label="Qual Federação?"
           readonly
         ></v-text-field>
-      </div>
-    </div>
+      </v-col>
+    </v-row>
     <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
       <div style="width: 100%; margin: 0 auto; margin-bottom: 20px; text-align: center;">
         <router-link to="/atletas" tag="button">
-          <v-btn style="margin: 0 5px" color="primary">Visualizar Avaliações</v-btn>
+          <v-btn text style="margin: 5px" color="primary">Visualizar Avaliações</v-btn>
         </router-link>
         <router-link :to="'/atleta/' + atleta.id" tag="button">
-          <v-btn style="margin: 0 5px" color="primary">Editar</v-btn>
+          <v-btn text style="margin: 5px" color="primary">Editar</v-btn>
         </router-link>
         <router-link to="/atletas" tag="button">
-          <v-btn style="margin: 0 5px" color="error">Voltar</v-btn>
+          <v-btn text style="margin: 5px" color="black">Voltar</v-btn>
         </router-link>
       </div>
     </div>
@@ -138,11 +109,9 @@
 
 <script>
 import Nav from "../Nav/Nav";
-import PictureInput from "vue-picture-input";
 export default {
   components: {
-    Nav,
-    PictureInput
+    Nav
   },
   data() {
     return {

@@ -121,7 +121,7 @@
         <v-card-text>
           <v-container>
             <v-row dense>
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="3">
                 <v-text-field
                   v-if="avaliacao.id"
                   v-mask="cpfMask"
@@ -129,6 +129,7 @@
                   label="CPF do Atleta"
                   required
                   append-icon="mdi-magnify"
+                  prepend-inner-icon="mdi-account-badge"
                   filled
                   readonly
                 ></v-text-field>
@@ -138,12 +139,14 @@
                   v-mask="cpfMask"
                   label="CPF do Atleta"
                   append-icon="mdi-magnify"
+                  prepend-inner-icon="mdi-account-badge"
                   required
                   @click:append="carregarAtletaPorCPF()"
+                  @blur="carregarAtletaPorCPF()"
                 ></v-text-field>
               </v-col>
 
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="9">
                 <v-combobox
                   v-if="avaliacao.id"
                   v-model="avaliacao.nome"
@@ -151,6 +154,7 @@
                   item-text="nome"
                   item-value="id"
                   label="Nome do Atleta"
+                  prepend-inner-icon="mdi-account-badge-horizontal"
                   filled
                   readonly
                 ></v-combobox>
@@ -161,11 +165,12 @@
                   item-text="nome"
                   item-value="id"
                   label="Nome do Atleta"
+                  prepend-inner-icon="mdi-account-badge-horizontal"
                   @change="carregarAtletaPorNome(atleta.nome)"
                   auto-select-first
                 ></v-combobox>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="6">
                 <v-select
                   v-if="avaliacao.id"
                   name="categoria"
@@ -174,6 +179,7 @@
                   item-text="nome"
                   item-value="id"
                   label="Categoria"
+                  prepend-inner-icon="mdi-soccer"
                   required
                 ></v-select>
                 <v-select
@@ -184,10 +190,11 @@
                   item-value="id"
                   label="Categoria"
                   name="categoria"
+                  prepend-inner-icon="mdi-soccer"
                   required
                 ></v-select>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="6">
                 <v-select
                   v-if="avaliacao.id"
                   name="treinador"
@@ -196,6 +203,7 @@
                   item-text="nome"
                   item-value="id"
                   label="Treinador"
+                  prepend-inner-icon="mdi-account-edit"
                   required
                 ></v-select>
                 <v-select
@@ -206,10 +214,11 @@
                   item-value="id"
                   label="Treinador"
                   name="treinador"
+                  prepend-inner-icon="mdi-account-edit"
                   required
                 ></v-select>
               </v-col>
-              <v-col cols="12">
+              <v-col cols="12" sm="6" md="4">
                 <v-select
                   v-if="avaliacao.id"
                   name="status"
@@ -218,6 +227,7 @@
                   item-text="nome"
                   item-value="id"
                   label="Status"
+                  prepend-inner-icon="mdi-progress-check"
                   required
                 ></v-select>
                 <v-select
@@ -228,10 +238,11 @@
                   item-value="id"
                   label="Status"
                   name="status"
+                  prepend-inner-icon="mdi-progress-check"
                   required
                 ></v-select>
               </v-col>
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="6" md="4">
                 <v-menu
                   ref="menu2"
                   v-model="menu2"
@@ -246,7 +257,7 @@
                     <v-text-field
                       v-model="avaliacao.dtInicio"
                       label="Data de Início"
-                      prepend-icon="mdi-calendar-month"
+                      prepend-inner-icon="mdi-calendar-month"
                       v-on="on"
                     ></v-text-field>
                   </template>
@@ -257,7 +268,7 @@
                   </v-date-picker>
                 </v-menu>
               </v-col>
-              <v-col cols="12" sm="6" md="6">
+              <v-col cols="12" sm="6" md="4">
                 <v-menu
                   ref="menu3"
                   v-model="menu3"
@@ -272,7 +283,7 @@
                     <v-text-field
                       v-model="avaliacao.dtDispensa"
                       label="Data de Dispensa"
-                      prepend-icon="mdi-calendar-month"
+                      prepend-inner-icon="mdi-calendar-month"
                       v-on="on"
                     ></v-text-field>
                   </template>
@@ -288,15 +299,24 @@
                   v-if="avaliacao.id"
                   v-mask="notaMask"
                   v-model="avaliacao.nota"
+                  prepend-inner-icon="mdi-thumbs-up-down"
                   label="Nota"
                 ></v-text-field>
-                <v-text-field v-else v-mask="notaMask" v-model="nota" label="Nota" required></v-text-field>
+                <v-text-field
+                  v-else
+                  v-mask="notaMask"
+                  v-model="nota"
+                  prepend-inner-icon="mdi-thumbs-up-down"
+                  label="Nota"
+                  required
+                ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
                   v-model="avaliacao.cadastradoPor"
                   label="Cadastrado por:"
                   readonly
+                  prepend-inner-icon="mdi-account"
                   filled
                 ></v-text-field>
               </v-col>
@@ -306,9 +326,17 @@
                   name="observacao"
                   v-model="avaliacao.observacao"
                   label="Observação"
+                  prepend-inner-icon="mdi-note-text"
                   value
                 ></v-textarea>
-                <v-textarea v-else name="observacao" v-model="observacao" label="Observação" value></v-textarea>
+                <v-textarea
+                  v-else
+                  name="observacao"
+                  prepend-inner-icon="mdi-note-text"
+                  v-model="observacao"
+                  label="Observação"
+                  value
+                ></v-textarea>
               </v-col>
             </v-row>
           </v-container>
