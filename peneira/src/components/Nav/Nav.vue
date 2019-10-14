@@ -1,43 +1,8 @@
-<!--template>
-  <div>
-    <v-app-bar app text-center color="black">
-      <v-toolbar-title class="headline text-uppercase"></v-toolbar-title>
-      <div style="margin: 0 auto; display: inline-flex">
-        <router-link :to="avaliacoes.route" tag="button">
-          <v-btn color="white" text>Avaliações</v-btn>
-        </router-link>
-        <router-link :to="atletas.route" tag="button">
-          <v-btn color="white" text>Atletas</v-btn>
-        </router-link>
-        <div class="text-center">
-          <v-menu open-on-hover botton offset-y>
-            <template v-slot:activator="{ on }">
-              <v-btn color="white" text v-on="on">Administração</v-btn>
-            </template>
-
-            <v-list color="black">
-              <v-list-item
-                style="color:white"
-                v-for="(item, index) in items"
-                :key="index"
-                :to="item.route"
-              >
-                <v-list-item-title style="color:white">{{ item.title }}</v-list-item-title>
-              </v-list-item>
-            </v-list>
-          </v-menu>
-        </div>
-      </div>
-    </v-app-bar>
-  </div>
-</!--template>-->
-
 <template>
   <nav>
     <v-app-bar dark app>
       <v-icon @click.stop="drawer = !drawer">mdi-menu</v-icon>
       <v-app-bar-title
-        :justify="left"
         align="center"
         cols="12"
         md="12"
@@ -200,6 +165,7 @@ export default {
     },
 
     card: false,
+    menu: false,
     drawer: false,
     group: null,
     disabled: false,

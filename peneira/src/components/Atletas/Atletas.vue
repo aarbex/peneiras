@@ -199,10 +199,14 @@
                       v-on="on"
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="date2" no-title scrollable>
+                  <v-date-picker v-model="date2" no-title scrollable locale="pt-BR">
                     <div class="flex-grow-1"></div>
-                    <v-btn text color="primary" @click="menu2 = false">Cancel</v-btn>
-                    <v-btn text color="primary" @click="$refs.menu2.save(date2)">OK</v-btn>
+                    <v-btn text color="primary" @click="menu2 = false ">Cancel</v-btn>
+                    <v-btn
+                      text
+                      color="primary"
+                      @click=" dtNascimento = formatDate(date2);$refs.menu2.save(dtNascimento)"
+                    >OK</v-btn>
                   </v-date-picker>
                 </v-menu>
               </v-col>
@@ -528,20 +532,36 @@
               <v-col cols="12" sm="6" md="2">
                 <v-checkbox
                   v-if="atleta.id"
+                  v-model="atleta.alojamento"
+                  label="Necessita alojamento?"
+                  hide-details
+                  class="shrink mr-2 mt-0"
+                ></v-checkbox>
+                <v-checkbox
+                  v-else
+                  v-model="alojamento"
+                  label="Necessita alojamento?"
+                  hide-details
+                  class="shrink mr-2 mt-0"
+                ></v-checkbox>
+              </v-col>
+              <v-col cols="12" sm="6" md="2">
+                <v-checkbox
+                  v-if="atleta.id"
                   v-model="atleta.federado"
-                  label="Atleta Federado"
+                  label="Atleta Federado?"
                   hide-details
                   class="shrink mr-2 mt-0"
                 ></v-checkbox>
                 <v-checkbox
                   v-else
                   v-model="federado"
-                  label="Atleta Federado"
+                  label="Atleta Federado?"
                   hide-details
                   class="shrink mr-2 mt-0"
                 ></v-checkbox>
               </v-col>
-              <v-col cols="12" sm="3" md="10">
+              <v-col cols="12" sm="3" md="8">
                 <v-text-field
                   :disabled="!atleta.federado"
                   v-if="atleta.id"
@@ -564,7 +584,8 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn color="blue darken-1" text @click="adicionarOuEditar(atleta)">Salvar</v-btn>
+          <v-btn v-if="atleta.id" color="blue darken-1" text @click="editarAtleta(atleta)">Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="addAtleta()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -616,6 +637,7 @@ export default {
       dtNascimento: "",
       logradouro: "",
       num: "",
+      complemento: "",
       bairro: "",
       cep: "",
       cidade: "",
@@ -627,6 +649,7 @@ export default {
       pai: "",
       mae: "",
       indicacao: "",
+      alojamento: "",
       federado: "",
       federacao: "",
       dtCadastro: "",
@@ -651,8 +674,10 @@ export default {
         "Pós-graduação (Stricto sensu, nível doutor) - Completo"
       ],
       date: new Date().toLocaleString().substr(0, 10),
+      date2: new Date().toISOString().substr(0, 10),
       search: "",
       menu: false,
+      menu2: false,
       dialog: false,
       dialog1: false,
       cpfMask: "###.###.###-##",
@@ -674,7 +699,7 @@ export default {
       return [
         {
           text: "Atleta",
-          align: "left",
+          align: "center",
           value: "nome"
         },
         { text: "E-mail", value: "email" },
@@ -712,6 +737,12 @@ export default {
   },
 
   methods: {
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
     filterOnlyCapsText(value, search) {
       return (
         value != null &&
@@ -755,18 +786,8 @@ export default {
         (this.atleta = {});
     },
     addAtleta() {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.dtCadastro = this.formatDate(this.date);
       this.posicao = this.posicoes.filter(x => x.id == this.posicao.id)[0];
-      let data = new Date(this.date);
-      this.dtNascimento =
-        data.getDate() +
-        1 +
-        "/" +
-        (data.getMonth() + 1) +
-        "/" +
-        data.getFullYear();
       let _atleta = {
         nome: this.nome,
         email: this.email,
@@ -825,23 +846,11 @@ export default {
           (this.federado = ""),
           (this.federacao = ""),
           (this.dtCadastro = ""),
-          (this.dtNascimento = ""),
-          this.$router.push("/atletas")
+          (this.dtNascimento = "")
         );
     },
 
     editarAtleta(_atleta) {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
-      let data = new Date(this.date);
-      let dataNascimento =
-        data.getDate() +
-        1 +
-        "/" +
-        (data.getMonth() + 1) +
-        "/" +
-        data.getFullYear();
       this.posicao = this.posicoes.filter(x => x.id == _atleta.posicao.id)[0];
       let _atletaEditar = {
         nome: _atleta.nome,
@@ -868,13 +877,12 @@ export default {
           id: this.posicao.id,
           nome: this.posicao.nome
         },
-        dtNascimento: dataNascimento
+        dtNascimento: this.dataNascimento
       };
       this.$http.put(
         `https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${_atleta.id}`,
         _atletaEditar
       );
-      this.$router.push("/atletas");
     }
   },
   adicionarOuEditar(atleta) {

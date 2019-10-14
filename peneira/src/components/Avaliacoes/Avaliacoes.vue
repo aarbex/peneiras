@@ -24,43 +24,6 @@
             ></v-text-field>
           </v-col>
         </template>
-        <!--template-- v-slot:item.action="{ item }">
-          <router-link :to="'/avaliacao/detalhe/' + item.id" tag="button">
-            <v-btn class="mx-2" fab dark xSmall color="black">
-              <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                  <v-icon medium dark v-on="on">mdi-eye</v-icon>
-                </template>
-                <span>Detalhes</span>
-              </v-tooltip>
-            </v-btn>
-          </router-link>
-          <router-link :to="'/avaliacao/' + item.id" tag="button">
-            <v-btn class="mx-2" fab dark xSmall color="primary">
-              <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                  <v-icon medium dark v-on="on">mdi-pencil</v-icon>
-                </template>
-                <span>Editar</span>
-              </v-tooltip>
-            </v-btn>
-          </router-link>
-          <v-btn
-            class="mx-2"
-            fab
-            dark
-            xSmall
-            color="error"
-            @click="removerAvaliacao(item); dialog1 = true"
-          >
-            <v-tooltip top>
-              <template v-slot:activator="{ on }">
-                <v-icon medium dark v-on="on">mdi-trash-can</v-icon>
-              </template>
-              <span>Excluir</span>
-            </v-tooltip>
-          </v-btn>
-        </!--template-->
         <template v-slot:item.action="{ item }">
           <v-menu>
             <template v-slot:activator="{ on }">
@@ -261,10 +224,14 @@
                       v-on="on"
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="date2" no-title scrollable>
+                  <v-date-picker v-model="date2" no-title scrollable locale="pt-BR">
                     <div class="flex-grow-1"></div>
-                    <v-btn text color="primary" @click="menu2 = false">Cancel</v-btn>
-                    <v-btn text color="primary" @click="$refs.menu2.save(date2)">OK</v-btn>
+                    <v-btn text color="primary" @click="menu2 = false ">Cancel</v-btn>
+                    <v-btn
+                      text
+                      color="primary"
+                      @click=" avaliacao.dtInicio = formatDate(date2);$refs.menu2.save(avaliacao.dtInicio)"
+                    >OK</v-btn>
                   </v-date-picker>
                 </v-menu>
               </v-col>
@@ -287,10 +254,14 @@
                       v-on="on"
                     ></v-text-field>
                   </template>
-                  <v-date-picker v-model="date3" no-title scrollable>
+                  <v-date-picker v-model="date3" no-title scrollable locale="pt-BR">
                     <div class="flex-grow-1"></div>
-                    <v-btn text color="primary" @click="menu3 = false">Cancel</v-btn>
-                    <v-btn text color="primary" @click="$refs.menu3.save(date3)">OK</v-btn>
+                    <v-btn text color="primary" @click="menu3 = false ">Cancel</v-btn>
+                    <v-btn
+                      text
+                      color="primary"
+                      @click=" avaliacao.dtDispensa = formatDate(date3);$refs.menu3.save(avaliacao.dtDispensa)"
+                    >OK</v-btn>
                   </v-date-picker>
                 </v-menu>
               </v-col>
@@ -344,7 +315,13 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn color="blue darken-1" text @click="adicionarOuEditar(avaliacao)">Salvar</v-btn>
+          <v-btn
+            v-if="avaliacao.id"
+            color="blue darken-1"
+            text
+            @click="editarAvaliacao(avaliacao)"
+          >Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="addAvaliacao()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -408,8 +385,11 @@ export default {
       dataMask: "##/##/####",
       notaMask: "#,##",
       date: new Date().toISOString().substr(0, 10),
-      date2: "",
-      date3: "",
+      date2: new Date().toISOString().substr(0, 10),
+      date3: new Date().toISOString().substr(0, 10),
+      dateFormatted: "",
+      dateFormatted2: "",
+      dateFormatted3: "",
       menu2: false,
       menu3: false,
       dialog: false,
@@ -484,6 +464,13 @@ export default {
   },
 
   methods: {
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+
     filterOnlyCapsText(value, search) {
       return (
         value != null &&
