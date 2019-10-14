@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <Nav></Nav>
     <v-row class="my-5">
       <h2 class="mx-auto">Posições</h2>
@@ -76,19 +76,57 @@
         <v-card-text>
           <v-container>
             <v-row dense>
-              <v-col cols="12" sm="6" md="9">
+              <v-col cols="12">
                 <v-text-field
                   v-if="usuario.id"
                   v-model="usuario.nome"
                   label="Nome da usuario"
-                  prepend-inner-icon="mdi-soccer-field"
+                  prepend-inner-icon="mdi-account"
                 ></v-text-field>
                 <v-text-field
                   v-else
                   v-model="nome"
                   label="Nome do usuario"
-                  prepend-inner-icon="mdi-soccer-field"
+                  prepend-inner-icon="mdi-account"
                 ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-if="usuario.id"
+                  v-model="usuario.email"
+                  label="Email da usuario"
+                  prepend-inner-icon="mdi-email"
+                ></v-text-field>
+                <v-text-field
+                  v-else
+                  v-model="email"
+                  label="Email do usuario"
+                  prepend-inner-icon="mdi-email"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-select
+                  v-if="usuario.id"
+                  name="Perfil"
+                  v-model="usuario.perfil.id"
+                  :items="perfis"
+                  item-text="nome"
+                  item-value="id"
+                  label="Perfil"
+                  prepend-inner-icon="mdi-account-details"
+                  required
+                ></v-select>
+                <v-select
+                  v-else
+                  v-model="perfil.id"
+                  :items="perfis"
+                  item-text="nome"
+                  item-value="id"
+                  label="Perfil"
+                  name="perfil"
+                  prepend-inner-icon="mdi-account-details"
+                  required
+                ></v-select>
               </v-col>
             </v-row>
           </v-container>
@@ -100,7 +138,7 @@
             v-if="usuario.id"
             color="blue darken-1"
             text
-            @click="editarusuario(usuario);dialog=false"
+            @click="editarUsuario(usuario);dialog=false"
           >Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="addUsuario();dialog=false">Salvar</v-btn>
         </v-card-actions>
@@ -123,7 +161,7 @@
     <div class="flex-grow-1">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019 - Todos os direitos reservados</small>
     </div>
-  </v-container>
+  </div>
 </template>
 
 <script>
@@ -144,14 +182,21 @@ export default {
 
   data() {
     return {
+      search: "",
+      nome: "",
+      email: "",
+      dtCadastro: "",
       dialog: false,
       dialog1: false,
-      dialog3: false,
       show1: false,
       show2: false,
       password1: "",
       password2: "",
-      email: "",
+      perfil: {},
+      perfis: [],
+      senhaAux1: "",
+      senhaAux2: "",
+      senha: "",
       rules: {
         required: value => !!value || "Required.",
         min: v => v.length >= 8 || "Min 8 characters",
@@ -163,6 +208,29 @@ export default {
       id: this.$route.params.id
     };
   },
+  computed: {
+    headers() {
+      return [
+        {
+          text: "ID",
+          align: "center",
+          value: "id"
+        },
+        { text: "Nome", value: "nome", align: "center" },
+        { text: "E-mail", value: "email", align: "center" },
+        { text: "Perfil", value: "perfil.nome", align: "center" },
+        { text: "Data de Cadastro", value: "dtCadastro", align: "center" },
+        { text: "Ações", value: "action", align: "center", sortable: false }
+      ];
+    },
+    emailErrors() {
+      const errors = [];
+      if (!this.$v.email.$dirty) return errors;
+      !this.$v.email.email && errors.push("Must be valid e-mail");
+      !this.$v.email.required && errors.push("E-mail is required");
+      return errors;
+    }
+  },
 
   created() {
     this.$http
@@ -171,16 +239,13 @@ export default {
       )
       .then(res => res.json())
       .then(usuarios => (this.usuarios = usuarios));
-  },
 
-  computed: {
-    emailErrors() {
-      const errors = [];
-      if (!this.$v.email.$dirty) return errors;
-      !this.$v.email.email && errors.push("Must be valid e-mail");
-      !this.$v.email.required && errors.push("E-mail is required");
-      return errors;
-    }
+    this.$http
+      .get(
+        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/"
+      )
+      .then(res => res.json())
+      .then(perfis => (this.perfis = perfis));
   },
 
   methods: {
@@ -206,6 +271,82 @@ export default {
           //this.usuarios = this.usuarios.filter(u => u.id != usuario.id);
           this.dialog1 = false;
         });
+    },
+    addUsuario() {
+      let now = new Date();
+      this.dtCadastro =
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      let _senha = "";
+      if (this.senha1 === this.senha2) {
+        _senha = this.senha1;
+      }
+      this.perfil = this.perfis.filter(x => x.id == this.perfil.id)[0];
+      let _usuario = {
+        nome: this.nome,
+        email: this.email,
+        senha: _senha,
+        dtCadastro: this.dtCadastro,
+        perfil: {
+          id: this.perfil.id,
+          nome: this.perfil.nome
+        },
+        senhaAux1: this.senhaAux1,
+        senhaAux2: this.senhaAux2
+      };
+      this.$http
+        .post(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios",
+          _usuario
+        )
+        .then(res => res.json())
+        .then(
+          (this.nome = ""),
+          (this.email = ""),
+          (this.dtCadastro = ""),
+          (this.perfil = {}),
+          (this.senha = ""),
+          (this.senhaAux1 = ""),
+          (this.senhaAux2 = ""),
+          this.$router.push("/usuarios")
+        );
+    },
+
+    editarUsuario(_usuario) {
+      let now = new Date();
+      this.dtCadastro =
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      let _senha = "";
+      if (_usuario.senhaAux1 === _usuario.senhaAux2) {
+        _senha = _usuario.senhaAux1;
+      }
+      this.perfil = this.perfis.filter(x => x.id == this.usuario.perfil.id)[0];
+      let _usuarioEditar = {
+        nome: _usuario.nome,
+        email: _usuario.email,
+        senha: _senha,
+        senhaAux1: _usuario.senhaAux1,
+        senhaAux2: _usuario.senhaAux2,
+        dtCadastro: this.dtCadastro,
+        perfil: {
+          id: this.perfil.id,
+          nome: this.perfil.nome
+        }
+      };
+      this.$http.put(
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/${_usuario.id}`,
+        _usuarioEditar
+      );
+      this.$router.push("/usuarios");
+    },
+    limparFormulario() {
+      this.nome = "";
+      this.email = "";
+      this.dtCadastro = "";
+      this.usuario = {};
+      this.perfil = {};
+      this.senha = "";
+      this.senhaAux1 = "";
+      this.senhaAux2 = "";
     }
   }
 };
