@@ -4,48 +4,6 @@
     <v-row class="my-5">
       <h2 class="mx-auto">Categorias</h2>
     </v-row>
-    <!--v-simple-table class="text-center" style="width: 70%; margin: 0 auto">
-      <thead class="text-center">
-        <th class="text-center">ID</th>
-        <th class="text-center">Nome</th>
-        <th class="text-center">Data Cadastro</th>
-        <th class="text-center">Ações</th>
-      </thead>
-      <tbody v-if="categorias.length">
-        <tr v-for="c in categorias" :key="c.id">
-          <td>{{c.id}}</td>
-          <td>{{c.nome}}</td>
-          <td>{{c.dtCadastro}}</td>
-          <td style="width:32%">
-            <router-link :to="'/categoria/' + c.id">
-              <v-btn class="mx-2 btn" fab dark xSmall color="primary">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <v-icon medium dark v-on="on">mdi-pencil</v-icon>
-                  </template>
-                  <span>Editar</span>
-                </v-tooltip>
-              </v-btn>
-            </router-link>
-            <v-btn
-              class="actionButtons"
-              fab
-              dark
-              xSmall
-              @click="categoria = c;dialog2=true"
-              color="error"
-            >
-              <v-tooltip top>
-                <template v-slot:activator="{ on }">
-                  <v-icon medium dark v-on="on">mdi-trash-can</v-icon>
-                </template>
-                <span>Excluir</span>
-              </v-tooltip>
-            </v-btn>
-          </td>
-        </tr>
-      </tbody>
-    </!--v-simple-table>-->
     <v-data-table
       :headers="headers"
       :items="categorias"
@@ -92,18 +50,73 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog2" max-width="290">
+    <v-dialog v-model="dialog" width="80%">
+      <template v-slot:activator="{ on }">
+        <v-btn
+          style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
+          color="primary"
+          class="ms-5 mb-5"
+          fab
+          dark
+          small
+          v-on="on"
+          @click="limparFormulario()"
+        >
+          <v-tooltip top>
+            <template v-slot:activator="{ on }">
+              <v-icon small dark v-on="on">mdi-plus</v-icon>
+            </template>
+            <span>Adicionar</span>
+          </v-tooltip>
+        </v-btn>
+      </template>
       <v-card>
-        <v-card-title class="headline">Atenção!!!</v-card-title>
+        <v-toolbar v-if="categoria.id" dark color="primary">Editar Avaliação</v-toolbar>
+        <v-toolbar v-else dark color="primary">Cadastrar Avaliação</v-toolbar>
+        <v-card-text>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12" sm="6" md="9">
+                <v-text-field
+                  v-if="categoria.id"
+                  v-model="categoria.nome"
+                  label="Nome da Categoria"
+                  prepend-inner-icon="mdi-soccer"
+                ></v-text-field>
+                <v-text-field
+                  v-else
+                  v-model="nome"
+                  label="Nome do Categoria"
+                  prepend-inner-icon="mdi-soccer"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
+          <v-btn
+            v-if="categoria.id"
+            color="blue darken-1"
+            text
+            @click="editarCategoria(categoria);dialog=false"
+          >Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="addCategoria();dialog=false">Salvar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog1" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
 
-        <v-card-text>Deseja realmente excluir a categoria {{categoria.nome}}?</v-card-text>
+        <v-card-text justify="center">Deseja realmente excluir a Categoria {{categoria.nome}}?</v-card-text>
 
         <v-card-actions>
-          <v-spacer></v-spacer>
+          <div class="flex-grow-1"></div>
 
-          <v-btn color="error" text @click="dialog2 = false">Cancelar</v-btn>
-
-          <v-btn color="success" text @click="removerCategoria(categoria)">Confirmar</v-btn>
+          <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
+          <v-btn color="primary" text @click="removerCategoria(categoria); dialog1=false">Excluir</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -121,11 +134,14 @@ export default {
   },
   data() {
     return {
-      dialog2: false,
+      search: "",
+      dialog: false,
+      dialog1: false,
       nome: "",
       nameRules: [v => !!v || "O nome da categoria é obrigatório!"],
       categorias: [],
       categoria: {},
+      dtCadastro: "",
       id: this.$route.params.id
     };
   },
@@ -133,16 +149,23 @@ export default {
     headers() {
       return [
         {
-          text: "Categoria",
-          align: "left",
-          value: "nome",
-
-          width: "50%"
+          text: "ID",
+          value: "id",
+          align: "center"
         },
-        { text: "Data de Cadastro", value: "dtCadastro", width: "40%" },
+        {
+          text: "Categoria",
+          value: "nome",
+          align: "center"
+        },
+        {
+          text: "Data de Cadastro",
+          value: "dtCadastro",
+          align: "center"
+        },
+
         {
           text: "Ações",
-          width: "10%",
           value: "action",
           align: "center",
           sortable: false
@@ -170,6 +193,24 @@ export default {
   },
 
   methods: {
+    filterOnlyCapsText(value, search) {
+      return (
+        value != null &&
+        search != null &&
+        typeof value === "string" &&
+        value
+          .toString()
+          .toLowerCase()
+          .indexOf(search) !== -1
+      );
+    },
+    adicionarOuEditar(categoria) {
+      if (categoria.id) {
+        this.addCategoria();
+      } else {
+        this.editarCategoria(categoria);
+      }
+    },
     removerCategoria(categoria) {
       this.$http
         .delete(
@@ -179,8 +220,49 @@ export default {
           let indice = this.categorias.indexOf(categoria);
           this.categorias.splice(indice, 1);
           //this.categorias = this.categorias.filter(p => p.id != categoria.id);
-          this.dialog2 = false;
+          this.dialog1 = false;
         });
+    },
+    addCategoria() {
+      let now = new Date();
+      this.dtCadastro =
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      let _categoria = {
+        nome: this.nome,
+        dtCadastro: this.dtCadastro
+      };
+      if (this.nome.length > 0) {
+        this.$http
+          .post(
+            "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/",
+            _categoria
+          )
+          .then(res => res.json());
+        this.nome = "";
+        this.dtCadastro = "";
+        this.$router.push("/categorias");
+      }
+    },
+
+    editarCategoria(_categoria) {
+      let now = new Date();
+      this.dtCadastro =
+        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      let _categoriaEditar = {
+        id: _categoria.id,
+        nome: _categoria.nome,
+        dtCadastro: this.dtCadastro
+      };
+      this.$http.put(
+        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/${_categoriaEditar.id}`,
+        _categoriaEditar
+      );
+      this.$router.push("/categorias");
+    },
+    limparFormulario() {
+      this.nome = "";
+      this.dtCadastro = "";
+      this.categoria = {};
     }
   }
 };

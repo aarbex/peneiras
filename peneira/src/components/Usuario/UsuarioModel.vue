@@ -80,7 +80,10 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/" +
+            this.id
+        )
         .then(res => res.json())
         .then(usuario => (this.usuario = usuario));
     }
@@ -97,7 +100,10 @@ export default {
   beforeMount() {
     if (this.id) {
       this.$http
-        .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/" + this.id)
+        .get(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios/" +
+            this.id
+        )
         .then(res => res.json())
         .then(usuario => (this.usuario = usuario));
     }
@@ -126,7 +132,10 @@ export default {
         senhaAux2: this.senhaAux2
       };
       this.$http
-        .post("https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios", _usuario)
+        .post(
+          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/usuarios",
+          _usuario
+        )
         .then(res => res.json())
         .then(
           (this.nome = ""),
