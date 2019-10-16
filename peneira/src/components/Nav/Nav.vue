@@ -1,7 +1,8 @@
 <template>
   <nav>
     <v-app-bar dark app>
-      <v-icon @click.stop="drawer = !drawer">mdi-menu</v-icon>
+      <v-icon v-if="drawer" @click.stop="drawer = !drawer">mdi-arrow-collapse-left</v-icon>
+      <v-icon v-else @click.stop="drawer = !drawer">mdi-menu</v-icon>
       <v-app-bar-title
         align="center"
         cols="12"
@@ -49,9 +50,18 @@
         </v-card>
       </v-menu>
     </v-app-bar>
-    <v-navigation-drawer dense light absolute temporary v-model="drawer" class="px-2">
-      <h3 class="my-3">SISTEMA DE PENEIRAS</h3>
-
+    <v-navigation-drawer
+      dense
+      light
+      app
+      :mobile-break-point="600"
+      hide-overlay
+      v-model="drawer"
+      class="px-2"
+    >
+      <v-row>
+        <h3 class="my-3 mx-auto">SISTEMA DE PENEIRAS</h3>
+      </v-row>
       <v-divider></v-divider>
       <v-list dense>
         <h5 class="ms-4">INÍCIO</h5>

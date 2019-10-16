@@ -5,57 +5,6 @@
       <h2 class="mx-auto">Atletas</h2>
     </v-row>
     <div>
-      <!--v-simple-table>
-        <thead class="text-center">
-          <th class="text-center">Nome</th>
-          <th class="text-center">Email</th>
-          <th class="text-center">CPF</th>
-          <th class="text-center">Data de Nascimento</th>
-          <th class="text-center">Posição</th>
-          <th class="text-center">Data de Cadastro</th>
-          <th class="text-center">Ações</th>
-        </thead>
-        <tbody v-if="atletas.length">
-          <tr v-for="a in atletas" :key="a.id">
-            <td class="text-center">{{a.nome}}</td>
-            <td class="text-center">{{a.email}}</td>
-            <td class="text-center">{{a.cpf}}</td>
-            <td class="text-center">{{a.dtNascimento}}</td>
-            <td class="text-center">{{a.posicao.nome}}</td>
-            <td class="text-center">{{a.dtCadastro}}</td>
-            <td class="text-center" style="width: 20%">
-              <router-link :to="'/atleta/detalhe/' + a.id" tag="button">
-                <v-btn class="mx-2" fab dark xSmall color="black">
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                      <v-icon medium dark v-on="on">mdi-eye</v-icon>
-                    </template>
-                    <span>Detalhes</span>
-                  </v-tooltip>
-                </v-btn>
-              </router-link>
-              <router-link :to="'/atleta/' + a.id">
-                <v-btn class="mx-2" fab dark xSmall color="primary">
-                  <v-tooltip top>
-                    <template v-slot:activator="{ on }">
-                      <v-icon medium dark v-on="on">mdi-pencil</v-icon>
-                    </template>
-                    <span>Editar</span>
-                  </v-tooltip>
-                </v-btn>
-              </router-link>
-              <v-btn class="mx-2" fab dark xSmall color="error" @click="atleta = a;dialog1 = true">
-                <v-tooltip top>
-                  <template v-slot:activator="{ on }">
-                    <v-icon medium dark v-on="on">mdi-trash-can</v-icon>
-                  </template>
-                  <span>Excluir</span>
-                </v-tooltip>
-              </v-btn>
-            </td>
-          </tr>
-        </tbody>
-      </!--v-simple-table>-->
       <v-data-table
         :headers="headers"
         :items="atletas"
@@ -64,6 +13,7 @@
         class="elevation-1 px-5"
         :search="search"
         :custom-filter="filterOnlyCapsText"
+        mobile-breakpoint="0"
       >
         <template v-slot:top>
           <v-col cols="12">
@@ -115,13 +65,12 @@
           class="ms-5 mb-5"
           fab
           dark
-          small
           v-on="on"
           @click="limparFormulario()"
         >
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-icon small dark v-on="on">mdi-plus</v-icon>
+              <v-icon dark v-on="on">mdi-plus</v-icon>
             </template>
             <span>Adicionar</span>
           </v-tooltip>
@@ -132,8 +81,24 @@
         <v-toolbar v-else dark color="primary">Cadastrar Atleta</v-toolbar>
         <v-card-text>
           <v-container>
-            <v-row dense>
-              <v-col cols="12">
+            <v-row align="baseline" dense>
+              <v-col cols="12" sm="6" md="2">
+                <picture-input
+                  ref="pictureInput"
+                  @change="onChange"
+                  width="90"
+                  height="120"
+                  accept="image/jpeg, image/png"
+                  size="10"
+                  buttonClass="btn"
+                  :zindex="0"
+                  :customStrings="{
+                    drag: 'Arraste ou clique aqui para selecionar uma foto',
+                    tap: 'Clique aqui para selecionar uma foto',
+                    change: 'Alterar Foto'      }"
+                ></picture-input>
+              </v-col>
+              <v-col cols="12" sm="6" md="10">
                 <v-text-field
                   v-if="atleta.id"
                   v-model="atleta.nome"
@@ -154,24 +119,8 @@
                   auto-select-first
                 ></v-text-field>
               </v-col>
-              <v-col cols="12" sm="6" md="4">
-                <v-file-input
-                  v-if="atleta.id"
-                  v-model="atleta.foto"
-                  :rules="rules"
-                  accept="image/png, image/jpeg, image/bmp"
-                  prepend-icon="mdi-camera"
-                  label="Foto"
-                ></v-file-input>
-                <v-file-input
-                  v-else
-                  :rules="rules"
-                  accept="image/png, image/jpeg, image/bmp"
-                  prepend-icon="mdi-camera"
-                  label="Foto"
-                ></v-file-input>
-              </v-col>
-              <v-col cols="12" sm="6" md="5">
+
+              <v-col cols="12" sm="6" md="9">
                 <v-text-field
                   v-if="atleta.id"
                   v-model="atleta.email"
@@ -607,21 +556,23 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <div class="flex-grow-1">
-      <small class="mx-5">Sport Club Corinthians Paulista © 2019 - Todos os direitos reservados</small>
+    <div class="flex-grow-1 mx-auto" align="center">
+      <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
+      <br />
+      <small class="mx-5">Todos os direitos reservados</small>
     </div>
   </div>
 </template>
 
 <script>
 import Nav from "../Nav/Nav";
-//import PictureInput from "vue-picture-input";
+import PictureInput from "vue-picture-input";
 import { mask } from "vue-the-mask";
 
 export default {
   components: {
-    Nav
-    //PictureInput
+    Nav,
+    PictureInput
   },
   directives: {
     mask
@@ -737,6 +688,12 @@ export default {
   },
 
   methods: {
+    onChange(image) {
+      if (image) {
+        this.foto = image;
+      }
+    },
+
     formatDate(date) {
       if (!date) return null;
 
@@ -883,26 +840,27 @@ export default {
         `https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${_atleta.id}`,
         _atletaEditar
       );
+    },
+
+    adicionarOuEditar(atleta) {
+      if (atleta.id) {
+        this.addAtleta();
+      } else {
+        this.editarAtleta(atleta);
+      }
+    },
+    removerAtleta(atleta) {
+      this.$http
+        .delete(
+          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${atleta.id}`
+        )
+        .then(() => {
+          let indice = this.atletas.indexOf(atleta);
+          this.atletas.splice(indice, 1);
+          //this.atletas = this.atletas.filter(u => u.id != atleta.id);
+          this.dialog1 = false;
+        });
     }
-  },
-  adicionarOuEditar(atleta) {
-    if (atleta.id) {
-      this.addAtleta();
-    } else {
-      this.editarAtleta(atleta);
-    }
-  },
-  removerAtleta(atleta) {
-    this.$http
-      .delete(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${atleta.id}`
-      )
-      .then(() => {
-        let indice = this.atletas.indexOf(atleta);
-        this.atletas.splice(indice, 1);
-        //this.atletas = this.atletas.filter(u => u.id != atleta.id);
-        this.dialog1 = false;
-      });
   }
 };
 </script>

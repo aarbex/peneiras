@@ -13,6 +13,7 @@
       class="elevation-1 px-5"
       :search="search"
       :custom-filter="filterOnlyCapsText"
+      mobile-breakpoint="0"
     >
       <template v-slot:top>
         <v-col cols="12">
@@ -58,13 +59,12 @@
           class="ms-5 mb-5"
           fab
           dark
-          small
           v-on="on"
           @click="limparFormulario()"
         >
           <v-tooltip top>
             <template v-slot:activator="{ on }">
-              <v-icon small dark v-on="on">mdi-plus</v-icon>
+              <v-icon dark v-on="on">mdi-plus</v-icon>
             </template>
             <span>Adicionar</span>
           </v-tooltip>
@@ -158,8 +158,10 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <div class="flex-grow-1">
-      <small class="mx-5">Sport Club Corinthians Paulista © 2019 - Todos os direitos reservados</small>
+    <div class="flex-grow-1 mx-auto" align="center">
+      <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
+      <br />
+      <small class="mx-5">Todos os direitos reservados</small>
     </div>
   </div>
 </template>
