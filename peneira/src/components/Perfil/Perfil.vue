@@ -22,6 +22,7 @@
             label="Pesquisar em perfis cadastradas"
             prepend-inner-icon="mdi-magnify"
             filled
+            clearable
           ></v-text-field>
         </v-col>
       </template>
@@ -34,11 +35,11 @@
           </template>
 
           <v-list bottom>
-            <v-list-item>
-              <v-list-item-title @click="dialog = true; perfil = item">Editar</v-list-item-title>
+            <v-list-item @click="dialog = true; perfil = item; carregaPerfil(item)">
+              <v-list-item-title text>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item>
-              <v-list-item-title @click="dialog1 = true; perfil = item">Excluir</v-list-item-title>
+            <v-list-item @click="dialog1 = true; perfil = item">
+              <v-list-item-title text>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -76,18 +77,26 @@
         <v-card-text>
           <v-container>
             <v-row dense>
-              <v-col cols="12" sm="6" md="9">
+              <v-col cols="12">
                 <v-text-field
                   v-if="perfil.id"
-                  v-model="perfil.nome"
+                  v-model="nome"
                   label="Nome do Perfil"
                   prepend-inner-icon="mdi-account-details"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="editarPerfil(perfil)"
                 ></v-text-field>
                 <v-text-field
                   v-else
                   v-model="nome"
                   label="Nome do Perfil"
                   prepend-inner-icon="mdi-account-details"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="verificaPerfil()"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -96,13 +105,8 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn
-            v-if="perfil.id"
-            color="blue darken-1"
-            text
-            @click="editarPerfil(perfil);dialog=false"
-          >Salvar</v-btn>
-          <v-btn v-else color="blue darken-1" text @click="addPerfil();dialog=false">Salvar</v-btn>
+          <v-btn v-if="perfil.id" color="blue darken-1" text @click="editarPerfil(perfil)">Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="verificaPerfil()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -117,6 +121,19 @@
 
           <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
           <v-btn color="primary" text @click="removerPerfil(perfil); dialog1=false">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">O perfil "{{this.nome}}" já está cadastrado!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -139,22 +156,22 @@ export default {
       search: "",
       dialog: false,
       dialog1: false,
+      dialog2: false,
       nome: "",
-      nameRules: [v => !!v || "O nome da perfil é obrigatório!"],
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório."
+      },
       perfis: [],
       perfil: {},
+      perfilVerificado: "",
       dtCadastro: "",
+      date: new Date().toISOString().substr(0, 10),
       id: this.$route.params.id
     };
   },
   computed: {
     headers() {
       return [
-        {
-          text: "ID",
-          align: "center",
-          value: "id"
-        },
         {
           text: "Perfil",
           align: "center",
@@ -178,14 +195,12 @@ export default {
 
   created() {
     this.$http
-      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis")
-      .then(res => res.json())
-      .then(perfis => (this.perfis = perfis));
-  },
-
-  beforeMount() {
-    this.$http
-      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis")
+      .get("perfis", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(perfis => (this.perfis = perfis));
   },
@@ -202,18 +217,20 @@ export default {
           .indexOf(search) !== -1
       );
     },
-    adicionarOuEditar(perfil) {
-      if (perfil.id) {
-        this.addPerfil();
-      } else {
-        this.editarPerfil(perfil);
-      }
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
     },
     removerPerfil(perfil) {
       this.$http
-        .delete(
-          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/${perfil.id}`
-        )
+        .delete(`perfis/${perfil.id}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(() => {
           let indice = this.perfis.indexOf(perfil);
           this.perfis.splice(indice, 1);
@@ -221,41 +238,53 @@ export default {
           this.dialog1 = false;
         });
     },
+    verificaPerfil() {
+      this.perfilVerificado = this.perfis.filter(x => x.nome === this.nome)[0];
+      if (this.perfilVerificado) {
+        this.dialog2 = true;
+      } else {
+        this.addPerfil();
+        this.perfilVerificado = "";
+      }
+    },
     addPerfil() {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.dtCadastro = this.formatDate(this.date);
       let _perfil = {
         nome: this.nome,
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
         this.$http
-          .post(
-            "https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/",
-            _perfil
-          )
+          .post("perfis", _perfil, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
           .then(res => res.json());
-        this.nome = "";
-        this.dtCadastro = "";
-        this.$router.push("/perfis");
+        window.location.href = window.location.origin + "/perfis";
       }
     },
 
     editarPerfil(_perfil) {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
       let _perfilEditar = {
         id: _perfil.id,
-        nome: _perfil.nome,
+        nome: this.nome,
         dtCadastro: this.dtCadastro
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/perfis/${_perfilEditar.id}`,
-        _perfilEditar
-      );
-      this.$router.push("/perfis");
+      if (this.nome.length > 0) {
+        this.$http.put(`perfis/${_perfilEditar.id}`, _perfilEditar, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        });
+        window.location.href = window.location.origin + "/perfis";
+      }
+    },
+    carregaPerfil(perfil) {
+      this.nome = perfil.nome;
+      this.dtCadastro = perfil.dtCadastro;
     },
     limparFormulario() {
       this.nome = "";

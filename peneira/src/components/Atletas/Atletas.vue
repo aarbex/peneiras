@@ -8,7 +8,7 @@
       <v-data-table
         :headers="headers"
         :items="atletas"
-        sort-by="dtInicio"
+        sort-by="nome"
         item-key="id"
         class="elevation-1 px-5"
         :search="search"
@@ -22,6 +22,7 @@
               label="Pesquisar em atletas cadastrados"
               prepend-inner-icon="mdi-magnify"
               filled
+              clearable
             ></v-text-field>
           </v-col>
         </template>
@@ -36,14 +37,14 @@
             <v-list bottom>
               <router-link :to="'/atleta/detalhe/' + item.id" tag="button">
                 <v-list-item>
-                  <v-list-item-title xSmall>Detalhes</v-list-item-title>
+                  <v-item-list-title xSmall>Detalhes</v-item-list-title>
                 </v-list-item>
               </router-link>
-              <v-list-item>
-                <v-list-item-title @click="dialog = true; atleta = item">Editar</v-list-item-title>
+              <v-list-item @click="dialog = true; atleta = item; carregaAtleta(item)">
+                <v-item-list-title>Editar</v-item-list-title>
               </v-list-item>
-              <v-list-item>
-                <v-list-item-title @click="dialog1 = true; atleta = item">Excluir</v-list-item-title>
+              <v-list-item @click="dialog1 = true; atleta = item">
+                <v-item-list-title>Excluir</v-item-list-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -84,7 +85,8 @@
             <v-row align="baseline" dense>
               <v-col cols="12" sm="6" md="2">
                 <picture-input
-                  ref="pictureInput"
+                  ref="foto"
+                  :prefill="this.foto"
                   @change="onChange"
                   width="90"
                   height="120"
@@ -100,52 +102,51 @@
               </v-col>
               <v-col cols="12" sm="6" md="10">
                 <v-text-field
-                  v-if="atleta.id"
-                  v-model="atleta.nome"
-                  :items="atletas"
-                  item-text="nome"
-                  item-value="id"
-                  label="Nome do Atleta"
-                  prepend-inner-icon="mdi-account-badge-horizontal"
-                ></v-text-field>
-                <v-text-field
-                  v-else
-                  v-model="atleta.nome"
-                  :items="atletas"
-                  item-text="nome"
-                  item-value="id"
+                  v-model="nome"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   prepend-inner-icon="mdi-account-badge-horizontal"
                   label="Nome do Atleta"
                   auto-select-first
+                  class="text-capitalized"
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
 
               <v-col cols="12" sm="6" md="9">
                 <v-text-field
-                  v-if="atleta.id"
-                  v-model="atleta.email"
+                  v-model="email"
                   prepend-inner-icon="mdi-email"
                   label="E-mail"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required, rules.email]"
                 ></v-text-field>
-                <v-text-field v-else v-model="email" prepend-inner-icon="mdi-email" label="E-mail"></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="3">
                 <v-menu
                   ref="menu2"
                   v-model="menu2"
                   :close-on-content-click="false"
-                  :return-value.sync="atleta.dtNascimento"
+                  :return-value.sync="dtNascimento"
                   transition="scale-transition"
                   offset-y
+                  v-mask="dataMask"
                   full-width
                   min-width="290px"
                 >
                   <template v-slot:activator="{ on }">
                     <v-text-field
-                      v-model="atleta.dtNascimento"
+                      v-model="dtNascimento"
                       label="Data de Nascimento"
                       prepend-inner-icon="mdi-calendar-month"
                       v-on="on"
+                      hint="* Preenchimento Obrigatório"
+                      persistent-hint
+                      required
+                      :rules="[rules.required]"
                     ></v-text-field>
                   </template>
                   <v-date-picker v-model="date2" no-title scrollable locale="pt-BR">
@@ -161,53 +162,40 @@
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  v-mask="cpfMask"
-                  v-model="atleta.cpf"
-                  label="CPF"
-                  prepend-inner-icon="mdi-account-badge"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   v-model="cpf"
                   prepend-inner-icon="mdi-account-badge"
                   v-mask="cpfMask"
                   label="CPF"
                   required
+                  filled
+                  readonly
+                ></v-text-field>
+                <v-text-field
+                  v-model="cpf"
+                  prepend-inner-icon="mdi-account-badge"
+                  v-mask="cpfMask"
+                  label="CPF"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  @blur="verificaAtletaCPF()"
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  v-mask="rgMask"
-                  v-model="atleta.rg"
-                  prepend-inner-icon="mdi-account-badge"
-                  label="RG"
-                  required
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   v-model="rg"
                   prepend-inner-icon="mdi-account-badge"
                   v-mask="rgMask"
                   label="RG"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="3">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="cep"
-                  prepend-inner-icon="mdi-home-account"
-                  v-model="atleta.cep"
-                  label="CEP"
-                  append-icon="mdi-magnify"
-                  @click:append="buscaEndereco(atleta.cep)"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="cep"
                   v-model="cep"
                   prepend-inner-icon="mdi-home-account"
@@ -215,56 +203,42 @@
                   label="CEP"
                   @click:append="buscaEndereco(cep)"
                   @blur="buscaEndereco(cep)"
+                  v-mask="cepMask"
                   value
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="7">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="rua"
-                  prepend-inner-icon="mdi-home-account"
-                  v-model="atleta.logradouro"
-                  label="Endereço (Rua / Avenida)"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="rua"
                   v-model="endereco.logradouro"
                   prepend-inner-icon="mdi-home-account"
                   label="Endereço (Rua / Avenida)"
                   value
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="2">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="num"
-                  prepend-inner-icon="mdi-home-account"
-                  v-model="atleta.num"
-                  label="Número"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="num"
                   v-model="num"
                   prepend-inner-icon="mdi-home-account"
                   label="Número"
                   value
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="complemento"
-                  prepend-inner-icon="mdi-home-account"
-                  v-model="atleta.complemento"
-                  label="Complemento"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="complemento"
                   prepend-inner-icon="mdi-home-account"
                   v-model="complemento"
@@ -274,220 +248,145 @@
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="bairro"
-                  prepend-inner-icon="mdi-home-account"
-                  v-model="atleta.bairro"
-                  label="Bairro"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="bairro"
                   prepend-inner-icon="mdi-home-account"
                   v-model="endereco.bairro"
                   label="Bairro"
                   value
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="9">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="cidade"
-                  prepend-inner-icon="mdi-home-account"
-                  v-model="atleta.localidade"
-                  label="Cidade"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="cidade"
                   prepend-inner-icon="mdi-home-account"
                   v-model="endereco.localidade"
                   label="Cidade"
                   value
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="3">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="uf"
-                  prepend-inner-icon="mdi-home-account"
-                  v-model="atleta.uf"
-                  label="UF"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="uf"
                   prepend-inner-icon="mdi-home-account"
                   v-model="endereco.uf"
                   label="UF"
                   value
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="celular"
-                  prepend-inner-icon="mdi-cellphone-iphone"
-                  v-model="atleta.celular"
-                  label="Telefone Celular"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="celular"
                   prepend-inner-icon="mdi-cellphone-iphone"
                   v-model="celular"
+                  v-mask="celMask"
                   label="Telefone Celular"
                   value
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="telefone"
-                  prepend-inner-icon="mdi-phone"
-                  v-model="atleta.tel"
-                  label="Telefone Fixo"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="telefone"
                   prepend-inner-icon="mdi-phone"
                   v-model="tel"
+                  v-mask="telMask"
                   label="Telefone Fixo"
                   value
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-select
-                  v-if="atleta.id"
-                  name="escolaridade"
-                  v-model="atleta.escolaridade"
-                  :items="escolaridades"
-                  label="Escolaridade"
-                  prepend-inner-icon="mdi-school"
-                  required
-                ></v-select>
-                <v-select
-                  v-else
                   name="escolaridade"
                   v-model="escolaridade"
                   :items="escolaridades"
                   label="Escolaridade"
                   prepend-inner-icon="mdi-school"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
+                  :rules="[rules.required]"
                 ></v-select>
               </v-col>
               <v-col cols="12">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="escola"
-                  prepend-inner-icon="mdi-school"
-                  v-model="atleta.nomeEscola"
-                  label="Escola"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="escola"
                   prepend-inner-icon="mdi-school"
                   v-model="nomeEscola"
                   label="Escola"
+                  class="text-capitalized"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   value
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="pai"
-                  prepend-inner-icon="mdi-face"
-                  v-model="atleta.pai"
-                  label="Pai"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="pai"
                   prepend-inner-icon="mdi-face"
                   v-model="pai"
                   label="Pai"
+                  class="text-capitalized"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   value
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="mae"
-                  prepend-inner-icon="mdi-face-woman"
-                  v-model="atleta.mae"
-                  label="Mãe"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="mae"
                   prepend-inner-icon="mdi-face-woman"
                   v-model="mae"
                   label="Mãe"
+                  class="text-capitalized"
                   value
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  v-if="atleta.id"
-                  name="posicao"
-                  v-model="atleta.posicao.id"
-                  :items="posicoes"
-                  prepend-inner-icon="mdi-soccer-field"
-                  item-text="nome"
-                  item-value="id"
-                  label="posicao"
-                  required
-                ></v-select>
-                <v-select
-                  v-else
-                  v-model="posicao.id"
+                  v-model="posicaoID"
                   :items="posicoes"
                   item-text="nome"
                   item-value="id"
                   prepend-inner-icon="mdi-soccer-field"
-                  label="posicao"
+                  label="Posição"
                   name="posicao"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
+                  :rules="[rules.required]"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  name="indicacao"
-                  prepend-inner-icon="mdi-account-tie"
-                  v-model="atleta.indicacao"
-                  label="Indicação"
-                  value
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   name="indicacao"
                   prepend-inner-icon="mdi-account-tie"
                   v-model="indicacao"
                   label="Indicação"
+                  class="text-capitalized"
                   value
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="2">
                 <v-checkbox
-                  v-if="atleta.id"
-                  v-model="atleta.alojamento"
-                  label="Necessita alojamento?"
-                  hide-details
-                  class="shrink mr-2 mt-0"
-                ></v-checkbox>
-                <v-checkbox
-                  v-else
                   v-model="alojamento"
                   label="Necessita alojamento?"
                   hide-details
@@ -496,14 +395,6 @@
               </v-col>
               <v-col cols="12" sm="6" md="2">
                 <v-checkbox
-                  v-if="atleta.id"
-                  v-model="atleta.federado"
-                  label="Atleta Federado?"
-                  hide-details
-                  class="shrink mr-2 mt-0"
-                ></v-checkbox>
-                <v-checkbox
-                  v-else
                   v-model="federado"
                   label="Atleta Federado?"
                   hide-details
@@ -512,15 +403,7 @@
               </v-col>
               <v-col cols="12" sm="3" md="8">
                 <v-text-field
-                  :disabled="!atleta.federado"
-                  v-if="atleta.id"
-                  v-model="atleta.federacao"
-                  prepend-inner-icon="mdi-soccer"
-                  label="Qual Federação?"
-                ></v-text-field>
-                <v-text-field
                   :disabled="!federado"
-                  v-else
                   v-model="federacao"
                   label="Qual Federação?"
                   prepend-inner-icon="mdi-soccer"
@@ -534,7 +417,7 @@
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
           <v-btn v-if="atleta.id" color="blue darken-1" text @click="editarAtleta(atleta)">Salvar</v-btn>
-          <v-btn v-else color="blue darken-1" text @click="addAtleta()">Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="verificaAtleta()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -553,6 +436,32 @@
 
           <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
           <v-btn color="primary" text @click="removerAtleta(atleta); dialog1=false">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Já existe um atleta cadastrado com o CPF "{{this.cpf}}"!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Há campos obrigatórios que não foram preenchidos!!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -599,6 +508,7 @@ export default {
       nomeEscola: "",
       pai: "",
       mae: "",
+      posicaoID: "",
       indicacao: "",
       alojamento: "",
       federado: "",
@@ -607,6 +517,7 @@ export default {
       endereco: {},
       atleta: {},
       atletas: [],
+      atletaVerificado: "",
       posicao: {},
       posicoes: [],
       id: this.$route.params.id,
@@ -624,25 +535,29 @@ export default {
         "Pós-graduação (Stricto sensu, nível doutor) - Incompleto",
         "Pós-graduação (Stricto sensu, nível doutor) - Completo"
       ],
-      date: new Date().toLocaleString().substr(0, 10),
+      date: new Date().toISOString().substr(0, 10),
       date2: new Date().toISOString().substr(0, 10),
       search: "",
       menu: false,
       menu2: false,
       dialog: false,
       dialog1: false,
+      dialog2: false,
+      dialog3: false,
       cpfMask: "###.###.###-##",
-      rgMask: "##.###.###-#",
+      rgMask: "##.###.###-X",
       dataMask: "##/##/####",
       celMask: "(##) #####-####",
       telMask: "(##) ####-####",
-      cepMask: "##.###-###",
-      rules: [
-        value =>
-          !value ||
-          value.size < 2000000 ||
-          "O tamanho da foto deve ser menor do que 2MB!"
-      ]
+      cepMask: "#####-###",
+      fileSelected: "",
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório.",
+        email: value => {
+          const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return pattern.test(value) || "E-mail inválido.";
+        }
+      }
     };
   },
   computed: {
@@ -656,7 +571,7 @@ export default {
         { text: "E-mail", value: "email" },
         { text: "CPF", value: "cpf" },
         { text: "Data de Nascimento", value: "dtNascimento" },
-        { text: "Posição", value: "posicao.nome" },
+        { text: "Posição", value: "posicao" },
         { text: "Data de Cadastro", value: "dtCadastro" },
         { text: "Ações", value: "action", align: "center", sortable: false }
       ];
@@ -665,24 +580,33 @@ export default {
 
   created() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/"
-      )
+      .get("atletas", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(atletas => (this.atletas = atletas));
 
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes"
-      )
+      .get("posicoes", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(posicoes => (this.posicoes = posicoes));
   },
   beforeMount() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/"
-      )
+      .get("atletas", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(atletas => (this.atletas = atletas));
   },
@@ -691,6 +615,26 @@ export default {
     onChange(image) {
       if (image) {
         this.foto = image;
+        alert(this.foto);
+      } else {
+        alert("Imagem não suportada!");
+      }
+    },
+
+    verificaAtletaCPF() {
+      this.atletaVerificado = this.atletas.filter(x => x.cpf === this.cpf)[0];
+      if (this.atletaVerificado) {
+        this.dialog2 = true;
+      }
+    },
+
+    verificaAtleta() {
+      this.atletaVerificado = this.atletas.filter(x => x.cpf === this.cpf)[0];
+      if (this.atletaVerificado) {
+        this.dialog2 = true;
+      } else {
+        this.addAtleta();
+        this.atletaVerificado = "";
       }
     },
 
@@ -724,11 +668,12 @@ export default {
         (this.cpf = ""),
         (this.rg = ""),
         (this.dtNascimento = ""),
-        (this.endereco = ""),
+        (this.logradouro = ""),
         (this.num = ""),
+        (this.complemento = ""),
         (this.bairro = ""),
         (this.cep = ""),
-        (this.cidade = ""),
+        (this.localidade = ""),
         (this.uf = ""),
         (this.celular = ""),
         (this.tel = ""),
@@ -737,6 +682,7 @@ export default {
         (this.pai = ""),
         (this.mae = ""),
         (this.indicacao = ""),
+        (this.alojamento = ""),
         (this.federado = ""),
         (this.federacao = ""),
         (this.dtCadastro = ""),
@@ -744,116 +690,159 @@ export default {
     },
     addAtleta() {
       this.dtCadastro = this.formatDate(this.date);
-      this.posicao = this.posicoes.filter(x => x.id == this.posicao.id)[0];
       let _atleta = {
+        foto: this.foto,
         nome: this.nome,
         email: this.email,
         cpf: this.cpf,
         rg: this.rg,
-        endereco: this.endereco,
+        logradouro: this.endereco.logradouro,
         num: this.num,
-        bairro: this.bairro,
-        cep: this.cep,
-        cidade: this.cidade,
-        uf: this.uf,
+        complemento: this.complemento,
+        bairro: this.endereco.bairro,
+        cep: this.endereco.cep,
+        localidade: this.endereco.localidade,
+        uf: this.endereco.uf,
         celular: this.celular,
         tel: this.tel,
         escolaridade: this.escolaridade,
         nomeEscola: this.nomeEscola,
         pai: this.pai,
         mae: this.mae,
-        posicao: {
-          id: this.posicao.id,
-          nome: this.posicao.nome
-        },
+        posicaoID: this.posicaoID,
         indicacao: this.indicacao,
+        alojamento: this.alojamento,
         federado: this.federado,
         federacao: this.federacao,
         dtCadastro: this.dtCadastro,
         dtNascimento: this.dtNascimento
       };
-      this.$http
-        .post(
-          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas",
-          _atleta
-        )
-        .then(res => res.json())
-        .then(
-          (this.nome = ""),
-          (this.email = ""),
-          (this.cpf = ""),
-          (this.rg = ""),
-          (this.endereco = ""),
-          (this.num = ""),
-          (this.bairro = ""),
-          (this.cep = ""),
-          (this.cidade = ""),
-          (this.uf = ""),
-          (this.celular = ""),
-          (this.tel = ""),
-          (this.escolaridade = ""),
-          (this.nomeEscola = ""),
-          (this.posicao = {
-            id: "",
-            nome: ""
-          }),
-          (this.pai = ""),
-          (this.mae = ""),
-          (this.indicacao = ""),
-          (this.federado = ""),
-          (this.federacao = ""),
-          (this.dtCadastro = ""),
-          (this.dtNascimento = "")
-        );
+      if (
+        this.nome.length == 0 ||
+        this.email.length == 0 ||
+        this.dtNascimento.length == 0 ||
+        this.cpf.length == 0 ||
+        this.rg.length == 0 ||
+        this.cep.length == 0 ||
+        this.endereco.logradouro.length == 0 ||
+        this.endereco.bairro.length == 0 ||
+        this.endereco.localidade.length == 0 ||
+        this.endereco.uf.length == 0 ||
+        this.num.length == 0 ||
+        this.escolaridade.length == 0 ||
+        this.nomeEscola.length == 0 ||
+        this.pai.length == 0 ||
+        this.mae.length == 0 ||
+        this.posicaoID.length == 0
+      ) {
+        this.dialog3 = true;
+      } else {
+        this.$http
+          .post("atletas", _atleta, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
+          .then(res => res.json());
+        window.location.href = window.location.origin + "/atletas";
+      }
     },
 
     editarAtleta(_atleta) {
-      this.posicao = this.posicoes.filter(x => x.id == _atleta.posicao.id)[0];
+      //this.cep = _atleta.cep;
+      //this.buscaEndereco(this.cep);
       let _atletaEditar = {
-        nome: _atleta.nome,
-        email: _atleta.email,
-        cpf: _atleta.cpf,
-        rg: _atleta.rg,
-        endereco: _atleta.endereco,
-        num: _atleta.num,
-        bairro: _atleta.bairro,
-        cep: _atleta.cep,
-        cidade: _atleta.cidade,
-        uf: _atleta.uf,
-        celular: _atleta.celular,
-        tel: _atleta.tel,
-        escolaridade: _atleta.escolaridade,
-        nomeEscola: _atleta.nomeEscola,
-        pai: _atleta.pai,
-        mae: _atleta.mae,
-        indicacao: _atleta.indicacao,
-        federado: _atleta.federado,
-        federacao: _atleta.federacao,
-        dtCadastro: _atleta.dtCadastro,
-        posicao: {
-          id: this.posicao.id,
-          nome: this.posicao.nome
-        },
-        dtNascimento: this.dataNascimento
+        foto: this.foto,
+        nome: this.nome,
+        email: this.email,
+        cpf: this.cpf,
+        rg: this.rg,
+        logradouro: this.endereco.logradouro,
+        num: this.num,
+        complemento: this.complemento,
+        bairro: this.endereco.bairro,
+        cep: this.cep,
+        localidade: this.endereco.localidade,
+        uf: this.endereco.uf,
+        celular: this.celular,
+        tel: this.tel,
+        escolaridade: this.escolaridade,
+        nomeEscola: this.nomeEscola,
+        pai: this.pai,
+        mae: this.mae,
+        indicacao: this.indicacao,
+        federado: this.federado,
+        federacao: this.federacao,
+        alojamento: this.alojamento,
+        dtCadastro: this.dtCadastro,
+        posicaoID: this.posicaoID,
+        dtNascimento: this.dtNascimento
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${_atleta.id}`,
-        _atletaEditar
-      );
-    },
-
-    adicionarOuEditar(atleta) {
-      if (atleta.id) {
-        this.addAtleta();
+      if (
+        this.nome.length == 0 ||
+        this.email.length == 0 ||
+        this.dtNascimento.length == 0 ||
+        this.cpf.length == 0 ||
+        this.rg.length == 0 ||
+        this.cep.length == 0 ||
+        this.endereco.logradouro.length == 0 ||
+        this.endereco.bairro.length == 0 ||
+        this.endereco.localidade.length == 0 ||
+        this.endereco.uf.length == 0 ||
+        this.num.length == 0 ||
+        this.escolaridade.length == 0 ||
+        this.nomeEscola.length == 0 ||
+        this.pai.length == 0 ||
+        this.mae.length == 0 ||
+        this.posicaoID.length == 0
+      ) {
+        this.dialog3 = true;
       } else {
-        this.editarAtleta(atleta);
+        this.$http.put(`atletas/${_atleta.id}`, _atletaEditar, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        });
+        window.location.href = window.location.origin + "/atletas";
       }
+    },
+    carregaAtleta(atleta) {
+      (this.nome = atleta.nome),
+        (this.foto = atleta.foto),
+        (this.email = atleta.email),
+        (this.cpf = atleta.cpf),
+        (this.rg = atleta.rg),
+        (this.dtNascimento = atleta.dtNascimento),
+        (this.endereco.logradouro = atleta.logradouro),
+        (this.num = atleta.num),
+        (this.complemento = atleta.complemento),
+        (this.endereco.bairro = atleta.bairro),
+        (this.cep = atleta.cep),
+        (this.endereco.localidade = atleta.localidade),
+        (this.endereco.uf = atleta.uf),
+        (this.celular = atleta.celular),
+        (this.tel = atleta.tel),
+        (this.escolaridade = atleta.escolaridade),
+        (this.nomeEscola = atleta.nomeEscola),
+        (this.pai = atleta.pai),
+        (this.mae = atleta.mae),
+        (this.posicaoID = atleta.posicaoID),
+        (this.indicacao = atleta.indicacao),
+        (this.alojamento = atleta.alojamento),
+        (this.federado = atleta.federado),
+        (this.federacao = atleta.federacao),
+        (this.dtCadastro = atleta.dtCadastro);
     },
     removerAtleta(atleta) {
       this.$http
-        .delete(
-          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/${atleta.id}`
-        )
+        .delete(`atletas/${atleta.id}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(() => {
           let indice = this.atletas.indexOf(atleta);
           this.atletas.splice(indice, 1);
@@ -878,5 +867,8 @@ table {
 .div-add {
   text-align: right;
   padding-bottom: 10px;
+}
+.text-capitalized input {
+  text-transform: capitalize;
 }
 </style>

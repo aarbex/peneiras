@@ -4,56 +4,116 @@
     <h1>Avaliação</h1>
     <v-row class="mx-5">
       <v-col cols="12" sm="6" md="3">
-        <v-text-field v-model="avaliacao.cpf" label="CPF do Atleta" required readonly filled></v-text-field>
+        <v-select
+          v-if="this.id"
+          name="cpf"
+          v-model="avaliacao.atletaID"
+          :items="atletas"
+          prepend-inner-icon="mdi-account-badge"
+          item-text="cpf"
+          item-value="id"
+          label="CPF do Atleta"
+          readonly
+          filled
+        ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="9">
-        <v-text-field v-model="avaliacao.nome" label="Nome do Atleta" required readonly filled></v-text-field>
+        <v-select
+          v-if="avaliacao.id"
+          name="nome"
+          v-model="avaliacao.atletaID"
+          :items="atletas"
+          prepend-inner-icon="mdi-account-badge-horizontal"
+          item-text="nome"
+          item-value="id"
+          label="Nome do Atleta"
+          readonly
+          filled
+        ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="2">
-        <v-text-field v-model="avaliacao.dtNascimento" label="Data de Nascimento" readonly filled></v-text-field>
-      </v-col>
-      <v-col cols="12" sm="6" md="5">
-        <v-text-field
-          name="posicao"
-          v-model="avaliacao.posicao"
-          label="Posicao"
-          required
+        <v-select
+          v-if="avaliacao.id"
+          name="dtNascimento"
+          v-model="avaliacao.atletaID"
+          :items="atletas"
+          prepend-inner-icon="mdi-calendar-month"
+          item-text="dtNascimento"
+          item-value="id"
+          label="Data de Nascimento"
           readonly
           filled
-        ></v-text-field>
+        ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="5">
-        <v-text-field v-model="avaliacao.indicacao" readonly filled label="Indicação"></v-text-field>
+        <v-select
+          v-if="avaliacao.id"
+          name="posicao"
+          v-model="avaliacao.atletaID"
+          :items="atletas"
+          prepend-inner-icon="mdi-soccer-field"
+          item-text="posicao"
+          item-value="id"
+          label="Posição"
+          readonly
+          filled
+        ></v-select>
+      </v-col>
+      <v-col cols="12" sm="6" md="5">
+        <v-select
+          v-if="avaliacao.id"
+          name="indicacao"
+          v-model="avaliacao.atletaID"
+          :items="atletas"
+          prepend-inner-icon="mdi-account-tie"
+          item-text="indicacao"
+          item-value="id"
+          label="Indicação"
+          readonly
+          filled
+        ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-text-field
+        <v-select
           name="categoria"
-          v-model="avaliacao.categoria.nome"
+          v-model="avaliacao.categoriaID"
+          :items="categorias"
+          item-text="nome"
+          item-value="id"
           label="Categoria"
+          prepend-inner-icon="mdi-soccer"
           required
           readonly
           filled
-        ></v-text-field>
+        ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-text-field
+        <v-select
           name="treinador"
-          v-model="avaliacao.treinador.nome"
+          v-model="avaliacao.treinadorID"
+          :items="treinadores"
+          item-text="nome"
+          item-value="id"
           label="Treinador"
+          prepend-inner-icon="mdi-account-edit"
           required
           readonly
           filled
-        ></v-text-field>
+        ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="4">
-        <v-text-field
+        <v-select
           name="posicao"
-          v-model="avaliacao.status.nome"
+          v-model="avaliacao.statusID"
+          :items="statusList"
+          item-text="nome"
+          item-value="id"
           label="Status"
+          prepend-inner-icon="mdi-progress-check"
           required
           readonly
           filled
-        ></v-text-field>
+        ></v-select>
       </v-col>
       <v-col cols="12" sm="6" md="3">
         <v-text-field v-model="avaliacao.dtInicio" label="Data de Início" readonly filled></v-text-field>
@@ -89,8 +149,8 @@
               color="primary"
               class="ms-5"
               dark
+              @click="carregaAvaliacao(avaliacao)"
               v-on="on"
-              @click="limparFormulario()"
             >Editar</v-btn>
           </template>
           <v-card>
@@ -99,21 +159,22 @@
               <v-container>
                 <v-row dense>
                   <v-col cols="12" sm="6" md="3">
-                    <v-text-field
-                      v-mask="cpfMask"
-                      v-model="avaliacao.cpf"
-                      label="CPF do Atleta"
-                      required
-                      append-icon="mdi-magnify"
+                    <v-select
+                      name="cpf"
+                      v-model="atletaID"
+                      :items="atletas"
                       prepend-inner-icon="mdi-account-badge"
-                      filled
+                      item-text="cpf"
+                      item-value="id"
+                      label="CPF do Atleta"
                       readonly
-                    ></v-text-field>
+                      filled
+                    ></v-select>
                   </v-col>
 
                   <v-col cols="12" sm="6" md="9">
-                    <v-combobox
-                      v-model="avaliacao.nome"
+                    <v-select
+                      v-model="atletaID"
                       :items="atletas"
                       item-text="nome"
                       item-value="id"
@@ -121,12 +182,12 @@
                       prepend-inner-icon="mdi-account-badge-horizontal"
                       filled
                       readonly
-                    ></v-combobox>
+                    ></v-select>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
                     <v-select
                       name="categoria"
-                      v-model="avaliacao.categoria.id"
+                      v-model="categoriaID"
                       :items="categorias"
                       item-text="nome"
                       item-value="id"
@@ -138,25 +199,31 @@
                   <v-col cols="12" sm="6" md="6">
                     <v-select
                       name="treinador"
-                      v-model="avaliacao.treinador.id"
+                      v-model="treinadorID"
                       :items="treinadores"
                       item-text="nome"
                       item-value="id"
                       label="Treinador"
                       prepend-inner-icon="mdi-account-edit"
+                      hint="* Preenchimento Obrigatório"
+                      persistent-hint
                       required
+                      :rules="[rules.required]"
                     ></v-select>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
                     <v-select
                       name="status"
-                      v-model="avaliacao.status.id"
+                      v-model="statusID"
                       :items="statusList"
                       item-text="nome"
                       item-value="id"
                       label="Status"
                       prepend-inner-icon="mdi-progress-check"
+                      hint="* Preenchimento Obrigatório"
+                      persistent-hint
                       required
+                      :rules="[rules.required]"
                     ></v-select>
                   </v-col>
                   <v-col cols="12" sm="6" md="4">
@@ -164,7 +231,7 @@
                       ref="menu2"
                       v-model="menu2"
                       :close-on-content-click="false"
-                      :return-value.sync="avaliacao.dtInicio"
+                      :return-value.sync="dtInicio"
                       transition="scale-transition"
                       offset-y
                       full-width
@@ -172,10 +239,15 @@
                     >
                       <template v-slot:activator="{ on }">
                         <v-text-field
-                          v-model="avaliacao.dtInicio"
+                          v-model="dtInicio"
                           label="Data de Início"
+                          v-mask="dataMask"
                           prepend-inner-icon="mdi-calendar-month"
                           v-on="on"
+                          hint="* Preenchimento Obrigatório"
+                          persistent-hint
+                          required
+                          :rules="[rules.required]"
                         ></v-text-field>
                       </template>
                       <v-date-picker v-model="date2" no-title scrollable locale="pt-BR">
@@ -184,7 +256,7 @@
                         <v-btn
                           text
                           color="primary"
-                          @click=" avaliacao.dtInicio = formatDate(date2);$refs.menu2.save(avaliacao.dtInicio)"
+                          @click=" dtInicio = formatDate(date2);$refs.menu2.save(dtInicio)"
                         >OK</v-btn>
                       </v-date-picker>
                     </v-menu>
@@ -194,7 +266,7 @@
                       ref="menu3"
                       v-model="menu3"
                       :close-on-content-click="false"
-                      :return-value.sync="avaliacao.dtDispensa"
+                      :return-value.sync="dtDispensa"
                       transition="scale-transition"
                       offset-y
                       full-width
@@ -202,10 +274,12 @@
                     >
                       <template v-slot:activator="{ on }">
                         <v-text-field
-                          v-model="avaliacao.dtDispensa"
+                          v-model="dtDispensa"
+                          v-mask="dataMask"
                           label="Data de Dispensa"
                           prepend-inner-icon="mdi-calendar-month"
                           v-on="on"
+                          @change="verificaDatas()"
                         ></v-text-field>
                       </template>
                       <v-date-picker v-model="date3" no-title scrollable locale="pt-BR">
@@ -214,7 +288,7 @@
                         <v-btn
                           text
                           color="primary"
-                          @click=" avaliacao.dtDispensa = formatDate(date3);$refs.menu3.save(avaliacao.dtDispensa)"
+                          @click=" dtDispensa = formatDate(date3);$refs.menu3.save(dtDispensa); verificaDatas()"
                         >OK</v-btn>
                       </v-date-picker>
                     </v-menu>
@@ -222,14 +296,14 @@
                   <v-col cols="12" sm="6" md="6">
                     <v-text-field
                       v-mask="notaMask"
-                      v-model="avaliacao.nota"
+                      v-model="nota"
                       prepend-inner-icon="mdi-thumbs-up-down"
                       label="Nota"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
                     <v-text-field
-                      v-model="avaliacao.cadastradoPor"
+                      v-model="cadastradoPor"
                       label="Cadastrado por:"
                       readonly
                       prepend-inner-icon="mdi-account"
@@ -239,7 +313,7 @@
                   <v-col cols="12">
                     <v-textarea
                       name="observacao"
-                      v-model="avaliacao.observacao"
+                      v-model="observacao"
                       label="Observação"
                       prepend-inner-icon="mdi-note-text"
                       value
@@ -250,14 +324,39 @@
             </v-card-text>
             <v-card-actions>
               <div class="flex-grow-1"></div>
-              <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
+              <v-btn color="black" text @click="dialog = false">Cancelar</v-btn>
               <v-btn
                 v-if="avaliacao.id"
                 color="blue darken-1"
                 text
                 @click="editarAvaliacao(avaliacao)"
               >Salvar</v-btn>
-              <v-btn v-else color="blue darken-1" text @click="addAvaliacao()">Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialog4" max-width="290">
+          <v-card>
+            <v-card-title class="headline">Atenção!</v-card-title>
+
+            <v-card-text justify="center">Há campos obrigatórios que não foram preenchidos!!</v-card-text>
+
+            <v-card-actions>
+              <div class="flex-grow-1"></div>
+
+              <v-btn color="black" text @click="dialog4 = false">Fechar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialog5" max-width="290">
+          <v-card>
+            <v-card-title class="headline">Atenção!</v-card-title>
+
+            <v-card-text justify="center">A data de dispensa deve ser maior que a data de início!</v-card-text>
+
+            <v-card-actions>
+              <div class="flex-grow-1"></div>
+
+              <v-btn color="black" text @click="dialog5 = false">Fechar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -279,6 +378,10 @@ export default {
 
   data() {
     return {
+      atletaID: "",
+      categoriaID: "",
+      treinadorID: "",
+      statusID: "",
       avaliacoes: [],
       avaliacao: {},
       atletas: [],
@@ -292,8 +395,11 @@ export default {
       treinador: {},
       cpfMask: "###.###.###-##",
       dataMask: "##/##/####",
-      notaMask: "#,##",
-      dtDispensa: "13/09/2019",
+      notaMask: "##,##",
+      dtInicio: "",
+      dtDispensa: "",
+      dtCadastro: "",
+      nota: "",
       date: new Date().toISOString().substr(0, 10),
       date2: new Date().toISOString().substr(0, 10),
       date3: new Date().toISOString().substr(0, 10),
@@ -301,6 +407,12 @@ export default {
       menu3: false,
       dialog: false,
       dialog1: false,
+      dialog4: false,
+      dialog5: false,
+      cadastradoPor: "",
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório."
+      },
       id: this.$route.params.id
     };
   },
@@ -308,16 +420,36 @@ export default {
   created() {
     if (this.id) {
       this.$http
-        .get(
-          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/" +
-            this.id
-        )
+        .get("avaliacoes/" + this.id, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(res => res.json())
         .then(avaliacao => (this.avaliacao = avaliacao));
     }
 
     this.$http
-      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
+      .get("atletas", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(atletas => {
+        this.atletas = atletas;
+        //.map(x => ({ text: x.nome, value: x.id }));
+      });
+
+    this.$http
+      .get("status", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(status => {
         this.statusList = status;
@@ -325,9 +457,12 @@ export default {
       });
 
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias"
-      )
+      .get("categorias", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(categorias => {
         this.categorias = categorias;
@@ -335,9 +470,12 @@ export default {
       });
 
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores"
-      )
+      .get("treinadores", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(treinadores => {
         this.treinadores = treinadores;
@@ -352,62 +490,89 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
-    editarAvaliacao(_avaliacao) {
-      this.categoria = this.categorias.filter(
-        x => x.id == _avaliacao.categoria.id
-      )[0];
-      this.treinador = this.treinadores.filter(
-        x => x.id == _avaliacao.treinador.id
-      )[0];
-      this.status = this.statusList.filter(
-        x => x.id == _avaliacao.status.id
-      )[0];
-      if (this.date2) {
-        let dataInicio = new Date(this.date2);
-        this.dtInicio =
-          dataInicio.getDate() +
-          1 +
-          "/" +
-          (dataInicio.getMonth() + 1) +
-          "/" +
-          dataInicio.getFullYear();
-      }
-      if (this.date3) {
-        let dataDispensa = new Date(this.date3);
-        this.dtDispensa =
-          dataDispensa.getDate() +
-          1 +
-          "/" +
-          (dataDispensa.getMonth() + 1) +
-          "/" +
-          dataDispensa.getFullYear();
-      }
-      let _avaliacaoEditar = {
-        nome: _avaliacao.nome,
-        cpf: _avaliacao.cpf,
-        treinador: {
-          id: this.treinador.id,
-          nome: this.treinador.nome
-        },
-        categoria: {
-          id: this.categoria.id,
-          nome: this.categoria.nome
-        },
-        nota: _avaliacao.nota,
-        dtNascimento: _avaliacao.dtNascimento,
-        dtInicio: _avaliacao.dtInicio,
-        dtDispensa: _avaliacao.dtDispensa,
-        posicao: _avaliacao.posicao,
-        status: {
-          id: this.status.id,
-          nome: this.status.nome
+    verificaDatas() {
+      if (this.dtDispensa.length > 0) {
+        var dtInicioString = this.dtInicio.split("/");
+        var dtInicioFormatada =
+          dtInicioString[1] + "-" + dtInicioString[0] + "-" + dtInicioString[2];
+        var dtInicio = new Date(dtInicioFormatada);
+        var dtDispensaString = this.dtDispensa.split("/");
+        var dtDispensaFormatada =
+          dtDispensaString[1] +
+          "-" +
+          dtDispensaString[0] +
+          "-" +
+          dtDispensaString[2];
+        var dtDispensa = new Date(dtDispensaFormatada);
+        if (dtInicio.getTime() >= dtDispensa.getTime()) {
+          this.dialog5 = true;
         }
+      }
+    },
+    verificaDatasSalvar() {
+      if (this.dtDispensa.length > 0) {
+        var dtInicioString = this.dtInicio.split("/");
+        var dtInicioFormatada =
+          dtInicioString[1] + "-" + dtInicioString[0] + "-" + dtInicioString[2];
+        var dtInicio = new Date(dtInicioFormatada);
+        var dtDispensaString = this.dtDispensa.split("/");
+        var dtDispensaFormatada =
+          dtDispensaString[1] +
+          "-" +
+          dtDispensaString[0] +
+          "-" +
+          dtDispensaString[2];
+        var dtDispensa = new Date(dtDispensaFormatada);
+        if (dtInicio.getTime() >= dtDispensa.getTime()) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    },
+    editarAvaliacao(_avaliacao) {
+      let _avaliacaoEditar = {
+        atletaID: this.atletaID,
+        treinadorID: this.treinadorID,
+        categoriaID: this.categoriaID,
+        nota: this.nota,
+        dtNascimento: this.dtNascimento,
+        dtInicio: this.dtInicio,
+        dtDispensa: this.dtDispensa,
+        statusID: this.statusID,
+        observacao: this.observacao,
+        cadastradoPor: this.cadastradoPor,
+        dtCadastro: this.dtCadastro
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/${_avaliacao.id}`,
-        _avaliacaoEditar
-      );
-      this.$router.push("/avaliacoes/" + this.id);
+      if (this.dtInicio.length == 0) {
+        this.dialog4 = true;
+      } else if (!this.verificaDatasSalvar()) {
+        {
+          this.$http.put(`avaliacoes/${_avaliacao.id}`, _avaliacaoEditar, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          });
+          this.verificado = false;
+          window.location.href = window.location.origin + "/avaliacoes";
+        }
+      } else {
+        this.dialog5 = true;
+      }
+    },
+    carregaAvaliacao(avaliacao) {
+      this.atletaID = avaliacao.atletaID;
+      this.cpf = avaliacao.cpf;
+      this.nome = avaliacao.nome;
+      this.nota = avaliacao.nota;
+      this.treinadorID = avaliacao.treinadorID;
+      this.categoriaID = avaliacao.categoriaID;
+      this.dtInicio = avaliacao.dtInicio;
+      this.dtDispensa = avaliacao.dtDispensa;
+      this.dtCadastro = avaliacao.dtCadastro;
+      this.cadastradoPor = avaliacao.cadastradoPor;
+      this.statusID = avaliacao.statusID;
     },
     limparFormulario() {
       this.treinador = {};
@@ -415,6 +580,13 @@ export default {
       this.status = {};
       this.avaliacao = {};
       this.atleta = {};
+      this.atletaID = "";
+      this.categoriaID = "";
+      this.statusID = "";
+      this.treinadorID = "";
+      this.dtInicio = "";
+      this.dtDispensa = "";
+      this.dtCadastro = "";
     }
   }
 };

@@ -8,7 +8,7 @@
       :headers="headers"
       :items="posicoes"
       calculate-widths
-      sort-by="id"
+      sort-by="nome"
       item-key="id"
       class="elevation-1 px-5"
       :search="search"
@@ -22,6 +22,7 @@
             label="Pesquisar em posicoes cadastradas"
             prepend-inner-icon="mdi-magnify"
             filled
+            clearable
           ></v-text-field>
         </v-col>
       </template>
@@ -34,11 +35,11 @@
           </template>
 
           <v-list bottom>
-            <v-list-item>
-              <v-list-item-title @click="dialog = true; posicao = item">Editar</v-list-item-title>
+            <v-list-item @click="dialog = true; posicao = item;carregaPosicao(item)">
+              <v-list-item-title text>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item>
-              <v-list-item-title @click="dialog1 = true; posicao = item">Excluir</v-list-item-title>
+            <v-list-item @click="dialog1 = true; posicao = item">
+              <v-list-item-title text>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -76,18 +77,26 @@
         <v-card-text>
           <v-container>
             <v-row dense>
-              <v-col cols="12" sm="6" md="9">
+              <v-col cols="12">
                 <v-text-field
                   v-if="posicao.id"
-                  v-model="posicao.nome"
-                  label="Nome da posicao"
+                  v-model="nome"
+                  label="Nome da posição"
                   prepend-inner-icon="mdi-soccer-field"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="editarPosicao(posicao)"
                 ></v-text-field>
                 <v-text-field
                   v-else
                   v-model="nome"
-                  label="Nome do posicao"
+                  label="Nome da posição"
                   prepend-inner-icon="mdi-soccer-field"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="verificaPosicao()"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -100,9 +109,9 @@
             v-if="posicao.id"
             color="blue darken-1"
             text
-            @click="editarPosicao(posicao);dialog=false"
+            @click="editarPosicao(posicao)  "
           >Salvar</v-btn>
-          <v-btn v-else color="blue darken-1" text @click="addPosicao();dialog=false">Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="verificaPosicao()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -120,6 +129,20 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">A posição "{{this.nome}}" já está cadastrada!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -139,22 +162,22 @@ export default {
       search: "",
       dialog: false,
       dialog1: false,
+      dialog2: false,
       nome: "",
-      nameRules: [v => !!v || "O nome da posicao é obrigatório!"],
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório."
+      },
       posicoes: [],
       posicao: {},
+      posicaoVerificada: "",
       dtCadastro: "",
+      date: new Date().toISOString().substr(0, 10),
       id: this.$route.params.id
     };
   },
   computed: {
     headers() {
       return [
-        {
-          text: "ID",
-          align: "center",
-          value: "id"
-        },
         {
           text: "Posicão",
           align: "center",
@@ -178,20 +201,22 @@ export default {
 
   created() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes"
-      )
-      .then(res => res.json())
-      .then(posicoes => (this.posicoes = posicoes));
-  },
-
-  beforeMount() {
-    this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes"
-      )
-      .then(res => res.json())
-      .then(posicoes => (this.posicoes = posicoes));
+      .get("posicoes", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(
+        res => res.json().then(posicoes => (this.posicoes = posicoes)),
+        res => {
+          //error
+          if (res.status == 401) {
+            window.location.href =
+              window.location.origin + "/login?msg=Sua Sessão expirou!";
+          }
+        }
+      );
   },
 
   methods: {
@@ -206,60 +231,106 @@ export default {
           .indexOf(search) !== -1
       );
     },
-    adicionarOuEditar(posicao) {
-      if (posicao.id) {
-        this.addposicao();
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+    verificaPosicao() {
+      this.posicaoVerificada = this.posicoes.filter(
+        x => x.nome === this.nome
+      )[0];
+      if (this.posicaoVerificada) {
+        this.dialog2 = true;
       } else {
-        this.editarposicao(posicao);
+        this.addPosicao();
+        this.posicaoVerificada = "";
       }
     },
+
     removerPosicao(posicao) {
       this.$http
-        .delete(
-          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes/${posicao.id}`
-        )
-        .then(() => {
-          let indice = this.posicoes.indexOf(posicao);
-          this.posicoes.splice(indice, 1);
-          //this.posicoes = this.posicoes.filter(p => p.id != posicao.id);
-          this.dialog1 = false;
-        });
+        .delete(`posicoes/${posicao.id}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
+        .then(
+          () => {
+            let indice = this.posicoes.indexOf(posicao);
+            this.posicoes.splice(indice, 1);
+            //this.posicoes = this.posicoes.filter(p => p.id != posicao.id);
+            this.dialog1 = false;
+          },
+          res => {
+            //error
+            if (res.status == 401) {
+              window.location.href =
+                window.location.origin + "/login?msg=Sua Sessão expirou!";
+            }
+          }
+        );
     },
     addPosicao() {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.dtCadastro = this.formatDate(this.date);
       let _posicao = {
         nome: this.nome,
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
         this.$http
-          .post(
-            "https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes/",
-            _posicao
-          )
-          .then(res => res.json());
-        this.nome = "";
-        this.dtCadastro = "";
-        this.$router.push("/posicoes");
+          .post("posicoes", _posicao, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
+          .then(
+            res => res.json(),
+            res => {
+              //error
+              if (res.status == 401) {
+                window.location.href =
+                  window.location.origin + "/login?msg=Sua Sessão expirou!";
+              }
+            }
+          );
+        window.location.href = window.location.origin + "/posicoes";
       }
     },
 
     editarPosicao(_posicao) {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.dtCadastro = this.formatDate(this.date);
       let _posicaoEditar = {
         id: _posicao.id,
-        nome: _posicao.nome,
+        nome: this.nome,
         dtCadastro: this.dtCadastro
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/posicoes/${_posicaoEditar.id}`,
-        _posicaoEditar
-      );
-      this.$router.push("/posicoes");
+      if (this.nome.length > 0) {
+        this.$http
+          .put(`posicoes/${_posicaoEditar.id}`, _posicaoEditar, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
+          .then(
+            res => res.json(),
+            res => {
+              //error
+              if (res.status == 401) {
+                window.location.href =
+                  window.location.origin + "/login?msg=Sua Sessão expirou!";
+              }
+            }
+          );
+        window.location.href = window.location.origin + "/posicoes";
+      }
+    },
+    carregaPosicao(posicao) {
+      (this.nome = posicao.nome), (this.dtCadastro = posicao.dtCadastro);
     },
     limparFormulario() {
       this.nome = "";

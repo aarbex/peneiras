@@ -9,55 +9,74 @@
         class="title text-uppercase font-weight-medium"
       >SISTEMA DE PENEIRAS</v-toolbar-title>
     </v-app-bar>
-    <!--h2 class="py-10" align="center">SISTEMA DE GESTÃO DE PENEIRAS</!--h2>
-    <div-- style="width: 30%; align-content: center; margin: 0 auto;">
-      <h2>Login</h2>
-      <form>
-        <v-text-field
-          v-model="email"
-          :error-messages="emailErrors"
-          label="E-mail"
-          required
-          @input="$v.email.$touch()"
-          @blur="$v.email.$touch()"
-        ></v-text-field>
-        <v-text-field
-          v-model="password"
-          :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
-          :rules="[rules.required, rules.min]"
-          :type="show ? 'text' : 'password'"
-          name="input-password"
-          label="Senha"
-          hint="At least 8 characters"
-          counter
-          @click:append="show = !show"
-        ></v-text-field>
-        <v-checkbox
-          v-model="checkbox"
-          label="Primeiro Acesso?"
-          @change="$v.checkbox.$touch()"
-          @blur="$v.checkbox.$touch()"
-        ></v-checkbox>
-        <v-btn class="mr-4 primary" @click="submit" :to="avaliacoes.route">Entrar</v-btn>
-      </form>
-    </div-->
+
     <v-card class="mx-auto mt-12" max-width="500" flex align="right">
       <v-toolbar dark>
         <v-toolbar-title dense>Entrar</v-toolbar-title>
       </v-toolbar>
-      <v-text-field label="Usuário" prepend-inner-icon="mdi-account" class="mx-5 mt-5" required></v-text-field>
+      <v-text-field
+        label="Email"
+        v-model="email"
+        prepend-inner-icon="mdi-email"
+        class="mx-5 mt-5"
+        @keyup.enter="submit()"
+        required
+        :rules="[rules.required]"
+      ></v-text-field>
       <v-text-field
         label="Senha"
         prepend-inner-icon="mdi-lock"
         class="mx-5"
+        v-model="senha"
         :append-icon="show ? 'mdi-eye' : 'mdi-eye-off'"
         :type="show ? 'text' : 'password'"
         @click:append="show = !show"
+        @keyup.enter="submit()"
         required
+        :rules="[rules.required]"
       ></v-text-field>
       <v-divider></v-divider>
-      <v-btn dark text-color="white" class="ma-2" :to="boasVindas.route">Entrar</v-btn>
+      <v-btn dark text-color="white" class="ma-2" @click="submit();">Entrar</v-btn>
     </v-card>
+    <v-dialog v-model="dialog1" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">O usuário ou a senha estão incorretos!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog1 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Os campos usuário e senha são obrigatórios!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">{{msgfromurl}}</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -70,41 +89,56 @@ export default {
 
   validations: {
     email: { required, email },
-    checkbox: {
-      checked(val) {
-        return val;
-      }
-    }
+    senha: { required }
   },
 
   data: () => ({
     email: "",
+    senha: "",
     show: false,
+    dialog1: false,
+    dialog2: false,
+    dialog3: false,
     password: "",
+    msgfromurl: "",
     rules: {
-      required: value => !!value || "Required.",
-      min: v => v.length >= 8 || "Min 8 characters",
-      emailMatch: () => "The email and password you entered don't match"
-    },
-    checkbox: false,
-    boasVindas: {
-      route: "/boas-vindas"
+      required: value => !!value || "Preenchimento obrigatório!"
     }
   }),
 
-  computed: {
-    emailErrors() {
-      const errors = [];
-      if (!this.$v.email.$dirty) return errors;
-      !this.$v.email.email && errors.push("Must be valid e-mail");
-      !this.$v.email.required && errors.push("E-mail is required");
-      return errors;
+  computed: {},
+
+  created() {
+    var msg = this.$route.query.msg;
+    if (msg != undefined && msg != null) {
+      this.dialog3 = true;
+      this.msgfromurl = msg;
     }
   },
 
   methods: {
     submit() {
-      this.$v.$touch();
+      let _login = {
+        email: this.email,
+        senha: this.senha
+      };
+      if (this.email.length == 0 || this.senha.length == 0) {
+        this.dialog2 = true;
+      } else {
+        this.$http.post("login", _login).then(
+          function(res) {
+            window.localStorage.setItem("token", res.body.access_token);
+            window.localStorage.setItem(
+              "usuario",
+              JSON.stringify(res.body.usuario)
+            );
+            window.location.href = window.location.origin + "/boas-vindas";
+          },
+          function() {
+            this.dialog1 = true;
+          }
+        );
+      }
     }
   }
 };

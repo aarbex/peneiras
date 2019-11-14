@@ -8,7 +8,7 @@
       <v-data-table
         :headers="headers"
         :items="avaliacoes"
-        sort-by="dtInicio"
+        sort-by="nome"
         item-key="id"
         class="elevation-1 px-5"
         :search="search"
@@ -22,6 +22,7 @@
               label="Pesquisar em avaliações cadastradas"
               prepend-inner-icon="mdi-magnify"
               filled
+              clearable
             ></v-text-field>
           </v-col>
         </template>
@@ -39,11 +40,11 @@
                   <v-list-item-title xSmall>Detalhes</v-list-item-title>
                 </v-list-item>
               </router-link>
-              <v-list-item>
-                <v-list-item-title @click="dialog = true; avaliacao = item">Editar</v-list-item-title>
+              <v-list-item @click="dialog = true; avaliacao = item; carregaAvaliacao(item)">
+                <v-list-item-title>Editar</v-list-item-title>
               </v-list-item>
-              <v-list-item>
-                <v-list-item-title @click="dialog1 = true; avaliacao = item">Excluir</v-list-item-title>
+              <v-list-item @click="dialog1 = true; avaliacao = item">
+                <v-list-item-title>Excluir</v-list-item-title>
               </v-list-item>
             </v-list>
           </v-menu>
@@ -88,7 +89,7 @@
                 <v-text-field
                   v-if="avaliacao.id"
                   v-mask="cpfMask"
-                  v-model="avaliacao.cpf"
+                  v-model="cpf"
                   label="CPF do Atleta"
                   required
                   append-icon="mdi-magnify"
@@ -103,7 +104,10 @@
                   label="CPF do Atleta"
                   append-icon="mdi-magnify"
                   prepend-inner-icon="mdi-account-badge"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
+                  :rules="[rules.required]"
                   @click:append="carregarAtletaPorCPF()"
                   @blur="carregarAtletaPorCPF()"
                 ></v-text-field>
@@ -112,7 +116,7 @@
               <v-col cols="12" sm="6" md="9">
                 <v-combobox
                   v-if="avaliacao.id"
-                  v-model="avaliacao.nome"
+                  v-model="nome"
                   :items="atletas"
                   item-text="nome"
                   item-value="id"
@@ -131,78 +135,55 @@
                   prepend-inner-icon="mdi-account-badge-horizontal"
                   @change="carregarAtletaPorNome(atleta.nome)"
                   auto-select-first
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
                 ></v-combobox>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  v-if="avaliacao.id"
                   name="categoria"
-                  v-model="avaliacao.categoria.id"
+                  v-model="categoriaID"
                   :items="categorias"
                   item-text="nome"
                   item-value="id"
                   label="Categoria"
                   prepend-inner-icon="mdi-soccer"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
-                ></v-select>
-                <v-select
-                  v-else
-                  v-model="categoria.id"
-                  :items="categorias"
-                  item-text="nome"
-                  item-value="id"
-                  label="Categoria"
-                  name="categoria"
-                  prepend-inner-icon="mdi-soccer"
-                  required
+                  :rules="[rules.required]"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-select
-                  v-if="avaliacao.id"
-                  name="treinador"
-                  v-model="avaliacao.treinador.id"
-                  :items="treinadores"
-                  item-text="nome"
-                  item-value="id"
-                  label="Treinador"
-                  prepend-inner-icon="mdi-account-edit"
-                  required
-                ></v-select>
-                <v-select
-                  v-else
-                  v-model="treinador.id"
+                  v-model="treinadorID"
                   :items="treinadores"
                   item-text="nome"
                   item-value="id"
                   label="Treinador"
                   name="treinador"
                   prepend-inner-icon="mdi-account-edit"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
+                  :rules="[rules.required]"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="4">
                 <v-select
-                  v-if="avaliacao.id"
-                  name="status"
-                  v-model="avaliacao.status.id"
-                  :items="statusList"
-                  item-text="nome"
-                  item-value="id"
-                  label="Status"
-                  prepend-inner-icon="mdi-progress-check"
-                  required
-                ></v-select>
-                <v-select
-                  v-else
-                  v-model="status.id"
+                  v-model="statusID"
                   :items="statusList"
                   item-text="nome"
                   item-value="id"
                   label="Status"
                   name="status"
                   prepend-inner-icon="mdi-progress-check"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
+                  :rules="[rules.required]"
                 ></v-select>
               </v-col>
               <v-col cols="12" sm="6" md="4">
@@ -210,18 +191,23 @@
                   ref="menu2"
                   v-model="menu2"
                   :close-on-content-click="false"
-                  :return-value.sync="avaliacao.dtInicio"
+                  :return-value.sync="dtInicio"
                   transition="scale-transition"
                   offset-y
+                  v-mask="dataMask"
                   full-width
                   min-width="290px"
                 >
                   <template v-slot:activator="{ on }">
                     <v-text-field
-                      v-model="avaliacao.dtInicio"
+                      v-model="dtInicio"
                       label="Data de Início"
                       prepend-inner-icon="mdi-calendar-month"
                       v-on="on"
+                      hint="* Preenchimento Obrigatório"
+                      persistent-hint
+                      required
+                      :rules="[rules.required]"
                     ></v-text-field>
                   </template>
                   <v-date-picker v-model="date2" no-title scrollable locale="pt-BR">
@@ -230,7 +216,7 @@
                     <v-btn
                       text
                       color="primary"
-                      @click=" avaliacao.dtInicio = formatDate(date2);$refs.menu2.save(avaliacao.dtInicio)"
+                      @click=" dtInicio = formatDate(date2);$refs.menu2.save(dtInicio)"
                     >OK</v-btn>
                   </v-date-picker>
                 </v-menu>
@@ -240,18 +226,20 @@
                   ref="menu3"
                   v-model="menu3"
                   :close-on-content-click="false"
-                  :return-value.sync="avaliacao.dtDispensa"
+                  :return-value.sync="dtDispensa"
                   transition="scale-transition"
                   offset-y
+                  v-mask="dataMask"
                   full-width
                   min-width="290px"
                 >
                   <template v-slot:activator="{ on }">
                     <v-text-field
-                      v-model="avaliacao.dtDispensa"
+                      v-model="dtDispensa"
                       label="Data de Dispensa"
                       prepend-inner-icon="mdi-calendar-month"
                       v-on="on"
+                      @blur="verificaDatas()"
                     ></v-text-field>
                   </template>
                   <v-date-picker v-model="date3" no-title scrollable locale="pt-BR">
@@ -260,31 +248,31 @@
                     <v-btn
                       text
                       color="primary"
-                      @click=" avaliacao.dtDispensa = formatDate(date3);$refs.menu3.save(avaliacao.dtDispensa)"
+                      @click=" dtDispensa = formatDate(date3);$refs.menu3.save(dtDispensa); verificaDatas()"
                     >OK</v-btn>
                   </v-date-picker>
                 </v-menu>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="avaliacao.id"
-                  v-mask="notaMask"
-                  v-model="avaliacao.nota"
-                  prepend-inner-icon="mdi-thumbs-up-down"
-                  label="Nota"
-                ></v-text-field>
-                <v-text-field
-                  v-else
                   v-mask="notaMask"
                   v-model="nota"
                   prepend-inner-icon="mdi-thumbs-up-down"
                   label="Nota"
-                  required
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-model="avaliacao.cadastradoPor"
+                  v-if="avaliacao.id"
+                  v-model="cadastradoPor"
+                  label="Cadastrado por:"
+                  readonly
+                  prepend-inner-icon="mdi-account"
+                  filled
+                ></v-text-field>
+                <v-text-field
+                  v-else
+                  v-model="usuario.nome"
                   label="Cadastrado por:"
                   readonly
                   prepend-inner-icon="mdi-account"
@@ -293,15 +281,6 @@
               </v-col>
               <v-col cols="12">
                 <v-textarea
-                  v-if="avaliacao.id"
-                  name="observacao"
-                  v-model="avaliacao.observacao"
-                  label="Observação"
-                  prepend-inner-icon="mdi-note-text"
-                  value
-                ></v-textarea>
-                <v-textarea
-                  v-else
                   name="observacao"
                   prepend-inner-icon="mdi-note-text"
                   v-model="observacao"
@@ -319,9 +298,14 @@
             v-if="avaliacao.id"
             color="blue darken-1"
             text
-            @click="editarAvaliacao(avaliacao)"
+            @click="editarAvaliacao(avaliacao);this.verificado = true"
           >Salvar</v-btn>
-          <v-btn v-else color="blue darken-1" text @click="addAvaliacao()">Salvar</v-btn>
+          <v-btn
+            v-else
+            color="blue darken-1"
+            text
+            @click="verificaAvaliacao();this.verificado = true"
+          >Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -336,6 +320,47 @@
 
           <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
           <v-btn color="primary" text @click="removerAvaliacao(avaliacao); dialog1=false">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text
+          justify="center"
+        >Já existe uma avaliação cadastrada para esse atleta em {{this.ano}}!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog4" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Há campos obrigatórios que não foram preenchidos!!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog4 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog5" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">A data de dispensa deve ser maior que a data de início!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog5 = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -366,10 +391,17 @@ export default {
       search: "",
       atletas: [],
       atleta: {},
+      atletaID: "",
       nome: "",
       cpf: "",
       dtNascimento: "",
+      dtDispensa: "",
+      dtInicio: "",
       indicacao: "",
+      posicaoID: "",
+      statusID: "",
+      treinadorID: "",
+      categoriaID: "",
       posicao: "",
       dtCadastro: "",
       posicoes: [],
@@ -382,20 +414,33 @@ export default {
       treinadores: [],
       treinador: {},
       nota: "",
+      observacao: "",
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
+      cadastradoPor: "",
+      avaliacaoVerificada: "",
+      verificado: false,
       id: this.$route.params.id,
       cpfMask: "###.###.###-##",
       dataMask: "##/##/####",
-      notaMask: "#,##",
+      notaMask: ["#,##", "##,##"],
       date: new Date().toISOString().substr(0, 10),
       date2: new Date().toISOString().substr(0, 10),
       date3: new Date().toISOString().substr(0, 10),
+      hoje: new Date().toISOString().substr(0, 10),
       dateFormatted: "",
       dateFormatted2: "",
       dateFormatted3: "",
       menu2: false,
       menu3: false,
       dialog: false,
-      dialog1: false
+      dialog1: false,
+      dialog2: false,
+      dialog3: false,
+      dialog4: false,
+      dialog5: false,
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório."
+      }
     };
   },
   computed: {
@@ -407,12 +452,12 @@ export default {
           value: "nome"
         },
         { text: "CPF", value: "cpf" },
-        { text: "Categoria", value: "categoria.nome" },
-        { text: "Treinador", value: "treinador.nome" },
+        { text: "Categoria", value: "categoria" },
+        { text: "Treinador", value: "treinador" },
         { text: "Posição", value: "posicao" },
         { text: "Data Início", value: "dtInicio" },
         { text: "Data Dispensa", value: "dtDispensa" },
-        { text: "Status", value: "status.nome" },
+        { text: "Status", value: "status" },
         { text: "Nota", value: "nota" },
         { text: "Ações", value: "action", align: "center", sortable: false }
       ];
@@ -421,14 +466,31 @@ export default {
 
   created() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas/"
-      )
+      .get("avaliacoes", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(avaliacoes => (this.avaliacoes = avaliacoes));
+    this.$http
+      .get("atletas", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(atletas => (this.atletas = atletas));
 
     this.$http
-      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
+      .get("status", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(status => {
         this.statusList = status;
@@ -436,9 +498,12 @@ export default {
       });
 
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias"
-      )
+      .get("categorias", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(categorias => {
         this.categorias = categorias;
@@ -446,9 +511,12 @@ export default {
       });
 
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores"
-      )
+      .get("treinadores", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(treinadores => {
         this.treinadores = treinadores;
@@ -458,9 +526,12 @@ export default {
 
   beforeMount() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/"
-      )
+      .get("avaliacoes", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(avaliacoes => (this.avaliacoes = avaliacoes));
   },
@@ -471,6 +542,9 @@ export default {
 
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
+    },
+    limparDataDispensa() {
+      this.dtDispensa = "";
     },
 
     filterOnlyCapsText(value, search) {
@@ -484,18 +558,54 @@ export default {
           .indexOf(search) !== -1
       );
     },
-    adicionarOuEditar(avaliacao) {
-      if (avaliacao.id) {
-        this.addAvaliacao();
-      } else {
-        this.editarAvaliacao(avaliacao);
+    verificaDatas() {
+      if (this.dtDispensa.length > 0) {
+        var dtInicioString = this.dtInicio.split("/");
+        var dtInicioFormatada =
+          dtInicioString[1] + "-" + dtInicioString[0] + "-" + dtInicioString[2];
+        var dtInicio = new Date(dtInicioFormatada);
+        var dtDispensaString = this.dtDispensa.split("/");
+        var dtDispensaFormatada =
+          dtDispensaString[1] +
+          "-" +
+          dtDispensaString[0] +
+          "-" +
+          dtDispensaString[2];
+        var dtDispensa = new Date(dtDispensaFormatada);
+        if (dtInicio.getTime() >= dtDispensa.getTime()) {
+          this.dialog5 = true;
+        }
+      }
+    },
+    verificaDatasSalvar() {
+      if (this.dtDispensa.length > 0) {
+        var dtInicioString = this.dtInicio.split("/");
+        var dtInicioFormatada =
+          dtInicioString[1] + "-" + dtInicioString[0] + "-" + dtInicioString[2];
+        var dtInicio = new Date(dtInicioFormatada);
+        var dtDispensaString = this.dtDispensa.split("/");
+        var dtDispensaFormatada =
+          dtDispensaString[1] +
+          "-" +
+          dtDispensaString[0] +
+          "-" +
+          dtDispensaString[2];
+        var dtDispensa = new Date(dtDispensaFormatada);
+        if (dtInicio.getTime() >= dtDispensa.getTime()) {
+          return true;
+        } else {
+          return false;
+        }
       }
     },
     removerAvaliacao(avaliacao) {
       this.$http
-        .delete(
-          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/${avaliacao.id}`
-        )
+        .delete(`avaliacoes/${avaliacao.id}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(() => {
           let indice = this.avaliacoes.indexOf(avaliacao);
           this.avaliacoes.splice(indice, 1);
@@ -504,173 +614,165 @@ export default {
         });
     },
     addAvaliacao() {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
-      this.categoria = this.categorias.filter(
-        x => x.id == this.categoria.id
-      )[0];
-      this.treinador = this.treinadores.filter(
-        x => x.id == this.treinador.id
-      )[0];
-      this.status = this.statusList.filter(x => x.id == this.status.id)[0];
-      if (this.date2) {
-        let dataInicio = new Date(this.date2);
-        this.dtInicio =
-          dataInicio.getDate() +
-          "/" +
-          (dataInicio.getMonth() + 1) +
-          "/" +
-          dataInicio.getFullYear();
-      }
-      if (this.date3) {
-        let dataDispensa = new Date(this.date3);
-        this.dtDispensa =
-          dataDispensa.getDate() +
-          "/" +
-          (dataDispensa.getMonth() + 1) +
-          "/" +
-          dataDispensa.getFullYear();
-      }
+      this.dtCadastro = this.formatDate(this.date);
       let _avaliacao = {
-        nome: this.nome,
-        cpf: this.cpf,
+        atletaID: this.atletaID,
         nota: this.nota,
-        treinador: {
-          id: this.treinador.id,
-          nome: this.treinador.nome
-        },
-        categoria: {
-          id: this.categoria.id,
-          nome: this.categoria.nome
-        },
-        status: {
-          id: this.status.id,
-          nome: this.status.nome
-        },
+        treinadorID: this.treinadorID,
+        categoriaID: this.categoriaID,
+        statusID: this.statusID,
         dtInicio: this.dtInicio,
         dtDispensa: this.dtDispensa,
         dtCadastro: this.dtCadastro,
-        cadastradoPor: this.cadastradoPor,
-        observacao: this.observacao
+        observacao: this.observacao,
+        cadastradoPor: this.usuario.nome
       };
-      this.$http
-        .post(
-          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes",
-          _avaliacao
-        )
-        .then(res => res.json())
-        .then(
-          (this.nome = ""),
-          (this.cpf = ""),
-          (this.nota = ""),
-          (this.treinador = ""),
-          (this.categoria = ""),
-          (this.dtInicio = ""),
-          (this.dtDispensa = ""),
-          (this.dtCadastro = ""),
-          (this.cadastradoPor = ""),
-          (this.status = ""),
-          (this.dialog = false),
-          this.$router.push("/avaliacoes")
-        );
+      if (
+        this.atleta.nome.length == 0 ||
+        this.cpf.length == 0 ||
+        this.categoriaID.length == 0 ||
+        this.treinadorID.length == 0 ||
+        this.statusID.length == 0 ||
+        this.dtInicio.length == 0
+      ) {
+        this.dialog4 = true;
+      } else {
+        this.$http
+          .post("avaliacoes", _avaliacao, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
+          .then(res => res.json());
+        this.verificado = false;
+        window.location.href = window.location.origin + "/avaliacoes";
+      }
+    },
+    verificaAvaliacaoInicio() {
+      if (this.verificado == false && this.dtInicio.length == 0) {
+        let hoje = this.formatDate(this.hoje);
+        let ano = hoje.substring(6, 10);
+        this.avaliacaoVerificada = this.avaliacoes.filter(
+          x => x.atletaID == this.atletaID && x.dtInicio.substring(6, 10) == ano
+        )[0];
+        if (this.avaliacaoVerificada) {
+          this.ano = ano;
+          this.dialog2 = true;
+        }
+      }
+    },
+
+    verificaAvaliacao() {
+      let ano = this.dtInicio.substring(6, 10);
+      this.avaliacaoVerificada = this.avaliacoes.filter(
+        x => x.atletaID == this.atletaID && x.dtInicio.substring(6, 10) == ano
+      )[0];
+      if (this.avaliacaoVerificada) {
+        this.ano = ano;
+        this.dialog2 = true;
+      } else if (!this.verificaDatasSalvar()) {
+        this.addAvaliacao();
+        this.avaliacaoVerificada = "";
+      } else {
+        this.dialog5 = true;
+      }
     },
 
     editarAvaliacao(_avaliacao) {
-      this.categoria = this.categorias.filter(
-        x => x.id == _avaliacao.categoria.id
-      )[0];
-      this.treinador = this.treinadores.filter(
-        x => x.id == _avaliacao.treinador.id
-      )[0];
-      this.status = this.statusList.filter(
-        x => x.id == _avaliacao.status.id
-      )[0];
-      if (this.date2) {
-        let dataInicio = new Date(this.date2);
-        this.dtInicio =
-          dataInicio.getDate() +
-          1 +
-          "/" +
-          (dataInicio.getMonth() + 1) +
-          "/" +
-          dataInicio.getFullYear();
-      }
-      if (this.date3) {
-        let dataDispensa = new Date(this.date3);
-        this.dtDispensa =
-          dataDispensa.getDate() +
-          1 +
-          "/" +
-          (dataDispensa.getMonth() + 1) +
-          "/" +
-          dataDispensa.getFullYear();
-      }
       let _avaliacaoEditar = {
-        nome: _avaliacao.nome,
-        cpf: _avaliacao.cpf,
-        treinador: {
-          id: this.treinador.id,
-          nome: this.treinador.nome
-        },
-        categoria: {
-          id: this.categoria.id,
-          nome: this.categoria.nome
-        },
-        nota: _avaliacao.nota,
-        dtNascimento: _avaliacao.dtNascimento,
-        dtInicio: _avaliacao.dtInicio,
-        dtDispensa: _avaliacao.dtDispensa,
-        posicao: _avaliacao.posicao,
-        status: {
-          id: this.status.id,
-          nome: this.status.nome
-        }
+        atletaID: this.atletaID,
+        treinadorID: this.treinadorID,
+        categoriaID: this.categoriaID,
+        nota: this.nota,
+        dtNascimento: this.dtNascimento,
+        dtInicio: this.dtInicio,
+        dtDispensa: this.dtDispensa,
+        statusID: this.statusID,
+        observacao: this.observacao,
+        cadastradoPor: this.cadastradoPor,
+        dtCadastro: this.dtCadastro
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/avaliacoes/${_avaliacao.id}`,
-        _avaliacaoEditar
-      );
-      this.$router.push("/avaliacoes");
+      if (this.dtInicio.length == 0) {
+        this.dialog4 = true;
+      } else if (!this.verificaDatasSalvar()) {
+        {
+          this.$http.put(`avaliacoes/${_avaliacao.id}`, _avaliacaoEditar, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          });
+          this.verificado = false;
+          window.location.href = window.location.origin + "/avaliacoes";
+        }
+      } else {
+        this.dialog5 = true;
+      }
     },
     carregarAtletaPorCPF() {
       this.$http
-        .get(
-          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas"
-        )
+        .get("atletas", {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(res => res.json())
         .then(atletas => (this.atletas = atletas));
       this.atleta = this.atletas.filter(x => x.cpf == this.cpf)[0];
+      this.atletaID = this.atleta.id;
       this.nome = this.atleta.nome;
-      this.posicao = this.atleta.posicao.nome;
+      this.posicao = this.atleta.posicao;
       this.dtNascimento = this.atleta.dtNascimento;
       this.indicacao = this.atleta.indicacao;
+      this.verificaAvaliacaoInicio();
     },
     carregarAtletaPorNome(atleta) {
       this.$http
-        .get(
-          "https://my-json-server.typicode.com/rafafcasado/peneirasccp/atletas"
-        )
+        .get("atletas", {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(res => res.json())
         .then(atletas => (this.atletas = atletas));
       this.atleta = this.atletas.filter(x => x.nome === atleta.nome)[0];
+      this.atletaID = this.atleta.id;
       this.cpf = this.atleta.cpf;
-      this.nome = this.atleta.nome;
-      this.posicao = this.atleta.posicao.nome;
+      this.posicao = this.atleta.posicao;
       this.dtNascimento = this.atleta.dtNascimento;
       this.indicacao = this.atleta.indicacao;
+      this.verificaAvaliacaoInicio();
     },
+    carregaAvaliacao(avaliacao) {
+      this.atletaID = avaliacao.atletaID;
+      this.cpf = avaliacao.cpf;
+      this.nome = avaliacao.nome;
+      this.nota = avaliacao.nota;
+      this.treinadorID = avaliacao.treinadorID;
+      this.categoriaID = avaliacao.categoriaID;
+      this.dtInicio = avaliacao.dtInicio;
+      this.dtDispensa = avaliacao.dtDispensa;
+      this.dtCadastro = avaliacao.dtCadastro;
+      this.cadastradoPor = avaliacao.cadastradoPor;
+      this.statusID = avaliacao.statusID;
+    },
+
     limparFormulario() {
-      this.nome = "";
+      this.atletaID = "";
       this.cpf = "";
+      this.nome = "";
       this.nota = "";
-      this.treinador = {};
-      this.categoria = {};
+      this.treinadorID = "";
+      this.categoriaID = "";
       this.dtInicio = "";
       this.dtDispensa = "";
       this.dtCadastro = "";
       this.cadastradoPor = "";
-      this.status = {};
+      this.statusID = "";
+      this.verificado = false;
       this.avaliacao = {};
       this.atleta = {};
     }

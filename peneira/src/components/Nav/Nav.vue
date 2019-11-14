@@ -3,12 +3,14 @@
     <v-app-bar dark app>
       <v-icon v-if="drawer" @click.stop="drawer = !drawer">mdi-arrow-collapse-left</v-icon>
       <v-icon v-else @click.stop="drawer = !drawer">mdi-menu</v-icon>
-      <v-app-bar-title
-        align="center"
-        cols="12"
-        md="12"
-        class="title text-uppercase font-weight-medium ps-5"
-      >SISTEMA DE PENEIRAS</v-app-bar-title>
+      <router-link to="/boas-vindas" tag="button">
+        <v-app-bar-title
+          align="center"
+          cols="12"
+          md="12"
+          class="title text-uppercase font-weight-medium ps-5"
+        >SISTEMA DE PENEIRAS</v-app-bar-title>
+      </router-link>
       <div class="flex-grow-1"></div>
       <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
         <template v-slot:activator="{ on }">
@@ -19,17 +21,17 @@
           <v-list>
             <v-list-item>
               <v-list-item-avatar color="black">
-                <span class="white--text headline">F</span>
+                <span class="white--text headline">{{usuario.nome.substring(0,1)}}</span>
               </v-list-item-avatar>
 
               <v-list-item-content>
                 <v-list-item-title>{{usuario.nome}}</v-list-item-title>
-                <v-list-item-subtitle>{{usuario.perfil.nome}}</v-list-item-subtitle>
+                <v-list-item-subtitle>{{usuario.perfil}}</v-list-item-subtitle>
               </v-list-item-content>
             </v-list-item>
           </v-list>
           <v-list dense>
-            <v-list-item>
+            <v-list-item @click="dialog=true; buscarUsuario();zeraSenha()">
               <v-list-item-icon>
                 <v-icon small>mdi-account-key</v-icon>
               </v-list-item-icon>
@@ -42,7 +44,7 @@
           <v-card-actions>
             <div class="flex-grow-1"></div>
 
-            <v-btn small color="black" text @click="menu = false">
+            <v-btn small color="black" text @click="logout()">
               Sair
               <v-icon class="ms-2">mdi-exit-to-app</v-icon>
             </v-btn>
@@ -161,19 +163,125 @@
         </router-link>
       </v-list>
     </v-navigation-drawer>
+    <v-dialog v-model="dialog" width="50%">
+      <v-card>
+        <v-toolbar dark color="primary">Alterar senha</v-toolbar>
+        <v-card-text>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="senhaAux1"
+                  label="Digite a senha"
+                  prepend-inner-icon="mdi-lock"
+                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="show1 ? 'text' : 'password'"
+                  @click:append="show1 = !show1"
+                  required
+                  :rules="[rules.required]"
+                  autofocus
+                  @keyup.enter="alterarSenha()"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12">
+                <v-text-field
+                  v-model="senhaAux2"
+                  label="Repita a senha"
+                  prepend-inner-icon="mdi-lock"
+                  :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="show2 ? 'text' : 'password'"
+                  @click:append="show2 = !show2"
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="alterarSenha();"
+                ></v-text-field>
+              </v-col>
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="black" text @click="dialog = false">Cancelar</v-btn>
+          <v-btn v-if="usuario.id" color="blue darken-1" text @click="alterarSenha()">Salvar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog1" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Senha alterada com sucesso!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog1 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">As senhas não coincidem!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false; dialog1=true">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">As senhas não coincidem!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog4" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">As senhas devem ser preenchidas!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog4 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </nav>
 </template>
 
 <script>
 export default {
   data: () => ({
-    usuario: {
-      nome: "Fulano de Tal",
-      perfil: {
-        nome: "Administrador"
-      }
+    usuario: JSON.parse(window.localStorage.getItem("usuario")),
+    usuarioEditar: {},
+    rules: {
+      required: value => !!value || "Preenchimento obrigatório."
     },
-
+    nome: "",
+    email: "",
+    perfilID: "",
+    dtCadastro: "",
+    usuarioID: "",
+    senhaAux1: "",
+    senhaAux2: "",
+    date: "",
+    dialog: false,
+    dialog1: false,
+    dialog2: false,
+    dialog3: false,
+    dialog4: false,
     card: false,
     menu: false,
     drawer: false,
@@ -183,6 +291,8 @@ export default {
     closeDelay: "0",
     value: false,
     active: true,
+    show1: false,
+    show2: false,
     avaliacoes: {
       route: "/avaliacoes"
     },
@@ -207,6 +317,72 @@ export default {
   watch: {
     group() {
       this.drawer = false;
+    }
+  },
+
+  created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.$http
+      .get("usuarios/" + this.usuario.id, {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(usuario => (this.usuarioEditar = usuario));
+  },
+
+  methods: {
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
+    },
+    logout() {
+      this.$http.post("logout", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      });
+      window.location.href = window.location.origin + "/login";
+    },
+    carregaUsuario(usuario) {
+      this.nome = usuario.nome;
+      this.email = usuario.email;
+      this.perfilID = usuario.perfilID;
+      this.dtCadastro = usuario.dtCadastro;
+    },
+    alterarSenha() {
+      if (!this.senhaAux1 && !this.senhaAux2) {
+        this.dialog4 = true;
+      } else if (this.senhaAux1 === this.senhaAux2) {
+        let _senha = this.senhaAux1;
+        let _usuarioEditar = {
+          id: this.usuarioEditar.id,
+          nome: this.usuarioEditar.nome,
+          email: this.usuarioEditar.email,
+          perfilID: this.usuarioEditar.perfilID,
+          senha: _senha,
+          dtCadastro: this.usuarioEditar.dtCadastro
+        };
+        this.$http.put(`usuarios/${this.usuarioEditar.id}`, _usuarioEditar, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        });
+        this.dialog = false;
+        this.dialog1 = true;
+      } else {
+        this.dialog3 = true;
+      }
+    },
+    zeraSenha() {
+      this.senhaAux1 = "";
+      this.senhaAux2 = "";
     }
   }
 };

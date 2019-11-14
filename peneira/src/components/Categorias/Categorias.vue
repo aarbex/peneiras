@@ -22,6 +22,7 @@
             label="Pesquisar em categorias cadastradas"
             prepend-inner-icon="mdi-magnify"
             filled
+            clearable
           ></v-text-field>
         </v-col>
       </template>
@@ -34,11 +35,11 @@
           </template>
 
           <v-list bottom>
-            <v-list-item>
-              <v-list-item-title @click="dialog = true; categoria = item">Editar</v-list-item-title>
+            <v-list-item @click="dialog = true; categoria = item; carregaCategoria(item)">
+              <v-list-item-title>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item>
-              <v-list-item-title @click="dialog1 = true; categoria = item">Excluir</v-list-item-title>
+            <v-list-item @click="dialog1 = true; categoria = item">
+              <v-list-item-title>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -76,18 +77,26 @@
         <v-card-text>
           <v-container>
             <v-row dense>
-              <v-col cols="12" sm="6" md="9">
+              <v-col cols="12">
                 <v-text-field
                   v-if="categoria.id"
-                  v-model="categoria.nome"
+                  v-model="nome"
                   label="Nome da Categoria"
                   prepend-inner-icon="mdi-soccer"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="editarCategoria(categoria)"
                 ></v-text-field>
                 <v-text-field
                   v-else
                   v-model="nome"
                   label="Nome do Categoria"
                   prepend-inner-icon="mdi-soccer"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="verificaCategoria()"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -100,9 +109,9 @@
             v-if="categoria.id"
             color="blue darken-1"
             text
-            @click="editarCategoria(categoria);dialog=false"
+            @click="editarCategoria(categoria)"
           >Salvar</v-btn>
-          <v-btn v-else color="blue darken-1" text @click="addCategoria();dialog=false">Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="verificaCategoria()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -117,6 +126,19 @@
 
           <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
           <v-btn color="primary" text @click="removerCategoria(categoria); dialog1=false">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">A categoria "{{this.nome}}" já está cadastrada!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -139,22 +161,22 @@ export default {
       search: "",
       dialog: false,
       dialog1: false,
+      dialog2: false,
       nome: "",
-      nameRules: [v => !!v || "O nome da categoria é obrigatório!"],
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório."
+      },
       categorias: [],
       categoria: {},
+      categoriaVerificada: "",
       dtCadastro: "",
+      date: new Date().toISOString().substr(0, 10),
       id: this.$route.params.id
     };
   },
   computed: {
     headers() {
       return [
-        {
-          text: "ID",
-          value: "id",
-          align: "center"
-        },
         {
           text: "Categoria",
           value: "nome",
@@ -178,18 +200,24 @@ export default {
 
   created() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias"
-      )
+      .get("categorias", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(categorias => (this.categorias = categorias));
   },
 
   beforeMount() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias"
-      )
+      .get("categorias", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(categorias => (this.categorias = categorias));
   },
@@ -206,18 +234,21 @@ export default {
           .indexOf(search) !== -1
       );
     },
-    adicionarOuEditar(categoria) {
-      if (categoria.id) {
-        this.addCategoria();
-      } else {
-        this.editarCategoria(categoria);
-      }
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
     },
+
     removerCategoria(categoria) {
       this.$http
-        .delete(
-          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/${categoria.id}`
-        )
+        .delete(`categorias/${categoria.id}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(() => {
           let indice = this.categorias.indexOf(categoria);
           this.categorias.splice(indice, 1);
@@ -226,40 +257,54 @@ export default {
         });
     },
     addCategoria() {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.dtCadastro = this.formatDate(this.date);
       let _categoria = {
         nome: this.nome,
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
         this.$http
-          .post(
-            "https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/",
-            _categoria
-          )
+          .post("categorias", _categoria, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
           .then(res => res.json());
-        this.nome = "";
-        this.dtCadastro = "";
-        this.$router.push("/categorias");
+        window.location.href = window.location.origin + "/categorias";
       }
     },
 
     editarCategoria(_categoria) {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
       let _categoriaEditar = {
         id: _categoria.id,
-        nome: _categoria.nome,
+        nome: this.nome,
         dtCadastro: this.dtCadastro
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/categorias/${_categoriaEditar.id}`,
-        _categoriaEditar
-      );
-      this.$router.push("/categorias");
+      if (this.nome.length > 0) {
+        this.$http.put(`categorias/${_categoriaEditar.id}`, _categoriaEditar, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        });
+        window.location.href = window.location.origin + "/categorias";
+      }
+    },
+    verificaCategoria() {
+      this.categoriaVerificada = this.categorias.filter(
+        x => x.nome === this.nome
+      )[0];
+      if (this.categoriaVerificada) {
+        this.dialog2 = true;
+      } else {
+        this.addCategoria();
+        this.categoriaVerificada = "";
+      }
+    },
+    carregaCategoria(categoria) {
+      this.nome = categoria.nome;
+      this.dtCadastro = categoria.dtCadastro;
     },
     limparFormulario() {
       this.nome = "";

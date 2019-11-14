@@ -8,7 +8,7 @@
       :headers="headers"
       :items="statusLista"
       calculate-widths
-      sort-by="id"
+      sort-by="nome"
       item-key="id"
       class="elevation-1 px-5"
       :search="search"
@@ -22,6 +22,7 @@
             label="Pesquisar em status cadastrados"
             prepend-inner-icon="mdi-magnify"
             filled
+            clearable
           ></v-text-field>
         </v-col>
       </template>
@@ -34,11 +35,11 @@
           </template>
 
           <v-list bottom>
-            <v-list-item>
-              <v-list-item-title @click="dialog = true; status = item">Editar</v-list-item-title>
+            <v-list-item @click="dialog = true; status = item; carregaStatus(item)">
+              <v-list-item-title text>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item>
-              <v-list-item-title @click="dialog1 = true; status = item">Excluir</v-list-item-title>
+            <v-list-item @click="dialog1 = true; status = item">
+              <v-list-item-title text>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -76,18 +77,26 @@
         <v-card-text>
           <v-container>
             <v-row dense>
-              <v-col cols="12" sm="6" md="9">
+              <v-col cols="12">
                 <v-text-field
                   v-if="status.id"
-                  v-model="status.nome"
+                  v-model="nome"
                   label="Nome da status"
                   prepend-inner-icon="mdi-progress-check"
+                  @keyup.enter="editarStatus(status)"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
                 <v-text-field
                   v-else
                   v-model="nome"
                   label="Nome do status"
                   prepend-inner-icon="mdi-progress-check"
+                  autofocus
+                  required
+                  :rules="[rules.required]"
+                  @keyup.enter="verificaStatus()"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -96,13 +105,8 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn
-            v-if="status.id"
-            color="blue darken-1"
-            text
-            @click="editarStatus(status);dialog=false"
-          >Salvar</v-btn>
-          <v-btn v-else color="blue darken-1" text @click="addStatus();dialog=false">Salvar</v-btn>
+          <v-btn v-if="status.id" color="blue darken-1" text @click="editarStatus(status)">Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="verificaStatus()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -117,6 +121,19 @@
 
           <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
           <v-btn color="primary" text @click="removerStatus(status); dialog1=false">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">O status "{{this.nome}}" já está cadastrado!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -139,22 +156,22 @@ export default {
       search: "",
       dialog: false,
       dialog1: false,
+      dialog2: false,
       nome: "",
-      nameRules: [v => !!v || "O nome da status é obrigatório!"],
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório."
+      },
       statusLista: [],
       status: {},
+      statusVerificado: "",
       dtCadastro: "",
+      date: new Date().toISOString().substr(0, 10),
       id: this.$route.params.id
     };
   },
   computed: {
     headers() {
       return [
-        {
-          text: "ID",
-          align: "center",
-          value: "id"
-        },
         {
           text: "Status",
           align: "center",
@@ -178,19 +195,32 @@ export default {
 
   created() {
     this.$http
-      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
+      .get("status", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(statusLista => (this.statusLista = statusLista));
   },
 
   beforeMount() {
     this.$http
-      .get("https://my-json-server.typicode.com/rafafcasado/peneirasccp/status")
+      .get("status", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(statusLista => (this.statusLista = statusLista));
   },
 
   methods: {
+    teste(teste) {
+      alert(teste);
+    },
     filterOnlyCapsText(value, search) {
       return (
         value != null &&
@@ -202,18 +232,20 @@ export default {
           .indexOf(search) !== -1
       );
     },
-    adicionarOuEditar(status) {
-      if (status.id) {
-        this.addStatus();
-      } else {
-        this.editarStatus(status);
-      }
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
     },
     removerStatus(status) {
       this.$http
-        .delete(
-          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/status/${status.id}`
-        )
+        .delete(`status/${status.id}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(() => {
           let indice = this.statusLista.indexOf(status);
           this.statusLista.splice(indice, 1);
@@ -221,41 +253,55 @@ export default {
           this.dialog1 = false;
         });
     },
+    verificaStatus() {
+      this.statusVerificado = this.statusLista.filter(
+        x => x.nome === this.nome
+      )[0];
+      if (this.statusVerificado) {
+        this.dialog2 = true;
+      } else {
+        this.addStatus();
+        this.statusVerificado = "";
+      }
+    },
     addStatus() {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.dtCadastro = this.formatDate(this.date);
       let _status = {
         nome: this.nome,
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
         this.$http
-          .post(
-            "https://my-json-server.typicode.com/rafafcasado/peneirasccp/status/",
-            _status
-          )
+          .post("status", _status, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
           .then(res => res.json());
-        this.nome = "";
-        this.dtCadastro = "";
-        this.$router.push("/status");
+        window.location.href = window.location.origin + "/status";
       }
     },
 
     editarStatus(_status) {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
       let _statusEditar = {
         id: _status.id,
-        nome: _status.nome,
+        nome: this.nome,
         dtCadastro: this.dtCadastro
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/status/${_statusEditar.id}`,
-        _statusEditar
-      );
-      this.$router.push("/status");
+      if (this.nome.length > 0) {
+        this.$http.put(`status/${_statusEditar.id}`, _statusEditar, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        });
+        window.location.href = window.location.origin + "/status";
+      }
+    },
+    carregaStatus(status) {
+      this.nome = status.nome;
+      this.dtCadastro = status.dtCadastro;
     },
     limparFormulario() {
       this.nome = "";

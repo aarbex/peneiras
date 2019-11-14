@@ -5,7 +5,7 @@
       <v-img src="../../assets/iptec.png" class="grey lighten-2 mx-auto mt-12" max-width="40%"></v-img>
     </v-row>
     <div class="mt-12" align="center">
-      <h3>Olá, {{usuario.nome}}!</h3>
+      <h3>Olá, {{this.usuario.nome}}!</h3>
       <p>Seja bem-vindo(a) ao Sistema de Peneiras</p>
     </div>
   </div>
@@ -20,9 +20,7 @@ export default {
   },
   data() {
     return {
-      usuario: {
-        nome: "Fulano de Tal"
-      },
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
     };
   }

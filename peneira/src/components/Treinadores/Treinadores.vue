@@ -8,7 +8,7 @@
       :headers="headers"
       :items="treinadores"
       calculate-widths
-      sort-by="id"
+      sort-by="nome"
       item-key="id"
       class="elevation-1 px-5"
       :search="search"
@@ -22,6 +22,7 @@
             label="Pesquisar em treinadores cadastrados"
             prepend-inner-icon="mdi-magnify"
             filled
+            clearable
           ></v-text-field>
         </v-col>
       </template>
@@ -34,11 +35,11 @@
           </template>
 
           <v-list bottom>
-            <v-list-item>
-              <v-list-item-title @click="dialog = true; treinador = item">Editar</v-list-item-title>
+            <v-list-item @click="dialog = true; treinador = item; carregaTreinador(item)">
+              <v-list-item-title>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item>
-              <v-list-item-title @click="dialog1 = true; treinador = item">Excluir</v-list-item-title>
+            <v-list-item @click="dialog1 = true; treinador = item">
+              <v-list-item-title>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
         </v-menu>
@@ -76,18 +77,26 @@
         <v-card-text>
           <v-container>
             <v-row dense>
-              <v-col cols="12" sm="6" md="9">
+              <v-col cols="12">
                 <v-text-field
                   v-if="treinador.id"
-                  v-model="treinador.nome"
+                  v-model="nome"
                   label="Nome da treinador"
                   prepend-inner-icon="mdi-account-edit"
+                  autofocus
+                  @keyup.enter="editarTreinador(treinador)"
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
                 <v-text-field
                   v-else
                   v-model="nome"
                   label="Nome do treinador"
                   prepend-inner-icon="mdi-account-edit"
+                  autofocus
+                  @keyup.enter="verificaTreinador()"
+                  required
+                  :rules="[rules.required]"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -100,9 +109,9 @@
             v-if="treinador.id"
             color="blue darken-1"
             text
-            @click="editarTreinador(treinador);dialog=false"
+            @click="editarTreinador(treinador)"
           >Salvar</v-btn>
-          <v-btn v-else color="blue darken-1" text @click="addTreinador();dialog=false">Salvar</v-btn>
+          <v-btn v-else color="blue darken-1" text @click="verificaTreinador()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -117,6 +126,19 @@
 
           <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
           <v-btn color="primary" text @click="removerTreinador(treinador); dialog1=false">Excluir</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog2" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Já existe um treinador cadastrado com esse nome!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -139,22 +161,22 @@ export default {
       search: "",
       dialog: false,
       dialog1: false,
+      dialog2: false,
       nome: "",
-      nameRules: [v => !!v || "O nome da treinador é obrigatório!"],
+      rules: {
+        required: value => !!value || "Preenchimento obrigatório."
+      },
       treinadores: [],
       treinador: {},
+      treinadorVerificado: "",
       dtCadastro: "",
+      date: new Date().toISOString().substr(0, 10),
       id: this.$route.params.id
     };
   },
   computed: {
     headers() {
       return [
-        {
-          text: "ID",
-          align: "center",
-          value: "id"
-        },
         {
           text: "Treinador",
           align: "center",
@@ -178,18 +200,24 @@ export default {
 
   created() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores"
-      )
+      .get("treinadores", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(treinadores => (this.treinadores = treinadores));
   },
 
   beforeMount() {
     this.$http
-      .get(
-        "https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores"
-      )
+      .get("treinadores", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
       .then(res => res.json())
       .then(treinadores => (this.treinadores = treinadores));
   },
@@ -206,18 +234,20 @@ export default {
           .indexOf(search) !== -1
       );
     },
-    adicionarOuEditar(treinador) {
-      if (treinador.id) {
-        this.addTreinador();
-      } else {
-        this.editarTreinador(treinador);
-      }
+    formatDate(date) {
+      if (!date) return null;
+
+      const [year, month, day] = date.split("-");
+      return `${day}/${month}/${year}`;
     },
     removerTreinador(treinador) {
       this.$http
-        .delete(
-          `https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores/${treinador.id}`
-        )
+        .delete(`treinadores/${treinador.id}`, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        })
         .then(() => {
           let indice = this.treinadores.indexOf(treinador);
           this.treinadores.splice(indice, 1);
@@ -225,41 +255,55 @@ export default {
           this.dialog1 = false;
         });
     },
+    verificaTreinador() {
+      this.treinadorVerificado = this.treinadores.filter(
+        x => x.nome === this.nome
+      )[0];
+      if (this.treinadorVerificado) {
+        this.dialog2 = true;
+      } else {
+        this.addTreinador();
+        this.treinadorVerificado = "";
+      }
+    },
     addTreinador() {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
+      this.dtCadastro = this.formatDate(this.date);
       let _treinador = {
         nome: this.nome,
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
         this.$http
-          .post(
-            "https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores/",
-            _treinador
-          )
+          .post("treinadores", _treinador, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
           .then(res => res.json());
-        this.nome = "";
-        this.dtCadastro = "";
-        this.$router.push("/treinadores");
+        window.location.href = window.location.origin + "/treinadores";
       }
     },
 
     editarTreinador(_treinador) {
-      let now = new Date();
-      this.dtCadastro =
-        now.getDate() + "/" + (now.getMonth() + 1) + "/" + now.getFullYear();
       let _treinadorEditar = {
         id: _treinador.id,
-        nome: _treinador.nome,
+        nome: this.nome,
         dtCadastro: this.dtCadastro
       };
-      this.$http.put(
-        `https://my-json-server.typicode.com/rafafcasado/peneirasccp/treinadores/${_treinadorEditar.id}`,
-        _treinadorEditar
-      );
-      this.$router.push("/treinadores");
+      if (this.nome.length > 0) {
+        this.$http.put(`treinadores/${_treinadorEditar.id}`, _treinadorEditar, {
+          headers: {
+            Authorization: "Bearer " + window.localStorage.getItem("token"),
+            "Content-Type": "application/json"
+          }
+        });
+        window.location.href = window.location.origin + "/treinadores";
+      }
+    },
+    carregaTreinador(treinador) {
+      this.nome = treinador.nome;
+      this.dtCadastro = treinador.dtCadastro;
     },
     limparFormulario() {
       this.nome = "";
