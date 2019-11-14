@@ -84,6 +84,8 @@
                   label="Nome da treinador"
                   prepend-inner-icon="mdi-account-edit"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   @keyup.enter="editarTreinador(treinador)"
                   required
                   :rules="[rules.required]"
@@ -94,6 +96,8 @@
                   label="Nome do treinador"
                   prepend-inner-icon="mdi-account-edit"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   @keyup.enter="verificaTreinador()"
                   required
                   :rules="[rules.required]"

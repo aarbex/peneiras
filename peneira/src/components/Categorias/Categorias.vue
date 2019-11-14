@@ -84,6 +84,8 @@
                   label="Nome da Categoria"
                   prepend-inner-icon="mdi-soccer"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                   @keyup.enter="editarCategoria(categoria)"
@@ -94,6 +96,8 @@
                   label="Nome do Categoria"
                   prepend-inner-icon="mdi-soccer"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                   @keyup.enter="verificaCategoria()"

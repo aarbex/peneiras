@@ -85,6 +85,8 @@
                   prepend-inner-icon="mdi-progress-check"
                   @keyup.enter="editarStatus(status)"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                 ></v-text-field>
@@ -94,6 +96,8 @@
                   label="Nome do status"
                   prepend-inner-icon="mdi-progress-check"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                   @keyup.enter="verificaStatus()"

@@ -84,6 +84,8 @@
                   label="Nome do Perfil"
                   prepend-inner-icon="mdi-account-details"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                   @keyup.enter="editarPerfil(perfil)"
@@ -94,6 +96,8 @@
                   label="Nome do Perfil"
                   prepend-inner-icon="mdi-account-details"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                   @keyup.enter="verificaPerfil()"

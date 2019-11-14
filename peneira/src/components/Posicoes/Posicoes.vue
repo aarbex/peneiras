@@ -84,6 +84,8 @@
                   label="Nome da posição"
                   prepend-inner-icon="mdi-soccer-field"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                   @keyup.enter="editarPosicao(posicao)"
@@ -94,6 +96,8 @@
                   label="Nome da posição"
                   prepend-inner-icon="mdi-soccer-field"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   required
                   :rules="[rules.required]"
                   @keyup.enter="verificaPosicao()"

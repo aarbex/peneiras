@@ -297,6 +297,7 @@
                     <v-text-field
                       v-mask="notaMask"
                       v-model="nota"
+                      hint="##,#"
                       prepend-inner-icon="mdi-thumbs-up-down"
                       label="Nota"
                     ></v-text-field>
@@ -395,7 +396,7 @@ export default {
       treinador: {},
       cpfMask: "###.###.###-##",
       dataMask: "##/##/####",
-      notaMask: "##,##",
+      notaMask: "##,#",
       dtInicio: "",
       dtDispensa: "",
       dtCadastro: "",

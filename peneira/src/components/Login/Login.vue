@@ -20,6 +20,8 @@
         prepend-inner-icon="mdi-email"
         class="mx-5 mt-5"
         @keyup.enter="submit()"
+        hint="* Preenchimento Obrigatório"
+        persistent-hint
         required
         :rules="[rules.required]"
       ></v-text-field>
@@ -32,6 +34,8 @@
         :type="show ? 'text' : 'password'"
         @click:append="show = !show"
         @keyup.enter="submit()"
+        hint="* Preenchimento Obrigatório"
+        persistent-hint
         required
         :rules="[rules.required]"
       ></v-text-field>

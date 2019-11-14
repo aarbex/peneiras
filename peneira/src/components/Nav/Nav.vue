@@ -180,6 +180,8 @@
                   required
                   :rules="[rules.required]"
                   autofocus
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   @keyup.enter="alterarSenha()"
                 ></v-text-field>
               </v-col>
@@ -193,6 +195,8 @@
                   @click:append="show2 = !show2"
                   required
                   :rules="[rules.required]"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
                   @keyup.enter="alterarSenha();"
                 ></v-text-field>
               </v-col>

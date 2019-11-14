@@ -259,6 +259,8 @@
                   v-model="nota"
                   prepend-inner-icon="mdi-thumbs-up-down"
                   label="Nota"
+                  hint="##,#"
+                  persistent-hint
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="6">
@@ -422,7 +424,7 @@ export default {
       id: this.$route.params.id,
       cpfMask: "###.###.###-##",
       dataMask: "##/##/####",
-      notaMask: ["#,##", "##,##"],
+      notaMask: "##,#",
       date: new Date().toISOString().substr(0, 10),
       date2: new Date().toISOString().substr(0, 10),
       date3: new Date().toISOString().substr(0, 10),
