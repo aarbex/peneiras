@@ -130,10 +130,10 @@
                   <v-col cols="12" sm="6" md="2">
                     <picture-input
                       ref="pictureInput"
+                      :prefill="foto"
                       @change="onChange"
                       width="90"
                       height="120"
-                      accept="image/jpeg, image/png"
                       size="10"
                       buttonClass="btn"
                       :zindex="0"
