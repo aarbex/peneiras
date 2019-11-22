@@ -571,6 +571,9 @@ export default {
       if (image) {
         this.foto = image;
       }
+      else {
+        alert("Imagem não suportada!");
+      }
     },
 
     formatDate(date) {
@@ -628,7 +631,8 @@ export default {
         alojamento: this.alojamento,
         dtCadastro: this.dtCadastro,
         posicaoID: this.posicao.id,
-        dtNascimento: this.dtNascimento
+        dtNascimento: this.dtNascimento,
+        foto: this.foto
       };
       if (
         this.nome.length == 0 ||

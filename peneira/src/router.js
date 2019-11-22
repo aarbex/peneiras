@@ -11,6 +11,7 @@ import Categorias from "./components/Categorias/Categorias.vue";
 import Treinadores from "./components/Treinadores/Treinadores.vue";
 import Status from "./components/Status/Status.vue";
 import Posicoes from "./components/Posicoes/Posicoes.vue";
+import Permissoes from "./components/Permissoes/Permissoes.vue";
 import BoasVindas from "./components/BoasVindas/BoasVindas.vue";
 
 Vue.use(Router);
@@ -80,6 +81,11 @@ export default new Router({
       path: "/posicoes",
       name: "Posicoes",
       component: Posicoes
+    },
+    {
+      path: "/permissoes",
+      name: "Permissoes",
+      component: Permissoes
     },
     {
       path: "/treinadores",

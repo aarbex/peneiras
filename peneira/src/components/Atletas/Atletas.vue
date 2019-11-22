@@ -161,6 +161,7 @@
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
+                  v-if="atleta.id"
                   v-model="cpf"
                   prepend-inner-icon="mdi-account-badge"
                   v-mask="cpfMask"
@@ -170,6 +171,7 @@
                   readonly
                 ></v-text-field>
                 <v-text-field
+                  v-else
                   v-model="cpf"
                   prepend-inner-icon="mdi-account-badge"
                   v-mask="cpfMask"
@@ -614,7 +616,6 @@ export default {
     onChange(image) {
       if (image) {
         this.foto = image;
-        alert(this.foto);
       } else {
         alert("Imagem não suportada!");
       }
