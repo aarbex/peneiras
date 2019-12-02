@@ -40,7 +40,9 @@
                   <v-list-item-title xSmall>Detalhes</v-list-item-title>
                 </v-list-item>
               </router-link>
-              <v-list-item @click="dialog = true; avaliacao = item; carregaAvaliacao(item)">
+              <v-list-item
+                @click="dialog = true; avaliacao = item; carregaAvaliacao(item); verificaAutorizador()"
+              >
                 <v-list-item-title>Editar</v-list-item-title>
               </v-list-item>
               <v-list-item @click="dialog1 = true; avaliacao = item">
@@ -282,6 +284,20 @@
                   filled
                 ></v-text-field>
               </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field
+                  v-if="autorizar || autorizador"
+                  v-model="autorizador"
+                  prepend-inner-icon="mdi-thumbs-up-down"
+                  label="Autorizado por:"
+                  class="text-capitalized"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  required
+                  :rules="[rules.required]"
+                  autofocus
+                ></v-text-field>
+              </v-col>
               <v-col cols="12">
                 <v-textarea
                   name="observacao"
@@ -301,7 +317,7 @@
             v-if="avaliacao.id"
             color="blue darken-1"
             text
-            @click="editarAvaliacao(avaliacao);this.verificado = true"
+            @click="verificaAvaliacaoEditar(avaliacao);this.verificado = true"
           >Salvar</v-btn>
           <v-btn
             v-else
@@ -330,14 +346,32 @@
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>
 
-        <v-card-text
-          justify="center"
-        >Já existe uma avaliação cadastrada para esse atleta em {{this.ano}}!</v-card-text>
+        <v-card-text justify="center">
+          Já existe uma avaliação cadastrada para esse atleta em {{this.ano}}!
+          <br />Caso deseje continuar, será necessário informar um autorizador!
+        </v-card-text>
 
         <v-card-actions>
           <div class="flex-grow-1"></div>
 
           <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialog7" persistent max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">
+          Já existe uma avaliação cadastrada para esse atleta em {{this.ano}}!
+          <br />Caso deseje continuar, será necessário informar um autorizador!
+          <br />Deseja continuar?
+        </v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="primary" text @click="autorizar = true; dialog7 = false">Continuar</v-btn>
+          <v-btn color="black" text @click="autorizar = true;dialog7 = false">Cancelar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -367,7 +401,7 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialog6" max-width="290">
+    <v-dialog v-model="dialog6" max-width="290" persistent>
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>
 
@@ -430,6 +464,8 @@ export default {
       categoria: {},
       treinadores: [],
       treinador: {},
+      autorizar: false,
+      autorizador: "",
       nota: "",
       observacao: "",
       usuario: JSON.parse(window.localStorage.getItem("usuario")),
@@ -456,6 +492,7 @@ export default {
       dialog4: false,
       dialog5: false,
       dialog6: false,
+      dialog7: false,
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
       }
@@ -643,7 +680,8 @@ export default {
         dtDispensa: this.dtDispensa,
         dtCadastro: this.dtCadastro,
         observacao: this.observacao,
-        cadastradoPor: this.usuario.nome
+        cadastradoPor: this.usuario.nome,
+        autorizador: this.autorizador
       };
       if (
         this.atleta.nome.length == 0 ||
@@ -653,6 +691,8 @@ export default {
         this.statusID.length == 0 ||
         this.dtInicio.length == 0
       ) {
+        this.dialog4 = true;
+      } else if (this.autorizar && !this.autorizador) {
         this.dialog4 = true;
       } else {
         this.$http
@@ -686,9 +726,9 @@ export default {
       this.avaliacaoVerificada = this.avaliacoes.filter(
         x => x.atletaID == this.atletaID && x.dtInicio.substring(6, 10) == ano
       )[0];
-      if (this.avaliacaoVerificada) {
+      if (this.avaliacaoVerificada && !this.autorizar) {
         this.ano = ano;
-        this.dialog2 = true;
+        this.dialog7 = true;
       } else if (!this.verificaDatasSalvar()) {
         this.addAvaliacao();
         this.avaliacaoVerificada = "";
@@ -696,7 +736,30 @@ export default {
         this.dialog5 = true;
       }
     },
-
+    verificaAvaliacaoEditar(avaliacao) {
+      let ano = this.dtInicio.substring(6, 10);
+      this.avaliacaoVerificada = this.avaliacoes.filter(
+        x => x.atletaID == this.atletaID && x.dtInicio.substring(6, 10) == ano
+      )[0];
+      if (
+        this.avaliacaoVerificada &&
+        !this.autorizar &&
+        this.avaliacao.id != this.avaliacaoVerificada.id
+      ) {
+        this.ano = ano;
+        this.dialog7 = true;
+      } else if (!this.verificaDatasSalvar()) {
+        this.editarAvaliacao(avaliacao);
+        this.avaliacaoVerificada = "";
+      } else {
+        this.dialog5 = true;
+      }
+    },
+    verificaAutorizador() {
+      if (this.autorizador) {
+        this.autorizar = true;
+      }
+    },
     editarAvaliacao(_avaliacao) {
       let _avaliacaoEditar = {
         atletaID: this.atletaID,
@@ -709,9 +772,12 @@ export default {
         statusID: this.statusID,
         observacao: this.observacao,
         cadastradoPor: this.cadastradoPor,
-        dtCadastro: this.dtCadastro
+        dtCadastro: this.dtCadastro,
+        autorizador: this.autorizador
       };
       if (this.dtInicio.length == 0) {
+        this.dialog4 = true;
+      } else if (this.autorizar && !this.autorizador) {
         this.dialog4 = true;
       } else if (!this.verificaDatasSalvar()) {
         {
@@ -782,6 +848,7 @@ export default {
       this.cadastradoPor = avaliacao.cadastradoPor;
       this.observacao = avaliacao.observacao;
       this.statusID = avaliacao.statusID;
+      this.autorizador = avaliacao.autorizador;
     },
 
     limparFormulario() {
@@ -801,6 +868,8 @@ export default {
       this.avaliacao = {};
       this.atleta = {};
       this.rgValidar = "";
+      this.autorizar = "";
+      this.autorizador = "";
     }
   }
 };

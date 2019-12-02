@@ -115,16 +115,19 @@
           filled
         ></v-select>
       </v-col>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="avaliacao.dtInicio" label="Data de Início" readonly filled></v-text-field>
       </v-col>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="avaliacao.dtDispensa" label="Data de Dispensa" readonly filled></v-text-field>
       </v-col>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="avaliacao.nota" label="Nota" readonly filled></v-text-field>
       </v-col>
-      <v-col cols="12" sm="6" md="3">
+      <v-col cols="12" sm="6" md="6">
+        <v-text-field v-model="avaliacao.autorizador" label="Autorizado Por" readonly filled></v-text-field>
+      </v-col>
+      <v-col cols="12" sm="6" md="6">
         <v-text-field v-model="avaliacao.cadastradoPor" label="Cadastrado por:" readonly filled></v-text-field>
       </v-col>
       <v-col cols="12">
@@ -149,7 +152,7 @@
               color="primary"
               class="ms-5"
               dark
-              @click="carregaAvaliacao(avaliacao)"
+              @click="carregaAvaliacao(avaliacao);verificaAutorizador()"
               v-on="on"
             >Editar</v-btn>
           </template>
@@ -311,6 +314,19 @@
                       filled
                     ></v-text-field>
                   </v-col>
+                  <v-col cols="12" sm="6" md="6">
+                    <v-text-field
+                      v-if="autorizar || autorizador"
+                      v-model="autorizador"
+                      prepend-inner-icon="mdi-thumbs-up-down"
+                      label="Autorizado por:"
+                      class="text-capitalized"
+                      hint="* Preenchimento Obrigatório"
+                      persistent-hint
+                      required
+                      :rules="[rules.required]"
+                    ></v-text-field>
+                  </v-col>
                   <v-col cols="12">
                     <v-textarea
                       name="observacao"
@@ -330,7 +346,7 @@
                 v-if="avaliacao.id"
                 color="blue darken-1"
                 text
-                @click="editarAvaliacao(avaliacao)"
+                @click="verificaAvaliacaoEditar(avaliacao)"
               >Salvar</v-btn>
             </v-card-actions>
           </v-card>
@@ -358,6 +374,39 @@
               <div class="flex-grow-1"></div>
 
               <v-btn color="black" text @click="dialog5 = false">Fechar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialog6" persistent max-width="290">
+          <v-card>
+            <v-card-title class="headline">Atenção!</v-card-title>
+
+            <v-card-text justify="center">
+              Já existe uma avaliação cadastrada para esse atleta em {{this.ano}}!
+              <br />Caso deseje continuar, será necessário informar um autorizador!
+            </v-card-text>
+
+            <v-card-actions>
+              <div class="flex-grow-1"></div>
+
+              <v-btn color="black" text @click="dialog6 = false">Fechar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialog7" persistent max-width="290">
+          <v-card>
+            <v-card-title class="headline">Atenção!</v-card-title>
+
+            <v-card-text justify="center">
+              Já existe uma avaliação cadastrada para esse atleta em {{this.ano}}!
+              <br />Caso deseje continuar, será necessário informar um autorizador!
+              <br />Deseja continuar?
+            </v-card-text>
+
+            <v-card-actions>
+              <div class="flex-grow-1"></div>
+              <v-btn color="primary" text @click="autorizar = true; dialog7 = false">Continuar</v-btn>
+              <v-btn color="black" text @click="dialog7 = false">Cancelar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -400,6 +449,9 @@ export default {
       dtInicio: "",
       dtDispensa: "",
       dtCadastro: "",
+      autorizar: "",
+      autorizador: "",
+      avaliacaoVerificada: "",
       nota: "",
       date: new Date().toISOString().substr(0, 10),
       date2: new Date().toISOString().substr(0, 10),
@@ -410,6 +462,8 @@ export default {
       dialog1: false,
       dialog4: false,
       dialog5: false,
+      dialog6: false,
+      dialog7: false,
       cadastradoPor: "",
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
@@ -441,6 +495,18 @@ export default {
       .then(res => res.json())
       .then(atletas => {
         this.atletas = atletas;
+        //.map(x => ({ text: x.nome, value: x.id }));
+      });
+    this.$http
+      .get("avaliacoes", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(avaliacoes => {
+        this.avaliacoes = avaliacoes;
         //.map(x => ({ text: x.nome, value: x.id }));
       });
 
@@ -531,6 +597,26 @@ export default {
         }
       }
     },
+    verificaAutorizador() {
+      if (this.autorizador) {
+        this.autorizar = true;
+      }
+    },
+    verificaAvaliacaoEditar(avaliacao) {
+      let ano = this.dtInicio.substring(6, 10);
+      this.avaliacaoVerificada = this.avaliacoes.filter(
+        x => x.atletaID == this.atletaID && x.dtInicio.substring(6, 10) == ano
+      )[0];
+      if (this.avaliacaoVerificada && !this.autorizar) {
+        this.ano = ano;
+        this.dialog7 = true;
+      } else if (!this.verificaDatasSalvar()) {
+        this.editarAvaliacao(avaliacao);
+        this.avaliacaoVerificada = "";
+      } else {
+        this.dialog5 = true;
+      }
+    },
     editarAvaliacao(_avaliacao) {
       let _avaliacaoEditar = {
         atletaID: this.atletaID,
@@ -543,7 +629,8 @@ export default {
         statusID: this.statusID,
         observacao: this.observacao,
         cadastradoPor: this.cadastradoPor,
-        dtCadastro: this.dtCadastro
+        dtCadastro: this.dtCadastro,
+        autorizador: this.autorizador
       };
       if (this.dtInicio.length == 0) {
         this.dialog4 = true;
@@ -575,6 +662,7 @@ export default {
       this.cadastradoPor = avaliacao.cadastradoPor;
       this.observacao = avaliacao.observacao;
       this.statusID = avaliacao.statusID;
+      this.autorizador = avaliacao.autorizador;
     },
     limparFormulario() {
       this.treinador = {};
@@ -589,6 +677,7 @@ export default {
       this.dtInicio = "";
       this.dtDispensa = "";
       this.dtCadastro = "";
+      this.autorizador = "";
     }
   }
 };
