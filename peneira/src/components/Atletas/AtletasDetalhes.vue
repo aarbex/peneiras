@@ -16,19 +16,21 @@
         <v-text-field v-model="atleta.dtNascimento" label="Data de Nascimento" filled readonly></v-text-field>
       </v-col>
       <v-col cols="12" md="6">
-        <v-text-field v-model="atleta.cpf" label="CPF" filled readonly></v-text-field>
-      </v-col>
-      <v-col cols="12" md="6">
         <v-text-field v-model="atleta.rg" label="RG" filled readonly></v-text-field>
       </v-col>
+      <v-col cols="12" md="6">
+        <v-text-field v-model="atleta.cpf" label="CPF" filled readonly></v-text-field>
+      </v-col>
 
-      <v-col cols="12" sm="6" md="10">
+      <v-col cols="12" sm="6" md="7">
         <v-text-field v-model="atleta.logradouro" label="Endereço (Rua / Avenida)" readonly filled></v-text-field>
       </v-col>
       <v-col cols="12" sm="6" md="2">
         <v-text-field v-model="atleta.num" label="Número" readonly filled></v-text-field>
       </v-col>
-
+      <v-col cols="12" sm="6" md="3">
+        <v-text-field v-model="atleta.complemento" label="Complemento" readonly filled></v-text-field>
+      </v-col>
       <v-col cols="12" sm="6" md="4">
         <v-text-field v-model="atleta.bairro" label="Bairro" readonly filled></v-text-field>
       </v-col>
@@ -68,7 +70,7 @@
           prepend-inner-icon="mdi-soccer-field"
           item-text="nome"
           item-value="id"
-          label="posicao"
+          label="Posicão"
           readonly
           filled
         ></v-select>
@@ -98,10 +100,11 @@
       </v-col>
       <v-col cols="12" sm="6" md="8">
         <v-text-field
+          v-if="atleta.federado"
           :disabled="!atleta.federado"
           filled
           v-model="atleta.federacao"
-          label="Qual Federação?"
+          label="Qual Clube?"
           readonly
         ></v-text-field>
       </v-col>
@@ -114,7 +117,7 @@
         <v-dialog v-model="dialog1" width="80%">
           <template v-slot:activator="{ on }">
             <v-btn
-              @click="carregaAtleta(atleta)"
+              @click="carregaAtleta(atleta);verificaAtletaVinculado()"
               color="primary"
               class="ms-5"
               text
@@ -195,25 +198,37 @@
                   </v-col>
                   <v-col cols="12" sm="6" md="6">
                     <v-text-field
-                      v-mask="cpfMask"
-                      v-model="cpf"
-                      label="CPF"
-                      prepend-inner-icon="mdi-account-badge"
-                      required
-                      filled
-                      readonly
-                    ></v-text-field>
-                  </v-col>
-                  <v-col cols="12" sm="6" md="6">
-                    <v-text-field
-                      v-mask="rgMask"
+                      v-if="avaliacaoVinculada"
                       v-model="rg"
                       prepend-inner-icon="mdi-account-badge"
+                      v-mask="rgMask"
                       label="RG"
                       hint="* Preenchimento Obrigatório"
                       persistent-hint
                       required
                       :rules="[rules.required]"
+                      filled
+                      readonly
+                    ></v-text-field>
+                    <v-text-field
+                      v-else
+                      v-model="rg"
+                      prepend-inner-icon="mdi-account-badge"
+                      v-mask="rgMask"
+                      label="RG"
+                      @blur="verificaAtletaInicio()"
+                      hint="* Preenchimento Obrigatório"
+                      persistent-hint
+                      required
+                      :rules="[rules.required]"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="12" sm="6" md="6">
+                    <v-text-field
+                      v-mask="CPFMask"
+                      v-model="cpf"
+                      prepend-inner-icon="mdi-account-badge"
+                      label="CPF"
                     ></v-text-field>
                   </v-col>
                   <v-col cols="12" sm="6" md="3">
@@ -418,7 +433,7 @@
                       :disabled="!atleta.federado"
                       v-model="federacao"
                       prepend-inner-icon="mdi-soccer"
-                      label="Qual Federação?"
+                      label="Qual Clube?"
                     ></v-text-field>
                   </v-col>
                 </v-row>
@@ -427,12 +442,22 @@
             <v-card-actions>
               <div class="flex-grow-1"></div>
               <v-btn color="black" text @click="dialog1 = false">Cancelar</v-btn>
-              <v-btn
-                v-if="atleta.id"
-                color="blue darken-1"
-                text
-                @click="editarAtleta(atleta)"
-              >Salvar</v-btn>
+              <v-btn color="blue darken-1" text @click="verificaAtletaEditar(atleta)">Salvar</v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+        <v-dialog v-model="dialog2" max-width="290" persistent>
+          <v-card>
+            <v-card-title class="headline">Atenção!</v-card-title>
+
+            <v-card-text
+              justify="center"
+            >Já existe um atleta cadastrado com o RG "{{this.rgVerificado}}"!</v-card-text>
+
+            <v-card-actions>
+              <div class="flex-grow-1"></div>
+
+              <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
             </v-card-actions>
           </v-card>
         </v-dialog>
@@ -472,6 +497,8 @@ export default {
       foto: "",
       email: "",
       cpf: "",
+      rgAtual: "",
+      rgVerificado: "",
       rg: "",
       dtNascimento: "",
       logradouro: "",
@@ -498,6 +525,8 @@ export default {
       atletas: [],
       posicao: {},
       posicoes: [],
+      avaliacoes: [],
+      avaliacaoVinculada: [],
       id: this.$route.params.id,
       escolaridades: [
         "Ensino Fundamental - Incompleto",
@@ -521,6 +550,7 @@ export default {
       menu2: false,
       dialog: false,
       dialog1: false,
+      dialog2: false,
       dialog3: false,
       cpfMask: "###.###.###-##",
       rgMask: "##.###.###-X",
@@ -528,6 +558,7 @@ export default {
       celMask: "(##) #####-####",
       telMask: "(##) ####-####",
       cepMask: "##.###-###",
+      atletaVerificado: "",
       rules: {
         required: value => !!value || "Preenchimento obrigatório.",
         email: value => {
@@ -550,6 +581,15 @@ export default {
         .then(res => res.json())
         .then(atleta => (this.atleta = atleta));
     }
+    this.$http
+      .get("atletas", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(atletas => (this.atletas = atletas));
 
     this.$http
       .get("posicoes", {
@@ -563,6 +603,15 @@ export default {
         this.posicoes = posicoes;
         //.map(x => ({ text: x.nome, value: x.id }));
       });
+    this.$http
+      .get("avaliacoes", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(avaliacoes => (this.avaliacoes = avaliacoes));
     this.carregaAtleta(this.atleta);
   },
 
@@ -570,8 +619,7 @@ export default {
     onChange(image) {
       if (image) {
         this.foto = image;
-      }
-      else {
+      } else {
         alert("Imagem não suportada!");
       }
     },
@@ -601,6 +649,31 @@ export default {
     },
     limparFormulario() {
       (this.foto = ""), (this.dtCadastro = ""), (this.atleta = {});
+    },
+    verificaAtletaVinculado() {
+      this.avaliacaoVinculada = this.avaliacoes.filter(
+        x => x.atletaID === this.atleta.id
+      )[0];
+    },
+
+    verificaAtletaEditar(atleta) {
+      this.atletaVerificado = this.atletas.filter(x => x.rg === this.rg)[0];
+      if (this.atletaVerificado && this.rg != this.rgAtual) {
+        this.atletaVerificado = "";
+        this.dialog2 = true;
+      } else {
+        this.editarAtleta(atleta);
+        this.atletaVerificado = "";
+      }
+    },
+    verificaAtletaInicio() {
+      this.rgAtual = this.atleta.rg;
+      this.atletaVerificado = this.atletas.filter(x => x.rg === this.rg)[0];
+      if (this.atletaVerificado && this.atletaVerificado.rg != this.rgAtual) {
+        this.rgVerificado = this.rg;
+        this.dialog2 = true;
+        this.rg = "";
+      }
     },
 
     editarAtleta(_atleta) {
@@ -660,6 +733,7 @@ export default {
             "Content-Type": "application/json"
           }
         });
+        this.dialog1 = false;
         window.location.href =
           window.location.origin + "/atleta/detalhe/" + _atleta.id;
       }
@@ -669,6 +743,7 @@ export default {
         (this.foto = atleta.foto),
         (this.email = atleta.email),
         (this.cpf = atleta.cpf),
+        (this.rgAtual = atleta.rg),
         (this.rg = atleta.rg),
         (this.dtNascimento = atleta.dtNascimento),
         (this.endereco.logradouro = atleta.logradouro),

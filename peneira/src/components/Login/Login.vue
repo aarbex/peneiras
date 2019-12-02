@@ -7,7 +7,7 @@
         cols="12"
         md="12"
         class="title text-uppercase font-weight-medium"
-      >SISTEMA DE PENEIRAS</v-toolbar-title>
+      >SISTEMA DE AVALIAÇÕES</v-toolbar-title>
     </v-app-bar>
 
     <v-card class="mx-auto mt-12" max-width="500" flex align="right">

@@ -6,13 +6,13 @@
       <v-col cols="12" sm="6" md="3">
         <v-select
           v-if="this.id"
-          name="cpf"
+          name="rg"
           v-model="avaliacao.atletaID"
           :items="atletas"
           prepend-inner-icon="mdi-account-badge"
-          item-text="cpf"
+          item-text="rg"
           item-value="id"
-          label="CPF do Atleta"
+          label="RG do Atleta"
           readonly
           filled
         ></v-select>
@@ -160,13 +160,13 @@
                 <v-row dense>
                   <v-col cols="12" sm="6" md="3">
                     <v-select
-                      name="cpf"
+                      name="rg"
                       v-model="atletaID"
                       :items="atletas"
                       prepend-inner-icon="mdi-account-badge"
-                      item-text="cpf"
+                      item-text="rg"
                       item-value="id"
-                      label="CPF do Atleta"
+                      label="RG do Atleta"
                       readonly
                       filled
                     ></v-select>
@@ -394,7 +394,7 @@ export default {
       categoria: {},
       treinadores: [],
       treinador: {},
-      cpfMask: "###.###.###-##",
+      rgMask: "###.###.###-##",
       dataMask: "##/##/####",
       notaMask: "##,#",
       dtInicio: "",
@@ -564,7 +564,7 @@ export default {
     },
     carregaAvaliacao(avaliacao) {
       this.atletaID = avaliacao.atletaID;
-      this.cpf = avaliacao.cpf;
+      this.rg = avaliacao.rg;
       this.nome = avaliacao.nome;
       this.nota = avaliacao.nota;
       this.treinadorID = avaliacao.treinadorID;
@@ -573,6 +573,7 @@ export default {
       this.dtDispensa = avaliacao.dtDispensa;
       this.dtCadastro = avaliacao.dtCadastro;
       this.cadastradoPor = avaliacao.cadastradoPor;
+      this.observacao = avaliacao.observacao;
       this.statusID = avaliacao.statusID;
     },
     limparFormulario() {

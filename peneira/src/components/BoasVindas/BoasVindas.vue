@@ -6,7 +6,7 @@
     </v-row>
     <div class="mt-12" align="center">
       <h3>Olá, {{this.usuario.nome}}!</h3>
-      <p>Seja bem-vindo(a) ao Sistema de Peneiras</p>
+      <p>Seja bem-vindo(a) ao Sistema de Avaliações!</p>
     </div>
   </div>
 </template>

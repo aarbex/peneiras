@@ -88,9 +88,9 @@
               <v-col cols="12" sm="6" md="3">
                 <v-text-field
                   v-if="avaliacao.id"
-                  v-mask="cpfMask"
-                  v-model="cpf"
-                  label="CPF do Atleta"
+                  v-mask="rgMask"
+                  v-model="rg"
+                  label="RG do Atleta"
                   required
                   append-icon="mdi-magnify"
                   prepend-inner-icon="mdi-account-badge"
@@ -99,22 +99,22 @@
                 ></v-text-field>
                 <v-text-field
                   v-else
-                  v-model="cpf"
-                  v-mask="cpfMask"
-                  label="CPF do Atleta"
+                  v-model="rg"
+                  v-mask="rgMask"
+                  label="RG do Atleta"
                   append-icon="mdi-magnify"
                   prepend-inner-icon="mdi-account-badge"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
                   :rules="[rules.required]"
-                  @click:append="carregarAtletaPorCPF()"
-                  @blur="carregarAtletaPorCPF()"
+                  @click:append="carregarAtletaPorRG()"
+                  @blur="carregarAtletaPorRG()"
                 ></v-text-field>
               </v-col>
 
               <v-col cols="12" sm="6" md="9">
-                <v-combobox
+                <v-text-field
                   v-if="avaliacao.id"
                   v-model="nome"
                   :items="atletas"
@@ -124,16 +124,17 @@
                   prepend-inner-icon="mdi-account-badge-horizontal"
                   filled
                   readonly
-                ></v-combobox>
+                ></v-text-field>
                 <v-combobox
                   v-else
-                  v-model="atleta.nome"
+                  v-model="nome"
                   :items="atletas"
                   item-text="nome"
                   item-value="id"
                   label="Nome do Atleta"
                   prepend-inner-icon="mdi-account-badge-horizontal"
-                  @change="carregarAtletaPorNome(atleta.nome)"
+                  @change="carregarAtletaPorNome()"
+                  readonly
                   auto-select-first
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
@@ -366,6 +367,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog6" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">RG não cadastrado em nossa base de dados!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog6 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -395,7 +409,8 @@ export default {
       atleta: {},
       atletaID: "",
       nome: "",
-      cpf: "",
+      rg: "",
+      rgValidar: "",
       dtNascimento: "",
       dtDispensa: "",
       dtInicio: "",
@@ -422,7 +437,7 @@ export default {
       avaliacaoVerificada: "",
       verificado: false,
       id: this.$route.params.id,
-      cpfMask: "###.###.###-##",
+      rgMask: "##.###.###-X",
       dataMask: "##/##/####",
       notaMask: "##,#",
       date: new Date().toISOString().substr(0, 10),
@@ -440,6 +455,7 @@ export default {
       dialog3: false,
       dialog4: false,
       dialog5: false,
+      dialog6: false,
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
       }
@@ -453,7 +469,7 @@ export default {
           align: "left",
           value: "nome"
         },
-        { text: "CPF", value: "cpf" },
+        { text: "RG", value: "rg" },
         { text: "Categoria", value: "categoria" },
         { text: "Treinador", value: "treinador" },
         { text: "Posição", value: "posicao" },
@@ -631,7 +647,7 @@ export default {
       };
       if (
         this.atleta.nome.length == 0 ||
-        this.cpf.length == 0 ||
+        this.rg.length == 0 ||
         this.categoriaID.length == 0 ||
         this.treinadorID.length == 0 ||
         this.statusID.length == 0 ||
@@ -712,7 +728,7 @@ export default {
         this.dialog5 = true;
       }
     },
-    carregarAtletaPorCPF() {
+    carregarAtletaPorRG() {
       this.$http
         .get("atletas", {
           headers: {
@@ -722,15 +738,20 @@ export default {
         })
         .then(res => res.json())
         .then(atletas => (this.atletas = atletas));
-      this.atleta = this.atletas.filter(x => x.cpf == this.cpf)[0];
-      this.atletaID = this.atleta.id;
-      this.nome = this.atleta.nome;
-      this.posicao = this.atleta.posicao;
-      this.dtNascimento = this.atleta.dtNascimento;
-      this.indicacao = this.atleta.indicacao;
-      this.verificaAvaliacaoInicio();
+      this.atleta = this.atletas.filter(x => x.rg == this.rg)[0];
+      if (this.atleta) {
+        this.atletaID = this.atleta.id;
+        this.nome = this.atleta.nome;
+        this.posicao = this.atleta.posicao;
+        this.dtNascimento = this.atleta.dtNascimento;
+        this.indicacao = this.atleta.indicacao;
+        this.verificaAvaliacaoInicio();
+      } else {
+        this.nome = "";
+        this.dialog6 = true;
+      }
     },
-    carregarAtletaPorNome(atleta) {
+    carregarAtletaPorNome() {
       this.$http
         .get("atletas", {
           headers: {
@@ -740,9 +761,9 @@ export default {
         })
         .then(res => res.json())
         .then(atletas => (this.atletas = atletas));
-      this.atleta = this.atletas.filter(x => x.nome === atleta.nome)[0];
+      this.atleta = this.atletas.filter(x => x.nome === this.nome)[0];
       this.atletaID = this.atleta.id;
-      this.cpf = this.atleta.cpf;
+      this.rg = this.atleta.rg;
       this.posicao = this.atleta.posicao;
       this.dtNascimento = this.atleta.dtNascimento;
       this.indicacao = this.atleta.indicacao;
@@ -750,7 +771,7 @@ export default {
     },
     carregaAvaliacao(avaliacao) {
       this.atletaID = avaliacao.atletaID;
-      this.cpf = avaliacao.cpf;
+      this.rg = avaliacao.rg;
       this.nome = avaliacao.nome;
       this.nota = avaliacao.nota;
       this.treinadorID = avaliacao.treinadorID;
@@ -759,12 +780,13 @@ export default {
       this.dtDispensa = avaliacao.dtDispensa;
       this.dtCadastro = avaliacao.dtCadastro;
       this.cadastradoPor = avaliacao.cadastradoPor;
+      this.observacao = avaliacao.observacao;
       this.statusID = avaliacao.statusID;
     },
 
     limparFormulario() {
       this.atletaID = "";
-      this.cpf = "";
+      this.rg = "";
       this.nome = "";
       this.nota = "";
       this.treinadorID = "";
@@ -772,11 +794,13 @@ export default {
       this.dtInicio = "";
       this.dtDispensa = "";
       this.dtCadastro = "";
+      this.observacao = "";
       this.cadastradoPor = "";
       this.statusID = "";
       this.verificado = false;
       this.avaliacao = {};
       this.atleta = {};
+      this.rgValidar = "";
     }
   }
 };

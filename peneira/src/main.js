@@ -18,8 +18,7 @@ Vue.http.interceptors.push((request, next) => {
     if (response.status == 401) {
       window.location.href =
         window.location.origin + "/login?msg=Sua Sessão expirou!";
-    }
-    if (
+    } else if (
       response.status == 500 &&
       response.body.message == "Internal Server Error"
     ) {

@@ -40,7 +40,9 @@
                   <v-item-list-title xSmall>Detalhes</v-item-list-title>
                 </v-list-item>
               </router-link>
-              <v-list-item @click="dialog = true; atleta = item; carregaAtleta(item)">
+              <v-list-item
+                @click="dialog = true; atleta = item; carregaAtleta(item); verificaAtletaVinculado()"
+              >
                 <v-item-list-title>Editar</v-item-list-title>
               </v-list-item>
               <v-list-item @click="dialog1 = true; atleta = item">
@@ -161,30 +163,7 @@
               </v-col>
               <v-col cols="12" sm="6" md="6">
                 <v-text-field
-                  v-if="atleta.id"
-                  v-model="cpf"
-                  prepend-inner-icon="mdi-account-badge"
-                  v-mask="cpfMask"
-                  label="CPF"
-                  required
-                  filled
-                  readonly
-                ></v-text-field>
-                <v-text-field
-                  v-else
-                  v-model="cpf"
-                  prepend-inner-icon="mdi-account-badge"
-                  v-mask="cpfMask"
-                  label="CPF"
-                  hint="* Preenchimento Obrigatório"
-                  persistent-hint
-                  @blur="verificaAtletaCPF()"
-                  required
-                  :rules="[rules.required]"
-                ></v-text-field>
-              </v-col>
-              <v-col cols="12" sm="6" md="6">
-                <v-text-field
+                  v-if="avaliacaoVinculada"
                   v-model="rg"
                   prepend-inner-icon="mdi-account-badge"
                   v-mask="rgMask"
@@ -193,6 +172,28 @@
                   persistent-hint
                   required
                   :rules="[rules.required]"
+                  filled
+                  readonly
+                ></v-text-field>
+                <v-text-field
+                  v-else
+                  v-model="rg"
+                  prepend-inner-icon="mdi-account-badge"
+                  v-mask="rgMask"
+                  label="RG"
+                  hint="* Preenchimento Obrigatório"
+                  persistent-hint
+                  @blur="verificaAtletaInicio()"
+                  required
+                  :rules="[rules.required]"
+                ></v-text-field>
+              </v-col>
+              <v-col cols="12" sm="6" md="6">
+                <v-text-field
+                  v-model="cpf"
+                  prepend-inner-icon="mdi-account-badge"
+                  v-mask="cpfMask"
+                  label="CPF"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" sm="6" md="3">
@@ -406,7 +407,7 @@
                 <v-text-field
                   :disabled="!federado"
                   v-model="federacao"
-                  label="Qual Federação?"
+                  label="Qual Clube?"
                   prepend-inner-icon="mdi-soccer"
                   required
                 ></v-text-field>
@@ -417,7 +418,12 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn v-if="atleta.id" color="blue darken-1" text @click="editarAtleta(atleta)">Salvar</v-btn>
+          <v-btn
+            v-if="atleta.id"
+            color="blue darken-1"
+            text
+            @click="verificaAtletaEditar(atleta)"
+          >Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="verificaAtleta()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
@@ -440,16 +446,18 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
-    <v-dialog v-model="dialog2" max-width="290">
+    <v-dialog v-model="dialog0" max-width="290" persistent>
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>
 
-        <v-card-text justify="center">Já existe um atleta cadastrado com o CPF "{{this.cpf}}"!</v-card-text>
+        <v-card-text
+          justify="center"
+        >Já existe um atleta cadastrado com o RG "{{this.rgVerificado}}"!</v-card-text>
 
         <v-card-actions>
           <div class="flex-grow-1"></div>
 
-          <v-btn color="black" text @click="dialog2 = false">Fechar</v-btn>
+          <v-btn color="black" text @click="dialog0 = false">Fechar</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -494,7 +502,9 @@ export default {
       foto: "",
       email: "",
       cpf: "",
+      rgAtual: "",
       rg: "",
+      rgVerificado: "",
       dtNascimento: "",
       logradouro: "",
       num: "",
@@ -518,9 +528,12 @@ export default {
       endereco: {},
       atleta: {},
       atletas: [],
+      avaliacoes: [],
+      avaliacaoVinculada: [],
       atletaVerificado: "",
       posicao: {},
       posicoes: [],
+      atletaVinculado: false,
       id: this.$route.params.id,
       escolaridades: [
         "Ensino Fundamental - Incompleto",
@@ -545,6 +558,7 @@ export default {
       dialog1: false,
       dialog2: false,
       dialog3: false,
+      dialog0: false,
       cpfMask: "###.###.###-##",
       rgMask: "##.###.###-X",
       dataMask: "##/##/####",
@@ -570,7 +584,7 @@ export default {
           value: "nome"
         },
         { text: "E-mail", value: "email" },
-        { text: "CPF", value: "cpf" },
+        { text: "RG", value: "rg" },
         { text: "Data de Nascimento", value: "dtNascimento" },
         { text: "Posição", value: "posicao" },
         { text: "Data de Cadastro", value: "dtCadastro" },
@@ -599,6 +613,16 @@ export default {
       })
       .then(res => res.json())
       .then(posicoes => (this.posicoes = posicoes));
+
+    this.$http
+      .get("avaliacoes", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(avaliacoes => (this.avaliacoes = avaliacoes));
   },
   beforeMount() {
     this.$http
@@ -624,16 +648,44 @@ export default {
     verificaAtletaCPF() {
       this.atletaVerificado = this.atletas.filter(x => x.cpf === this.cpf)[0];
       if (this.atletaVerificado) {
-        this.dialog2 = true;
+        this.dialog0 = true;
       }
     },
-
+    verificaAtletaInicio() {
+      this.rgAtual = this.atleta.rg;
+      this.atletaVerificado = this.atletas.filter(x => x.rg === this.rg)[0];
+      if (this.atletaVerificado && this.atletaVerificado.rg != this.rgAtual) {
+        this.rgVerificado = this.rg;
+        this.dialog0 = true;
+        this.rg = "";
+      }
+    },
     verificaAtleta() {
-      this.atletaVerificado = this.atletas.filter(x => x.cpf === this.cpf)[0];
+      this.atletaVerificado = this.atletas.filter(x => x.rg === this.rg)[0];
       if (this.atletaVerificado) {
-        this.dialog2 = true;
+        if (this.atletaVerificado.rg != this.atleta.rg) {
+          this.dialog0 = true;
+        } else {
+          this.addAtleta();
+          this.atletaVerificado = "";
+        }
       } else {
         this.addAtleta();
+        this.atletaVerificado = "";
+      }
+    },
+    verificaAtletaVinculado() {
+      this.avaliacaoVinculada = this.avaliacoes.filter(
+        x => x.atletaID === this.atleta.id
+      )[0];
+    },
+    verificaAtletaEditar(atleta) {
+      this.atletaVerificado = this.atletas.filter(x => x.rg === this.rg)[0];
+      if (this.atletaVerificado && this.rg != this.rgAtual) {
+        this.atletaVerificado = "";
+        this.dialog0 = true;
+      } else {
+        this.editarAtleta(atleta);
         this.atletaVerificado = "";
       }
     },
@@ -686,7 +738,8 @@ export default {
         (this.federado = ""),
         (this.federacao = ""),
         (this.dtCadastro = ""),
-        (this.atleta = {});
+        (this.atleta = {}),
+        (this.avaliacaoVinculada = "");
     },
     addAtleta() {
       this.dtCadastro = this.formatDate(this.date);
@@ -721,7 +774,6 @@ export default {
         this.nome.length == 0 ||
         this.email.length == 0 ||
         this.dtNascimento.length == 0 ||
-        this.cpf.length == 0 ||
         this.rg.length == 0 ||
         this.cep.length == 0 ||
         this.endereco.logradouro.length == 0 ||
@@ -783,7 +835,6 @@ export default {
         this.nome.length == 0 ||
         this.email.length == 0 ||
         this.dtNascimento.length == 0 ||
-        this.cpf.length == 0 ||
         this.rg.length == 0 ||
         this.cep.length == 0 ||
         this.endereco.logradouro.length == 0 ||
@@ -812,6 +863,7 @@ export default {
       (this.nome = atleta.nome),
         (this.foto = atleta.foto),
         (this.email = atleta.email),
+        (this.rgAtual = atleta.rg),
         (this.cpf = atleta.cpf),
         (this.rg = atleta.rg),
         (this.dtNascimento = atleta.dtNascimento),
@@ -833,7 +885,8 @@ export default {
         (this.alojamento = atleta.alojamento),
         (this.federado = atleta.federado),
         (this.federacao = atleta.federacao),
-        (this.dtCadastro = atleta.dtCadastro);
+        (this.dtCadastro = atleta.dtCadastro),
+        (this.avaliacaoVinculada = "");
     },
     removerAtleta(atleta) {
       this.$http

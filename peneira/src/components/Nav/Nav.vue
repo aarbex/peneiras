@@ -9,7 +9,7 @@
           cols="12"
           md="12"
           class="title text-uppercase font-weight-medium ps-5"
-        >SISTEMA DE PENEIRAS</v-app-bar-title>
+        >SISTEMA DE AVALIAÇÕES</v-app-bar-title>
       </router-link>
       <div class="flex-grow-1"></div>
       <v-menu v-model="menu" :close-on-content-click="false" :nudge-width="200" offset-x>
@@ -62,7 +62,7 @@
       class="px-2"
     >
       <v-row>
-        <h3 class="my-3 mx-auto">SISTEMA DE PENEIRAS</h3>
+        <h3 class="my-3 mx-auto">SISTEMA DE AVALIAÇÕES</h3>
       </v-row>
       <v-divider></v-divider>
       <v-list dense>
