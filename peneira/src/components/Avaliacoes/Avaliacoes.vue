@@ -528,7 +528,7 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(avaliacoes => (this.avaliacoes = avaliacoes));
+      .then(avaliacoes => (this.avaliacoes = avaliacoes.filter(x => x.dtExclusao == null)));
     this.$http
       .get("atletas", {
         headers: {
@@ -537,7 +537,7 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(atletas => (this.atletas = atletas));
+      .then(atletas => (this.atletas = atletas.filter(x => x.dtExclusao == null)));
 
     this.$http
       .get("status", {
@@ -548,7 +548,7 @@ export default {
       })
       .then(res => res.json())
       .then(status => {
-        this.statusList = status;
+        this.statusList = status.filter(x => x.dtExclusao == null);
         //.map(x => ({ text: x.nome, value: x.id }));
       });
 
@@ -561,7 +561,7 @@ export default {
       })
       .then(res => res.json())
       .then(categorias => {
-        this.categorias = categorias;
+        this.categorias = categorias.filter(x => x.dtExclusao == null);
         //.map(x => ({ text: x.nome, value: x.id }));
       });
 
@@ -574,22 +574,12 @@ export default {
       })
       .then(res => res.json())
       .then(treinadores => {
-        this.treinadores = treinadores;
+        this.treinadores = treinadores.filter(x => x.dtExclusao == null);
         //.map(x => ({ text: x.nome, value: x.id }));
       });
   },
 
-  beforeMount() {
-    this.$http
-      .get("avaliacoes", {
-        headers: {
-          Authorization: "Bearer " + window.localStorage.getItem("token"),
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => res.json())
-      .then(avaliacoes => (this.avaliacoes = avaliacoes));
-  },
+  
 
   methods: {
     formatDate(date) {
@@ -654,19 +644,30 @@ export default {
       }
     },
     removerAvaliacao(avaliacao) {
-      this.$http
-        .delete(`avaliacoes/${avaliacao.id}`, {
-          headers: {
-            Authorization: "Bearer " + window.localStorage.getItem("token"),
-            "Content-Type": "application/json"
-          }
-        })
-        .then(() => {
-          let indice = this.avaliacoes.indexOf(avaliacao);
-          this.avaliacoes.splice(indice, 1);
-          //this.avaliacoes = this.avaliacoes.filter(u => u.id != avaliacao.id);
-          this.dialog1 = false;
-        });
+        let _avaliacao = {
+        atletaID: avaliacao.atletaID,
+        treinadorID: avaliacao.treinadorID,
+        categoriaID: avaliacao.categoriaID,
+        nota: avaliacao.nota,
+        dtNascimento: avaliacao.dtNascimento,
+        dtInicio: avaliacao.dtInicio,
+        dtDispensa: avaliacao.dtDispensa,
+        statusID: avaliacao.statusID,
+        observacao: avaliacao.observacao,
+        cadastradoPor: avaliacao.cadastradoPor,
+        dtCadastro: avaliacao.dtCadastro,
+        autorizador: avaliacao.autorizador,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuario.nome
+      };
+      this.$http.put(`avaliacoes/${avaliacao.id}`, _avaliacao, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          });          
+      window.location.href = window.location.origin + "/avaliacoes";
+      this.dialog1 = false;
     },
     addAvaliacao() {
       this.dtCadastro = this.formatDate(this.date);
@@ -805,7 +806,7 @@ export default {
         .then(res => res.json())
         .then(atletas => (this.atletas = atletas));
       this.atleta = this.atletas.filter(x => x.rg == this.rg)[0];
-      if (this.atleta) {
+      if (this.atleta && this.atleta.dtExclusao ==  null) {
         this.atletaID = this.atleta.id;
         this.nome = this.atleta.nome;
         this.posicao = this.atleta.posicao;

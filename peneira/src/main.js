@@ -7,8 +7,8 @@ import VueResource from "vue-resource";
 Vue.config.productionTip = false;
 Vue.use(VueResource);
 //String de Conexão
-//Vue.http.options.root = "https://peneira.sccorinthians.com.br";
-Vue.http.options.root = "http://127.0.0.1:5000";
+Vue.http.options.root = "https://peneira.sccorinthians.com.br";
+//Vue.http.options.root = "http://127.0.0.1:5000";
 
 //Interceptor
 Vue.http.interceptors.push((request, next) => {

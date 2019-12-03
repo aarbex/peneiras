@@ -141,6 +141,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290" persistent>
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">O perfil não pôde ser excluído pois está vinculado à um ou mais usuários!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -161,15 +174,20 @@ export default {
       dialog: false,
       dialog1: false,
       dialog2: false,
+      dialog3: false,
       nome: "",
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
       },
       perfis: [],
       perfil: {},
+      usuarioVinculado:"",
+      perfilID:"",
       perfilVerificado: "",
+      usuarios:[],
       dtCadastro: "",
       date: new Date().toISOString().substr(0, 10),
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
     };
   },
@@ -206,7 +224,17 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(perfis => (this.perfis = perfis));
+      .then(perfis => (this.perfis = perfis.filter(x => x.dtExclusao == null)));
+      this.$http
+      .get("usuarios", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(usuarios => (this.usuarios = usuarios.filter(x => x.dtExclusao == null))); 
+      
   },
 
   methods: {
@@ -227,20 +255,28 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
-    removerPerfil(perfil) {
-      this.$http
-        .delete(`perfis/${perfil.id}`, {
+    verificaPerfilExclusao(){    
+       
+      this.usuarioVinculado = this.usuarios.filter(x => x.perfilID === this.perfilID)[0];      
+    },
+    removerPerfil(_perfil) {
+      this.perfilID = _perfil.id;
+      let _perfilEditar = {
+        id: _perfil.id,
+        nome: _perfil.nome,
+        dtCadastro: _perfil.dtCadastro,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuario.nome
+      };
+      this.verificaPerfilExclusao();
+      if(!this.usuarioVinculado){this.$http.put(`perfis/${_perfilEditar.id}`, _perfilEditar, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        })
-        .then(() => {
-          let indice = this.perfis.indexOf(perfil);
-          this.perfis.splice(indice, 1);
-          //this.perfis = this.perfis.filter(p => p.id != perfil.id);
-          this.dialog1 = false;
         });
+        window.location.href = window.location.origin + "/perfis";}
+        else{this.dialog3 = true;}
     },
     verificaPerfil() {
       this.perfilVerificado = this.perfis.filter(x => x.nome === this.nome)[0];

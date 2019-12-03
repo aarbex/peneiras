@@ -146,7 +146,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290" persistent>
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
 
+        <v-card-text justify="center">A posição não pôde ser excluída pois está vinculada à um ou mais usuários!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -167,6 +179,7 @@ export default {
       dialog: false,
       dialog1: false,
       dialog2: false,
+      dialog3: false,
       nome: "",
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
@@ -175,7 +188,11 @@ export default {
       posicao: {},
       posicaoVerificada: "",
       dtCadastro: "",
+      atletas:[],
+      posicaoVinculada:"",
+      posicaoID:"",
       date: new Date().toISOString().substr(0, 10),
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
     };
   },
@@ -212,7 +229,7 @@ export default {
         }
       })
       .then(
-        res => res.json().then(posicoes => (this.posicoes = posicoes)),
+        res => res.json().then(posicoes => (this.posicoes = posicoes.filter(x => x.dtExclusao == null))),
         res => {
           //error
           if (res.status == 401) {
@@ -221,6 +238,15 @@ export default {
           }
         }
       );
+      this.$http
+      .get("atletas", {
+        headers: {
+          Authorization: "Bearer " + window.localStorage.getItem("token"),
+          "Content-Type": "application/json"
+        }
+      })
+      .then(res => res.json())
+      .then(atletas => (this.atletas = atletas.filter(x => x.dtExclusao == null)));
   },
 
   methods: {
@@ -252,9 +278,11 @@ export default {
         this.posicaoVerificada = "";
       }
     },
-
-    removerPosicao(posicao) {
-      this.$http
+    verificaPosicaoExclusao(){      
+      this.posicaoVinculada = this.atletas.filter(x => x.posicaoID === this.posicaoID)[0];      
+    },
+    removerPosicao(_posicao) {
+      /*this.$http
         .delete(`posicoes/${posicao.id}`, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
@@ -275,7 +303,35 @@ export default {
                 window.location.origin + "/login?msg=Sua Sessão expirou!";
             }
           }
-        );
+        );*/
+      this.posicaoID = _posicao.id;
+      let _posicaoEditar = {
+        id: _posicao.id,
+        nome: _posicao.nome,
+        dtCadastro: _posicao.dtCadastro,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuario.nome
+      };
+      this.verificaPosicaoExclusao();
+      if(!this.posicaoVinculada){this.$http
+          .put(`posicoes/${_posicaoEditar.id}`, _posicaoEditar, {
+            headers: {
+              Authorization: "Bearer " + window.localStorage.getItem("token"),
+              "Content-Type": "application/json"
+            }
+          })
+          .then(
+            res => res.json(),
+            res => {
+              //error
+              if (res.status == 401) {
+                window.location.href =
+                  window.location.origin + "/login?msg=Sua Sessão expirou!";
+              }
+            }
+          );
+        window.location.href = window.location.origin + "/posicoes";}
+        else{this.dialog3 = true;}
     },
     addPosicao() {
       this.dtCadastro = this.formatDate(this.date);
@@ -306,7 +362,6 @@ export default {
     },
 
     editarPosicao(_posicao) {
-      this.dtCadastro = this.formatDate(this.date);
       let _posicaoEditar = {
         id: _posicao.id,
         nome: this.nome,

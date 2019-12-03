@@ -141,6 +141,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290" persistent>
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">O status não pôde ser excluído pois está vinculado à uma ou mais avaliações!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -161,6 +174,7 @@ export default {
       dialog: false,
       dialog1: false,
       dialog2: false,
+      dialog3: false,
       nome: "",
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
@@ -169,7 +183,11 @@ export default {
       status: {},
       statusVerificado: "",
       dtCadastro: "",
+      avaliacaoVinculada:"",
+      statusID:"",
+      avaliacoes:[],
       date: new Date().toISOString().substr(0, 10),
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
     };
   },
@@ -206,22 +224,19 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(statusLista => (this.statusLista = statusLista));
-  },
-
-  beforeMount() {
-    this.$http
-      .get("status", {
+      .then(statusLista => (this.statusLista = statusLista.filter(x => x.dtExclusao == null)));
+      this.$http
+      .get("avaliacoes", {
         headers: {
           Authorization: "Bearer " + window.localStorage.getItem("token"),
           "Content-Type": "application/json"
         }
       })
       .then(res => res.json())
-      .then(statusLista => (this.statusLista = statusLista));
+      .then(avaliacoes => (this.avaliacoes = avaliacoes.filter(x => x.dtExclusao == null)));
   },
 
-  methods: {
+ methods: {
     teste(teste) {
       alert(teste);
     },
@@ -242,20 +257,27 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
-    removerStatus(status) {
-      this.$http
-        .delete(`status/${status.id}`, {
+    verificaStatusExclusao(){      
+      this.avaliacaoVinculada = this.avaliacoes.filter(x => x.statusID === this.statusID)[0];      
+    },
+    removerStatus(_status) {
+      this.statusID = _status.id;
+      let _statusEditar = {
+        id: _status.id,
+        nome: _status.nome,
+        dtCadastro: _status.dtCadastro,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuario.nome 
+      };
+    this.verificaStatusExclusao();
+    if(!this.avaliacaoVinculada){this.$http.put(`status/${_statusEditar.id}`, _statusEditar, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        })
-        .then(() => {
-          let indice = this.statusLista.indexOf(status);
-          this.statusLista.splice(indice, 1);
-          //this.statusLista = this.statusLista.filter(p => p.id != status.id);
-          this.dialog1 = false;
         });
+        window.location.href = window.location.origin + "/status";}
+        else{this.dialog3 = true}
     },
     verificaStatus() {
       this.statusVerificado = this.statusLista.filter(

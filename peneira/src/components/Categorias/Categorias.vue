@@ -146,6 +146,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290" persistent>
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">A categoria não pôde ser excluída pois está vinculada à uma ou mais avaliações!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -166,15 +179,20 @@ export default {
       dialog: false,
       dialog1: false,
       dialog2: false,
+      dialog3: false,
       nome: "",
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
       },
       categorias: [],
+      categoriaID:"",
+      avaliacoes: [],
       categoria: {},
+      avaliacaoVinculada:"",
       categoriaVerificada: "",
       dtCadastro: "",
       date: new Date().toISOString().substr(0, 10),
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
     };
   },
@@ -211,20 +229,17 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(categorias => (this.categorias = categorias));
-  },
-
-  beforeMount() {
-    this.$http
-      .get("categorias", {
+      .then(categorias => (this.categorias = categorias.filter(x => x.dtExclusao == null)));
+      this.$http
+      .get("avaliacoes", {
         headers: {
           Authorization: "Bearer " + window.localStorage.getItem("token"),
           "Content-Type": "application/json"
         }
       })
       .then(res => res.json())
-      .then(categorias => (this.categorias = categorias));
-  },
+      .then(avaliacoes => (this.avaliacoes = avaliacoes.filter(x => x.dtExclusao == null)));
+  },  
 
   methods: {
     filterOnlyCapsText(value, search) {
@@ -244,21 +259,30 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
+    verificaCategoriaExclusao(){      
+      this.avaliacaoVinculada = this.avaliacoes.filter(x => x.categoriaID === this.categoriaID)[0];      
+    },
 
-    removerCategoria(categoria) {
-      this.$http
-        .delete(`categorias/${categoria.id}`, {
+    removerCategoria(_categoria) {
+      this.categoriaID = _categoria.id;
+      let _categoriaEditar = {
+        id: _categoria.id,
+        nome: _categoria.nome,
+        dtCadastro: _categoria.dtCadastro,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuario.nome
+      };
+      this.verificaCategoriaExclusao();
+      if(!this.avaliacaoVinculada){this.$http.put(`categorias/${_categoriaEditar.id}`, _categoriaEditar, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        })
-        .then(() => {
-          let indice = this.categorias.indexOf(categoria);
-          this.categorias.splice(indice, 1);
-          //this.categorias = this.categorias.filter(p => p.id != categoria.id);
-          this.dialog1 = false;
         });
+        window.location.href = window.location.origin + "/categorias";}
+      else{        
+        this.dialog3 = true;
+      }
     },
     addCategoria() {
       this.dtCadastro = this.formatDate(this.date);

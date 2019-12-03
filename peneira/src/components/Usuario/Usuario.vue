@@ -316,6 +316,7 @@ export default {
       usuarios: [],
       usuario: {},
       usuarioVerificado: "",
+      usuarioSessao: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
     };
   },
@@ -351,7 +352,7 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(usuarios => (this.usuarios = usuarios));
+      .then(usuarios => (this.usuarios = usuarios.filter(x => x.dtExclusao == null)));
     this.$http
       .get("perfis", {
         headers: {
@@ -360,7 +361,7 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(perfis => (this.perfis = perfis));
+      .then(perfis => (this.perfis = perfis.filter(x => x.dtExclusao == null)));
   },
 
   methods: {
@@ -370,20 +371,23 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
-    removerUsuario(usuario) {
-      this.$http
-        .delete(`usuarios/${usuario.id}`, {
+    removerUsuario(_usuario) {
+      let _usuarioEditar = {
+        nome: _usuario.nome,
+        email: _usuario.email,
+        perfilID: _usuario.perfilID,
+        senha: _usuario.senha,
+        dtCadastro: _usuario.dtCadastro,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuarioSessao.nome
+      };
+      this.$http.put(`usuarios/${_usuario.id}`, _usuarioEditar, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        })
-        .then(() => {
-          let indice = this.usuarios.indexOf(usuario);
-          this.usuarios.splice(indice, 1);
-          //this.usuarios = this.usuarios.filter(u => u.id != usuario.id);
-          this.dialog1 = false;
         });
+        window.location.href = window.location.origin + "/usuarios";
     },
     addUsuario() {
       this.dtCadastro = this.formatDate(this.date);

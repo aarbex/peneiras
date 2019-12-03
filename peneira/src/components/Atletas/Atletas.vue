@@ -474,6 +474,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog5" max-width="290" persistent>
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">O atleta não pôde ser excluído pois está vinculado à uma ou mais avaliações!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog5 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -530,10 +543,13 @@ export default {
       atletas: [],
       avaliacoes: [],
       avaliacaoVinculada: [],
+      avaliacaoVinculadaExclusao: [],
+      atletaID:"",
       atletaVerificado: "",
       posicao: {},
       posicoes: [],
       atletaVinculado: false,
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id,
       escolaridades: [
         "Ensino Fundamental - Incompleto",
@@ -559,6 +575,7 @@ export default {
       dialog2: false,
       dialog3: false,
       dialog0: false,
+      dialog5: false,
       cpfMask: "###.###.###-##",
       rgMask: "##.###.###-X",
       dataMask: "##/##/####",
@@ -602,7 +619,7 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(atletas => (this.atletas = atletas));
+      .then(atletas => (this.atletas = atletas.filter(x => x.dtExclusao == null)));
 
     this.$http
       .get("posicoes", {
@@ -612,7 +629,7 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(posicoes => (this.posicoes = posicoes));
+      .then(posicoes => (this.posicoes = posicoes.filter(x => x.dtExclusao == null)));
 
     this.$http
       .get("avaliacoes", {
@@ -622,20 +639,9 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(avaliacoes => (this.avaliacoes = avaliacoes));
+      .then(avaliacoes => (this.avaliacoes = avaliacoes.filter(x => x.dtExclusao == null)));
   },
-  beforeMount() {
-    this.$http
-      .get("atletas", {
-        headers: {
-          Authorization: "Bearer " + window.localStorage.getItem("token"),
-          "Content-Type": "application/json"
-        }
-      })
-      .then(res => res.json())
-      .then(atletas => (this.atletas = atletas));
-  },
-
+  
   methods: {
     onChange(image) {
       if (image) {
@@ -888,20 +894,49 @@ export default {
         (this.dtCadastro = atleta.dtCadastro),
         (this.avaliacaoVinculada = "");
     },
+    verificaAtletaExclusao(){      
+      this.avaliacaoVinculadaExclusao = this.avaliacoes.filter(x => x.atletaID === this.atletaID)[0];      
+    },
     removerAtleta(atleta) {
-      this.$http
-        .delete(`atletas/${atleta.id}`, {
+      this.atletaID = atleta.id;
+      let _atletaEditar = {
+        foto: atleta.foto,
+        nome: atleta.nome,
+        email: atleta.email,
+        cpf: atleta.cpf,
+        rg: atleta.rg,
+        logradouro: atleta.logradouro,
+        num: atleta.num,
+        complemento: atleta.complemento,
+        bairro: atleta.bairro,
+        cep: atleta.cep,
+        localidade: atleta.localidade,
+        uf: atleta.uf,
+        celular: atleta.celular,
+        tel: atleta.tel,
+        escolaridade: atleta.escolaridade,
+        nomeEscola: atleta.nomeEscola,
+        pai: atleta.pai,
+        mae: atleta.mae,
+        indicacao: atleta.indicacao,
+        federado: atleta.federado,
+        federacao: atleta.federacao,
+        alojamento: atleta.alojamento,
+        dtCadastro: atleta.dtCadastro,
+        posicaoID: atleta.posicaoID,
+        dtNascimento: atleta.dtNascimento,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuario.nome
+      };
+      this.verificaAtletaExclusao();
+      if(!this.avaliacaoVinculadaExclusao){this.$http.put(`atletas/${atleta.id}`, _atletaEditar, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        })
-        .then(() => {
-          let indice = this.atletas.indexOf(atleta);
-          this.atletas.splice(indice, 1);
-          //this.atletas = this.atletas.filter(u => u.id != atleta.id);
-          this.dialog1 = false;
         });
+        window.location.href = window.location.origin + "/atletas";}
+        else{this.dialog5 = true;}
     }
   }
 };

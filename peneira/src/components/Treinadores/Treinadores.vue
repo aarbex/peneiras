@@ -146,6 +146,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog3" max-width="290" persistent>
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">O treinador não pôde ser excluído pois está vinculado à uma ou mais avaliações!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog3 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -166,6 +179,7 @@ export default {
       dialog: false,
       dialog1: false,
       dialog2: false,
+      dialog3: false,
       nome: "",
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
@@ -174,7 +188,11 @@ export default {
       treinador: {},
       treinadorVerificado: "",
       dtCadastro: "",
+      avaliacoes:[],
+      avaliacaoVinculada:"",
+      treinadorID:"",
       date: new Date().toISOString().substr(0, 10),
+      usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
     };
   },
@@ -211,21 +229,18 @@ export default {
         }
       })
       .then(res => res.json())
-      .then(treinadores => (this.treinadores = treinadores));
-  },
-
-  beforeMount() {
-    this.$http
-      .get("treinadores", {
+      .then(treinadores => (this.treinadores = treinadores.filter(x => x.dtExclusao == null)));
+      this.$http
+      .get("avaliacoes", {
         headers: {
           Authorization: "Bearer " + window.localStorage.getItem("token"),
           "Content-Type": "application/json"
         }
       })
       .then(res => res.json())
-      .then(treinadores => (this.treinadores = treinadores));
+      .then(avaliacoes => (this.avaliacoes = avaliacoes.filter(x => x.dtExclusao == null)));
   },
-
+  
   methods: {
     filterOnlyCapsText(value, search) {
       return (
@@ -244,20 +259,26 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
-    removerTreinador(treinador) {
-      this.$http
-        .delete(`treinadores/${treinador.id}`, {
+    verificaTreinadorExclusao(){      
+      this.avaliacaoVinculada = this.avaliacoes.filter(x => x.treinadorID === this.treinadorID)[0];      
+    },
+    removerTreinador(_treinador) {
+      this.treinadorID = _treinador.id;
+      let _treinadorEditar = {
+        id: _treinador.id,
+        nome: _treinador.nome,
+        dtCadastro: _treinador.dtCadastro,
+        dtExclusao: this.formatDate(this.date),
+        usuarioExclusao: this.usuario.nome
+      };
+      this.verificaTreinadorExclusao();
+      if(!this.avaliacaoVinculada){this.$http.put(`treinadores/${_treinadorEditar.id}`, _treinadorEditar, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        })
-        .then(() => {
-          let indice = this.treinadores.indexOf(treinador);
-          this.treinadores.splice(indice, 1);
-          //this.treinadores = this.treinadores.filter(p => p.id != treinador.id);
-          this.dialog1 = false;
         });
+        window.location.href = window.location.origin + "/treinadores";}else{this.dialog3 = true;}
     },
     verificaTreinador() {
       this.treinadorVerificado = this.treinadores.filter(
