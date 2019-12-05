@@ -513,6 +513,7 @@ export default {
         { text: "Data Início", value: "dtInicio" },
         { text: "Data Dispensa", value: "dtDispensa" },
         { text: "Status", value: "status" },
+        { text: "Autorizado por:", value: "autorizador" },
         { text: "Nota", value: "nota" },
         { text: "Ações", value: "action", align: "center", sortable: false }
       ];
@@ -665,9 +666,9 @@ export default {
               Authorization: "Bearer " + window.localStorage.getItem("token"),
               "Content-Type": "application/json"
             }
-          });          
-      window.location.href = window.location.origin + "/avaliacoes";
-      this.dialog1 = false;
+          }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/avaliacoes"
+        }});
     },
     addAvaliacao() {
       this.dtCadastro = this.formatDate(this.date);
@@ -703,9 +704,12 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(res => res.json());
+          .then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/avaliacoes"
+        }});
         this.verificado = false;
-        window.location.href = window.location.origin + "/avaliacoes";
+        
       }
     },
     verificaAvaliacaoInicio() {
@@ -787,9 +791,10 @@ export default {
               Authorization: "Bearer " + window.localStorage.getItem("token"),
               "Content-Type": "application/json"
             }
-          });
-          this.verificado = false;
-          window.location.href = window.location.origin + "/avaliacoes";
+          }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/avaliacoes"
+        }});
+          this.verificado = false;         
         }
       } else {
         this.dialog5 = true;

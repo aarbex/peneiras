@@ -85,6 +85,7 @@
                   label="Nome do usuario"
                   prepend-inner-icon="mdi-account"
                   autofocus
+                  class="text-capitalized"
                   required
                   :rules="[rules.required]"
                 ></v-text-field>
@@ -371,6 +372,16 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
+    capital_letter(str) 
+    {
+      str = str.split(" ");
+
+      for (var i = 0, x = str.length; i < x; i++) {
+          str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+      return str.join(" ");
+    },
     removerUsuario(_usuario) {
       let _usuarioEditar = {
         nome: _usuario.nome,
@@ -386,8 +397,10 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/usuarios";
+        }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/usuarios"
+        }});
+        
     },
     addUsuario() {
       this.dtCadastro = this.formatDate(this.date);
@@ -398,7 +411,7 @@ export default {
         _senha = this.senhaAux1;
         this.perfil = this.perfis.filter(x => x.id == this.perfilID)[0];
         let _usuario = {
-          nome: this.nome,
+          nome: this.capital_letter(this.nome),
           email: this.email,
           senha: _senha,
           dtCadastro: this.dtCadastro,
@@ -411,8 +424,10 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(res => res.json());
-        window.location.href = window.location.origin + "/usuarios";
+          .then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/usuarios"
+        }});
       } else {
         this.dialog3 = true;
       }
@@ -431,7 +446,7 @@ export default {
     editarUsuario(_usuario) {
       this.perfil = this.perfis.filter(x => x.id == this.perfilID)[0];
       let _usuarioEditar = {
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         email: this.email,
         perfilID: this.perfil.id,
         senha: this.senha,
@@ -443,8 +458,10 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/usuarios";
+        })
+        .then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/usuarios"
+        }});        
       }
     },
 

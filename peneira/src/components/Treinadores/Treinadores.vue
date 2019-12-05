@@ -84,6 +84,7 @@
                   label="Nome da treinador"
                   prepend-inner-icon="mdi-account-edit"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   @keyup.enter="editarTreinador(treinador)"
@@ -96,6 +97,7 @@
                   label="Nome do treinador"
                   prepend-inner-icon="mdi-account-edit"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   @keyup.enter="verificaTreinador()"
@@ -253,6 +255,16 @@ export default {
           .indexOf(search) !== -1
       );
     },
+    capital_letter(str) 
+    {
+      str = str.split(" ");
+
+      for (var i = 0, x = str.length; i < x; i++) {
+          str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+      return str.join(" ");
+    },
     formatDate(date) {
       if (!date) return null;
 
@@ -277,8 +289,13 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/treinadores";}else{this.dialog3 = true;}
+        }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/treinadores"
+        }});
+        }
+        else{
+          this.dialog3 = true;
+          }
     },
     verificaTreinador() {
       this.treinadorVerificado = this.treinadores.filter(
@@ -294,7 +311,7 @@ export default {
     addTreinador() {
       this.dtCadastro = this.formatDate(this.date);
       let _treinador = {
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -305,15 +322,17 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(res => res.json());
-        window.location.href = window.location.origin + "/treinadores";
+          .then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/treinadores"
+        }}); 
       }
     },
 
     editarTreinador(_treinador) {
       let _treinadorEditar = {
         id: _treinador.id,
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -322,8 +341,9 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/treinadores";
+        }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/treinadores"
+        }});
       }
     },
     carregaTreinador(treinador) {

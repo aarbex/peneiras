@@ -103,6 +103,7 @@
           v-if="atleta.federado"
           :disabled="!atleta.federado"
           filled
+          class="text-capitalized"
           v-model="atleta.federacao"
           label="Qual Clube?"
           readonly
@@ -355,6 +356,7 @@
                       prepend-inner-icon="mdi-school"
                       v-model="nomeEscola"
                       label="Escola"
+                      class="text-capitalized"
                       value
                       hint="* Preenchimento Obrigatório"
                       persistent-hint
@@ -369,6 +371,7 @@
                       v-model="pai"
                       label="Pai"
                       value
+                      class="text-capitalized"
                       hint="* Preenchimento Obrigatório"
                       persistent-hint
                       required
@@ -382,6 +385,7 @@
                       v-model="mae"
                       label="Mãe"
                       value
+                      class="text-capitalized"
                       hint="* Preenchimento Obrigatório"
                       persistent-hint
                       required
@@ -408,6 +412,7 @@
                       name="indicacao"
                       prepend-inner-icon="mdi-account-tie"
                       v-model="indicacao"
+                      class="text-capitalized"
                       label="Indicação"
                       value
                     ></v-text-field>
@@ -432,6 +437,7 @@
                     <v-text-field
                       :disabled="!atleta.federado"
                       v-model="federacao"
+                      class="text-capitalized"
                       prepend-inner-icon="mdi-soccer"
                       label="Qual Clube?"
                     ></v-text-field>
@@ -623,7 +629,16 @@ export default {
         alert("Imagem não suportada!");
       }
     },
+    capital_letter(str) 
+    {
+      str = str.split(" ");
 
+      for (var i = 0, x = str.length; i < x; i++) {
+          str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+      return str.join(" ");
+    },
     formatDate(date) {
       if (!date) return null;
 
@@ -681,7 +696,7 @@ export default {
         x => x.id == this.atleta.posicaoID
       )[0];
       let _atletaEditar = {
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         email: this.email,
         cpf: this.cpf,
         rg: this.rg,
@@ -695,9 +710,9 @@ export default {
         celular: this.celular,
         tel: this.tel,
         escolaridade: this.escolaridade,
-        nomeEscola: this.nomeEscola,
-        pai: this.pai,
-        mae: this.mae,
+        nomeEscola: this.capital_letter(this.nomeEscola),
+        pai: this.capital_letter(this.pai),
+        mae: this.capital_letter(this.mae),
         indicacao: this.indicacao,
         federado: this.federado,
         federacao: this.federacao,
@@ -732,10 +747,10 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        this.dialog1 = false;
-        window.location.href =
-          window.location.origin + "/atleta/detalhe/" + _atleta.id;
+        }).then(res => {if(res.status == 200){
+          window.location.href =
+          window.location.origin + "/atleta/detalhe/" + _atleta.id
+        }});
       }
     },
     carregaAtleta(atleta) {

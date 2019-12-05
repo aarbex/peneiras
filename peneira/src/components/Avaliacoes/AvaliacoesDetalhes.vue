@@ -641,9 +641,12 @@ export default {
               Authorization: "Bearer " + window.localStorage.getItem("token"),
               "Content-Type": "application/json"
             }
-          });
+          }).then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/avaliacao/detalhe/" + _avaliacao.id
+        }});
           this.verificado = false;
-          window.location.href = window.location.origin + "/avaliacoes";
+          
         }
       } else {
         this.dialog5 = true;

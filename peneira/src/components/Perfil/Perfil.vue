@@ -84,6 +84,7 @@
                   label="Nome do Perfil"
                   prepend-inner-icon="mdi-account-details"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -96,6 +97,7 @@
                   label="Nome do Perfil"
                   prepend-inner-icon="mdi-account-details"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -255,6 +257,16 @@ export default {
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
     },
+    capital_letter(str) 
+{
+    str = str.split(" ");
+
+    for (var i = 0, x = str.length; i < x; i++) {
+        str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+    return str.join(" ");
+},
     verificaPerfilExclusao(){    
        
       this.usuarioVinculado = this.usuarios.filter(x => x.perfilID === this.perfilID)[0];      
@@ -274,9 +286,16 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/perfis";}
-        else{this.dialog3 = true;}
+        })
+        .then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/perfis"
+        }});
+        
+        
+        }
+        else{this.dialog3 = true;}        
+        
+        //window.location.href = window.location.origin + "/perfis";
     },
     verificaPerfil() {
       this.perfilVerificado = this.perfis.filter(x => x.nome === this.nome)[0];
@@ -290,7 +309,7 @@ export default {
     addPerfil() {
       this.dtCadastro = this.formatDate(this.date);
       let _perfil = {
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -301,15 +320,18 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(res => res.json());
-        window.location.href = window.location.origin + "/perfis";
+          .then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/perfis"
+        }}); 
       }
+      
     },
 
     editarPerfil(_perfil) {
       let _perfilEditar = {
         id: _perfil.id,
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -318,9 +340,12 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/perfis";
+        })
+        .then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/perfis"
+        }});
       }
+      
     },
     carregaPerfil(perfil) {
       this.nome = perfil.nome;
@@ -352,5 +377,8 @@ table {
 }
 .actionButtons {
   margin: 0 3px;
+}
+.capitalize{
+  text-transform: capitalize;
 }
 </style>

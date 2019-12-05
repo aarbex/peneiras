@@ -84,6 +84,7 @@
                   label="Nome da posição"
                   prepend-inner-icon="mdi-soccer-field"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -96,6 +97,7 @@
                   label="Nome da posição"
                   prepend-inner-icon="mdi-soccer-field"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -250,6 +252,16 @@ export default {
   },
 
   methods: {
+    capital_letter(str) 
+    {
+      str = str.split(" ");
+
+      for (var i = 0, x = str.length; i < x; i++) {
+          str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+      return str.join(" ");
+    },
     filterOnlyCapsText(value, search) {
       return (
         value != null &&
@@ -320,23 +332,16 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(
-            res => res.json(),
-            res => {
-              //error
-              if (res.status == 401) {
-                window.location.href =
-                  window.location.origin + "/login?msg=Sua Sessão expirou!";
-              }
-            }
-          );
-        window.location.href = window.location.origin + "/posicoes";}
+          .then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/posicoes"
+        }});
+        }
         else{this.dialog3 = true;}
     },
     addPosicao() {
       this.dtCadastro = this.formatDate(this.date);
       let _posicao = {
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -347,24 +352,17 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(
-            res => res.json(),
-            res => {
-              //error
-              if (res.status == 401) {
-                window.location.href =
-                  window.location.origin + "/login?msg=Sua Sessão expirou!";
-              }
-            }
-          );
-        window.location.href = window.location.origin + "/posicoes";
+          .then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/posicoes"
+        }});
       }
     },
 
     editarPosicao(_posicao) {
       let _posicaoEditar = {
         id: _posicao.id,
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -375,17 +373,9 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(
-            res => res.json(),
-            res => {
-              //error
-              if (res.status == 401) {
-                window.location.href =
-                  window.location.origin + "/login?msg=Sua Sessão expirou!";
-              }
-            }
-          );
-        window.location.href = window.location.origin + "/posicoes";
+          .then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/posicoes"
+        }});
       }
     },
     carregaPosicao(posicao) {

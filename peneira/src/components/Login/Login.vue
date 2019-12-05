@@ -81,6 +81,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    <v-dialog v-model="dialog4" max-width="290">
+      <v-card>
+        <v-card-title class="headline">Atenção!</v-card-title>
+
+        <v-card-text justify="center">Usuário desativado em nossa base de dados!</v-card-text>
+
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+
+          <v-btn color="black" text @click="dialog4 = false">Fechar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
 
@@ -99,10 +112,12 @@ export default {
   data: () => ({
     email: "",
     senha: "",
+    usuarios:[],
     show: false,
     dialog1: false,
     dialog2: false,
     dialog3: false,
+    dialog4: false,
     password: "",
     msgfromurl: "",
     rules: {
@@ -117,7 +132,7 @@ export default {
     if (msg != undefined && msg != null) {
       this.dialog3 = true;
       this.msgfromurl = msg;
-    }
+    }    
   },
 
   methods: {
@@ -136,14 +151,19 @@ export default {
               "usuario",
               JSON.stringify(res.body.usuario)
             );
-            window.location.href = window.location.origin + "/boas-vindas";
+            if(res.body.usuario.dtExclusao == null)
+            {window.location.href = window.location.origin + "/boas-vindas";}
+            else{
+              this.dialog4 = true;
+            }
           },
           function() {
             this.dialog1 = true;
           }
         );
       }
-    }
+    },
+    
   }
 };
 </script>

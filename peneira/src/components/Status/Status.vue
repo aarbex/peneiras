@@ -85,6 +85,7 @@
                   prepend-inner-icon="mdi-progress-check"
                   @keyup.enter="editarStatus(status)"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -96,6 +97,7 @@
                   label="Nome do status"
                   prepend-inner-icon="mdi-progress-check"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -251,6 +253,16 @@ export default {
           .indexOf(search) !== -1
       );
     },
+    capital_letter(str) 
+    {
+      str = str.split(" ");
+
+      for (var i = 0, x = str.length; i < x; i++) {
+          str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+      return str.join(" ");
+    },
     formatDate(date) {
       if (!date) return null;
 
@@ -275,8 +287,9 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/status";}
+        }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/status"
+        }});}
         else{this.dialog3 = true}
     },
     verificaStatus() {
@@ -293,7 +306,7 @@ export default {
     addStatus() {
       this.dtCadastro = this.formatDate(this.date);
       let _status = {
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -303,16 +316,17 @@ export default {
               Authorization: "Bearer " + window.localStorage.getItem("token"),
               "Content-Type": "application/json"
             }
-          })
-          .then(res => res.json());
-        window.location.href = window.location.origin + "/status";
+          }).then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/status"
+        }}); 
       }
     },
 
     editarStatus(_status) {
       let _statusEditar = {
         id: _status.id,
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -321,8 +335,9 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/status";
+        }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/status"
+        }});
       }
     },
     carregaStatus(status) {

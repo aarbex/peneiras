@@ -345,13 +345,13 @@ export default {
       return `${day}/${month}/${year}`;
     },
     logout() {
-      this.$http.post("logout", {
+      /*this.$http.post("logout", {
         headers: {
           Authorization: "Bearer " + window.localStorage.getItem("token"),
           "Content-Type": "application/json"
         }
-      });
-      window.location.href = window.location.origin + "/login";
+      });*/
+      window.location.href = window.location.origin + "/login";      
     },
     carregaUsuario(usuario) {
       this.nome = usuario.nome;

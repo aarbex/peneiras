@@ -650,7 +650,16 @@ export default {
         alert("Imagem não suportada!");
       }
     },
+    capital_letter(str) 
+    {
+      str = str.split(" ");
 
+      for (var i = 0, x = str.length; i < x; i++) {
+          str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+      return str.join(" ");
+    },
     verificaAtletaCPF() {
       this.atletaVerificado = this.atletas.filter(x => x.cpf === this.cpf)[0];
       if (this.atletaVerificado) {
@@ -751,7 +760,7 @@ export default {
       this.dtCadastro = this.formatDate(this.date);
       let _atleta = {
         foto: this.foto,
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         email: this.email,
         cpf: this.cpf,
         rg: this.rg,
@@ -765,9 +774,9 @@ export default {
         celular: this.celular,
         tel: this.tel,
         escolaridade: this.escolaridade,
-        nomeEscola: this.nomeEscola,
-        pai: this.pai,
-        mae: this.mae,
+        nomeEscola: this.capital_letter(this.nomeEscola),
+        pai: this.capital_letter(this.pai),
+        mae: this.capital_letter(this.mae),
         posicaoID: this.posicaoID,
         indicacao: this.indicacao,
         alojamento: this.alojamento,
@@ -801,9 +810,10 @@ export default {
               Authorization: "Bearer " + window.localStorage.getItem("token"),
               "Content-Type": "application/json"
             }
-          })
-          .then(res => res.json());
-        window.location.href = window.location.origin + "/atletas";
+          }).then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/atletas"
+        }});
       }
     },
 
@@ -812,7 +822,7 @@ export default {
       //this.buscaEndereco(this.cep);
       let _atletaEditar = {
         foto: this.foto,
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         email: this.email,
         cpf: this.cpf,
         rg: this.rg,
@@ -826,9 +836,9 @@ export default {
         celular: this.celular,
         tel: this.tel,
         escolaridade: this.escolaridade,
-        nomeEscola: this.nomeEscola,
-        pai: this.pai,
-        mae: this.mae,
+        nomeEscola: this.capital_letter(this.nomeEscola),
+        pai: this.capital_letter(this.pai),
+        mae: this.capital_letter(this.mae),
         indicacao: this.indicacao,
         federado: this.federado,
         federacao: this.federacao,
@@ -861,12 +871,13 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/atletas";
+        }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/atletas"
+        }});
       }
     },
     carregaAtleta(atleta) {
-      (this.nome = atleta.nome),
+        (this.nome = atleta.nome),
         (this.foto = atleta.foto),
         (this.email = atleta.email),
         (this.rgAtual = atleta.rg),
@@ -934,8 +945,10 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/atletas";}
+        }).then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/atletas"
+        }});}
         else{this.dialog5 = true;}
     }
   }

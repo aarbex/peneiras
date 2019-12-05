@@ -84,6 +84,7 @@
                   label="Nome da Categoria"
                   prepend-inner-icon="mdi-soccer"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -96,6 +97,7 @@
                   label="Nome do Categoria"
                   prepend-inner-icon="mdi-soccer"
                   autofocus
+                  class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
                   required
@@ -253,6 +255,16 @@ export default {
           .indexOf(search) !== -1
       );
     },
+    capital_letter(str) 
+    {
+      str = str.split(" ");
+
+      for (var i = 0, x = str.length; i < x; i++) {
+          str[i] = str[i][0].toUpperCase() + str[i].substr(1);
+    }
+
+      return str.join(" ");
+    },
     formatDate(date) {
       if (!date) return null;
 
@@ -278,8 +290,10 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/categorias";}
+        }).then(res => {if(res.status == 200){          
+          window.location.href = window.location.origin + "/categorias"
+        }});
+      }
       else{        
         this.dialog3 = true;
       }
@@ -287,7 +301,7 @@ export default {
     addCategoria() {
       this.dtCadastro = this.formatDate(this.date);
       let _categoria = {
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -298,15 +312,17 @@ export default {
               "Content-Type": "application/json"
             }
           })
-          .then(res => res.json());
-        window.location.href = window.location.origin + "/categorias";
+          .then(res => {if(res.status == 200){
+          res.json();
+          window.location.href = window.location.origin + "/categorias"
+        }});
       }
     },
 
     editarCategoria(_categoria) {
       let _categoriaEditar = {
         id: _categoria.id,
-        nome: this.nome,
+        nome: this.capital_letter(this.nome),
         dtCadastro: this.dtCadastro
       };
       if (this.nome.length > 0) {
@@ -315,8 +331,9 @@ export default {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        });
-        window.location.href = window.location.origin + "/categorias";
+        }).then(res => {if(res.status == 200){          
+          window.location.href = window.location.origin + "/categorias"
+        }});
       }
     },
     verificaCategoria() {
