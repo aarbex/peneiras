@@ -55,7 +55,7 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog" width="80%">
+    <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
@@ -144,7 +144,7 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn v-if="usuario.id" color="blue darken-1" text @click="editarUsuario(usuario)">Salvar</v-btn>
+          <v-btn v-if="usuario.id" color="blue darken-1" text @click="verificaUsuarioEditar(usuario)">Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="verificaUsuario()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
@@ -440,6 +440,17 @@ export default {
         this.dialog2 = true;
       } else {
         this.addUsuario();
+        this.usuarioVerificado = "";
+      }
+    },
+    verificaUsuarioEditar(usuario) {
+      this.usuarioVerificado = this.usuarios.filter(
+        x => x.email === this.email
+      )[0];
+      if (this.usuarioVerificado && this.usuarioVerificado.id != usuario.id) {
+        this.dialog2 = true;
+      } else {
+        this.editarUsuario(usuario);
         this.usuarioVerificado = "";
       }
     },

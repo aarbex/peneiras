@@ -115,7 +115,7 @@
         <router-link to="/atletas" tag="button">
           <v-btn text style="margin: 5px" color="black">Voltar</v-btn>
         </router-link>
-        <v-dialog v-model="dialog1" width="80%">
+        <v-dialog v-model="dialog1" width="80%" persistent>
           <template v-slot:activator="{ on }">
             <v-btn
               @click="carregaAtleta(atleta);verificaAtletaVinculado()"

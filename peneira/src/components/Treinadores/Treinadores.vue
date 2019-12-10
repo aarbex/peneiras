@@ -52,7 +52,7 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog" width="80%">
+    <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
@@ -87,7 +87,7 @@
                   class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
                   persistent-hint
-                  @keyup.enter="editarTreinador(treinador)"
+                  @keyup.enter="verificaTreinadorEditar(treinador)"
                   required
                   :rules="[rules.required]"
                 ></v-text-field>
@@ -115,7 +115,7 @@
             v-if="treinador.id"
             color="blue darken-1"
             text
-            @click="editarTreinador(treinador)"
+            @click="verificaTreinadorEditar(treinador)"
           >Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="verificaTreinador()">Salvar</v-btn>
         </v-card-actions>
@@ -299,12 +299,23 @@ export default {
     },
     verificaTreinador() {
       this.treinadorVerificado = this.treinadores.filter(
-        x => x.nome === this.nome
+        x => x.nome === this.capital_letter(this.nome)
       )[0];
       if (this.treinadorVerificado) {
         this.dialog2 = true;
       } else {
         this.addTreinador();
+        this.treinadorVerificado = "";
+      }
+    },
+    verificaTreinadorEditar(treinador) {
+      this.treinadorVerificado = this.treinadores.filter(
+        x => x.nome === this.capital_letter(this.nome)
+      )[0];
+      if (this.treinadorVerificado && this.treinadorVerificado.id != treinador.id) {
+        this.dialog2 = true;
+      } else {
+        this.editarTreinador(treinador);
         this.treinadorVerificado = "";
       }
     },

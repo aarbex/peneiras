@@ -52,7 +52,7 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog" width="80%">
+    <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
@@ -89,7 +89,7 @@
                   persistent-hint
                   required
                   :rules="[rules.required]"
-                  @keyup.enter="editarPosicao(posicao)"
+                  @keyup.enter="verificaPosicaoEditar(posicao)"
                 ></v-text-field>
                 <v-text-field
                   v-else
@@ -115,7 +115,7 @@
             v-if="posicao.id"
             color="blue darken-1"
             text
-            @click="editarPosicao(posicao)  "
+            @click="verificaPosicaoEditar(posicao)  "
           >Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="verificaPosicao()">Salvar</v-btn>
         </v-card-actions>
@@ -139,7 +139,7 @@
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>
 
-        <v-card-text justify="center">A posição "{{this.nome}}" já está cadastrada!</v-card-text>
+        <v-card-text justify="center">A posição "{{this.posicaoVerificada.nome}}" já está cadastrada!</v-card-text>
 
         <v-card-actions>
           <div class="flex-grow-1"></div>
@@ -281,12 +281,23 @@ export default {
     },
     verificaPosicao() {
       this.posicaoVerificada = this.posicoes.filter(
-        x => x.nome === this.nome
+        x => x.nome === this.capital_letter(this.nome)
       )[0];
       if (this.posicaoVerificada) {
         this.dialog2 = true;
       } else {
         this.addPosicao();
+        this.posicaoVerificada = "";
+      }
+    },
+    verificaPosicaoEditar(posicao) {
+      this.posicaoVerificada = this.posicoes.filter(
+        x => x.nome === this.capital_letter(this.nome)
+      )[0];
+      if (this.posicaoVerificada && this.posicaoVerificada.id != posicao.id) {
+        this.dialog2 = true;
+      } else {
+        this.editarPosicao(posicao);
         this.posicaoVerificada = "";
       }
     },

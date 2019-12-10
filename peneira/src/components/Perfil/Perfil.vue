@@ -52,7 +52,7 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog" width="80%">
+    <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
@@ -89,7 +89,7 @@
                   persistent-hint
                   required
                   :rules="[rules.required]"
-                  @keyup.enter="editarPerfil(perfil)"
+                  @keyup.enter="verificaPerfilEditar(perfil)"
                 ></v-text-field>
                 <v-text-field
                   v-else
@@ -110,8 +110,8 @@
         </v-card-text>
         <v-card-actions>
           <div class="flex-grow-1"></div>
-          <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn v-if="perfil.id" color="blue darken-1" text @click="editarPerfil(perfil)">Salvar</v-btn>
+          <v-btn color="black" text @keyup.enter="limparFormulario(); dialog = false" @click="limparFormulario(); dialog = false">Cancelar</v-btn>
+          <v-btn v-if="perfil.id" color="blue darken-1" text @click="verificaPerfilEditar(perfil)">Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="verificaPerfil()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
@@ -134,7 +134,7 @@
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>
 
-        <v-card-text justify="center">O perfil "{{this.nome}}" já está cadastrado!</v-card-text>
+        <v-card-text justify="center">O perfil "{{this.perfilVerificado.nome}}" já está cadastrado!</v-card-text>
 
         <v-card-actions>
           <div class="flex-grow-1"></div>
@@ -298,11 +298,20 @@ export default {
         //window.location.href = window.location.origin + "/perfis";
     },
     verificaPerfil() {
-      this.perfilVerificado = this.perfis.filter(x => x.nome === this.nome)[0];
+      this.perfilVerificado = this.perfis.filter(x => x.nome === this.capital_letter(this.nome))[0];
       if (this.perfilVerificado) {
         this.dialog2 = true;
       } else {
         this.addPerfil();
+        this.perfilVerificado = "";
+      }
+    },
+    verificaPerfilEditar(perfil) {
+      this.perfilVerificado = this.perfis.filter(x => x.nome === this.capital_letter(this.nome))[0];
+      if (this.perfilVerificado && this.perfilVerificado.id != perfil.id) {
+        this.dialog2 = true;
+      } else {
+        this.editarPerfil(perfil);
         this.perfilVerificado = "";
       }
     },

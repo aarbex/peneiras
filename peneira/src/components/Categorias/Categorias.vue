@@ -52,7 +52,7 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog" width="80%">
+    <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
@@ -89,7 +89,7 @@
                   persistent-hint
                   required
                   :rules="[rules.required]"
-                  @keyup.enter="editarCategoria(categoria)"
+                  @keyup.enter="verificaCategoriaEditar(categoria)"
                 ></v-text-field>
                 <v-text-field
                   v-else
@@ -115,7 +115,7 @@
             v-if="categoria.id"
             color="blue darken-1"
             text
-            @click="editarCategoria(categoria)"
+            @click="verificaCategoriaEditar(categoria)"
           >Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="verificaCategoria()">Salvar</v-btn>
         </v-card-actions>
@@ -139,7 +139,7 @@
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>
 
-        <v-card-text justify="center">A categoria "{{this.nome}}" já está cadastrada!</v-card-text>
+        <v-card-text justify="center">A categoria "{{this.categoriaVerificada.nome}}" já está cadastrada!</v-card-text>
 
         <v-card-actions>
           <div class="flex-grow-1"></div>
@@ -338,12 +338,23 @@ export default {
     },
     verificaCategoria() {
       this.categoriaVerificada = this.categorias.filter(
-        x => x.nome === this.nome
+        x => x.nome === this.capital_letter(this.nome)
       )[0];
       if (this.categoriaVerificada) {
         this.dialog2 = true;
       } else {
         this.addCategoria();
+        this.categoriaVerificada = "";
+      }
+    },
+    verificaCategoriaEditar(categoria) {
+      this.categoriaVerificada = this.categorias.filter(
+        x => x.nome === this.capital_letter(this.nome)
+      )[0];
+      if (this.categoriaVerificada && this.categoriaVerificada.id != categoria.id) {
+        this.dialog2 = true;
+      } else {
+        this.editarCategoria(categoria);
         this.categoriaVerificada = "";
       }
     },

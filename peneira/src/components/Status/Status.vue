@@ -52,7 +52,7 @@
         </tr>
       </template>
     </v-data-table>
-    <v-dialog v-model="dialog" width="80%">
+    <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
@@ -83,7 +83,7 @@
                   v-model="nome"
                   label="Nome da status"
                   prepend-inner-icon="mdi-progress-check"
-                  @keyup.enter="editarStatus(status)"
+                  @keyup.enter="verificaStatusEditar(status)"
                   autofocus
                   class="text-capitalized"
                   hint="* Preenchimento Obrigatório"
@@ -111,7 +111,7 @@
         <v-card-actions>
           <div class="flex-grow-1"></div>
           <v-btn color="black" text @click="limparFormulario(); dialog = false">Cancelar</v-btn>
-          <v-btn v-if="status.id" color="blue darken-1" text @click="editarStatus(status)">Salvar</v-btn>
+          <v-btn v-if="status.id" color="blue darken-1" text @click="verificaStatusEditar(status)">Salvar</v-btn>
           <v-btn v-else color="blue darken-1" text @click="verificaStatus()">Salvar</v-btn>
         </v-card-actions>
       </v-card>
@@ -134,7 +134,7 @@
       <v-card>
         <v-card-title class="headline">Atenção!</v-card-title>
 
-        <v-card-text justify="center">O status "{{this.nome}}" já está cadastrado!</v-card-text>
+        <v-card-text justify="center">O status "{{this.statusVerificado.nome}}" já está cadastrado!</v-card-text>
 
         <v-card-actions>
           <div class="flex-grow-1"></div>
@@ -294,12 +294,23 @@ export default {
     },
     verificaStatus() {
       this.statusVerificado = this.statusLista.filter(
-        x => x.nome === this.nome
+        x => x.nome === this.capital_letter(this.nome)
       )[0];
       if (this.statusVerificado) {
         this.dialog2 = true;
       } else {
         this.addStatus();
+        this.statusVerificado = "";
+      }
+    },
+    verificaStatusEditar(status) {
+      this.statusVerificado = this.statusLista.filter(
+        x => x.nome === this.capital_letter(this.nome)
+      )[0];
+      if (this.statusVerificado && this.statusVerificado.id != status.id) {
+        this.dialog2 = true;
+      } else {
+        this.editarStatus(status);
         this.statusVerificado = "";
       }
     },

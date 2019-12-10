@@ -145,7 +145,7 @@
         <router-link to="/avaliacoes" tag="button">
           <v-btn color="black" text>Voltar</v-btn>
         </router-link>
-        <v-dialog v-model="dialog" width="80%">
+        <v-dialog v-model="dialog" width="80%" persistent>
           <template v-slot:activator="{ on }">
             <v-btn
               text
