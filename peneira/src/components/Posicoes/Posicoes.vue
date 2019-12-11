@@ -267,10 +267,17 @@ export default {
         value != null &&
         search != null &&
         typeof value === "string" &&
+        (value
+          .toString()          
+          .indexOf(search) !== -1 ||
         value
-          .toString()
-          .toLowerCase()
-          .indexOf(search) !== -1
+          .toString() 
+          .toLowerCase()         
+          .indexOf(search) !== -1 ||
+        value
+          .toString() 
+          .toUpperCase()         
+          .indexOf(search) !== -1)
       );
     },
     formatDate(date) {
