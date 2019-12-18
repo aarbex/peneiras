@@ -148,6 +148,7 @@
         <v-dialog v-model="dialog" width="80%" persistent>
           <template v-slot:activator="{ on }">
             <v-btn
+              v-if="permissaoAvaliacao && permissaoAvaliacao.editar"
               text
               color="primary"
               class="ms-5"
@@ -428,6 +429,7 @@ export default {
 
   data() {
     return {
+      permissaoAvaliacao: {},
       atletaID: "",
       categoriaID: "",
       treinadorID: "",
@@ -473,6 +475,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     if (this.id) {
       this.$http
         .get("avaliacoes/" + this.id, {
@@ -556,6 +560,9 @@ export default {
 
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
+    },
+    carregarPermissao(){      
+      this.permissaoAvaliacao = this.usuario.permissoes.filter(x => x.entidade == "Avaliação")[0];
     },
     verificaDatas() {
       if (this.dtDispensa.length > 0) {

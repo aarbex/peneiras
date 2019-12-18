@@ -83,7 +83,7 @@ export default new Router({
       component: Posicoes
     },
     {
-      path: "/permissoes",
+      path: "/permissao/:id",
       name: "Permissoes",
       component: Permissoes
     },

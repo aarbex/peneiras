@@ -41,11 +41,12 @@
                 </v-list-item>
               </router-link>
               <v-list-item
+                v-if="permissaoAtleta && permissaoAtleta.editar"
                 @click="dialog = true; atleta = item; carregaAtleta(item); verificaAtletaVinculado()"
               >
                 <v-item-list-title>Editar</v-item-list-title>
-              </v-list-item>
-              <v-list-item @click="dialog1 = true; atleta = item">
+              </v-list-item >
+              <v-list-item @click="dialog1 = true; atleta = item" v-if="permissaoAtleta && permissaoAtleta.excluir">
                 <v-item-list-title>Excluir</v-item-list-title>
               </v-list-item>
             </v-list>
@@ -63,6 +64,7 @@
     <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
+          v-if="permissaoAtleta && permissaoAtleta.adicionar"
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
           color="primary"
           class="ms-5 mb-5"
@@ -583,6 +585,7 @@ export default {
       telMask: "(##) ####-####",
       cepMask: "#####-###",
       fileSelected: "",
+      permissaoAtleta: {},
       rules: {
         required: value => !!value || "Preenchimento obrigatório.",
         email: value => {
@@ -611,6 +614,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("atletas", {
         headers: {
@@ -649,6 +654,9 @@ export default {
       } else {
         alert("Imagem não suportada!");
       }
+    },
+    carregarPermissao(){      
+      this.permissaoAtleta = this.usuario.permissoes.filter(x => x.entidade == "Atleta")[0];      
     },
     capital_letter(str) 
     {

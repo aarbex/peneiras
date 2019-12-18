@@ -35,10 +35,13 @@
           </template>
 
           <v-list bottom>
-            <v-list-item @click="dialog = true; treinador = item; carregaTreinador(item)">
+            <v-list-item  v-if="!permissaoTreinador.excluir && !permissaoTreinador.editar">
+              <v-list-item-title>Não há ações disponíveis</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="permissaoTreinador && permissaoTreinador.editar" @click="dialog = true; treinador = item; carregaTreinador(item)">
               <v-list-item-title>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="dialog1 = true; treinador = item">
+            <v-list-item v-if="permissaoTreinador && permissaoTreinador.excluir" @click="dialog1 = true; treinador = item">
               <v-list-item-title>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -55,6 +58,7 @@
     <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
+        v-if="permissaoTreinador && permissaoTreinador.adicionar"
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
           color="primary"
           class="ms-5 mb-5"
@@ -193,6 +197,7 @@ export default {
       avaliacoes:[],
       avaliacaoVinculada:"",
       treinadorID:"",
+      permissaoTreinador:{},
       date: new Date().toISOString().substr(0, 10),
       usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
@@ -223,6 +228,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("treinadores", {
         headers: {
@@ -261,6 +268,9 @@ export default {
           .toUpperCase()         
           .indexOf(search) !== -1)
       );
+    },
+    carregarPermissao(){      
+      this.permissaoTreinador = this.usuario.permissoes.filter(x => x.entidade == "Treinador")[0];         
     },
     capital_letter(str) 
     {

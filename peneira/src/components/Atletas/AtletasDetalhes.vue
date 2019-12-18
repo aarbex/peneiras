@@ -118,6 +118,7 @@
         <v-dialog v-model="dialog1" width="80%" persistent>
           <template v-slot:activator="{ on }">
             <v-btn
+              v-if="permissaoAtleta && permissaoAtleta.editar"
               @click="carregaAtleta(atleta);verificaAtletaVinculado()"
               color="primary"
               class="ms-5"
@@ -532,6 +533,7 @@ export default {
       posicao: {},
       posicoes: [],
       avaliacoes: [],
+      permissaoAtleta: {},
       avaliacaoVinculada: [],
       id: this.$route.params.id,
       escolaridades: [
@@ -576,6 +578,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     if (this.id) {
       this.$http
         .get("atletas/" + this.id, {
@@ -628,6 +632,9 @@ export default {
       } else {
         alert("Imagem não suportada!");
       }
+    },
+    carregarPermissao(){      
+      this.permissaoAtleta = this.usuario.permissoes.filter(x => x.entidade == "Atleta")[0];      
     },
     capital_letter(str) 
     {

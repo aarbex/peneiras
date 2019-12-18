@@ -78,10 +78,10 @@
           </v-list-item>
         </router-link>
 
-        <h5 class="ms-4">OPERACIONAL</h5>
+        <h5 class="ms-4" v-if="permissaoAtleta.visualizar || permissaoAvaliacao.visualizar">OPERACIONAL</h5>
 
         <router-link to="/avaliacoes" tag="row">
-          <v-list-item>
+          <v-list-item v-if="permissaoAvaliacao && permissaoAvaliacao.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-clipboard-text</v-icon>
             </v-list-item-icon>
@@ -91,7 +91,7 @@
           </v-list-item>
         </router-link>
         <router-link to="/atletas" tag="row">
-          <v-list-item class="mb-2">
+          <v-list-item class="mb-2" v-if="permissaoAtleta && permissaoAtleta.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-account-badge-horizontal</v-icon>
             </v-list-item-icon>
@@ -102,7 +102,7 @@
         </router-link>
         <h5 class="ms-4">GESTÃO</h5>
         <router-link to="/categorias" tag="row">
-          <v-list-item>
+          <v-list-item v-if="permissaoCategoria && permissaoCategoria.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-soccer</v-icon>
             </v-list-item-icon>
@@ -112,7 +112,7 @@
           </v-list-item>
         </router-link>
         <router-link to="/perfis" tag="row">
-          <v-list-item>
+          <v-list-item v-if="permissaoPerfil && permissaoPerfil.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-account-details</v-icon>
             </v-list-item-icon>
@@ -122,7 +122,7 @@
           </v-list-item>
         </router-link>
         <router-link to="/posicoes" tag="row">
-          <v-list-item>
+          <v-list-item v-if="permissaoPosicao && permissaoPosicao.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-soccer-field</v-icon>
             </v-list-item-icon>
@@ -132,7 +132,7 @@
           </v-list-item>
         </router-link>
         <router-link to="/status" tag="row">
-          <v-list-item>
+          <v-list-item v-if="permissaoStatus && permissaoStatus.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-progress-check</v-icon>
             </v-list-item-icon>
@@ -142,7 +142,7 @@
           </v-list-item>
         </router-link>
         <router-link to="/treinadores" tag="row">
-          <v-list-item>
+          <v-list-item v-if="permissaoTreinador && permissaoTreinador.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-account-edit</v-icon>
             </v-list-item-icon>
@@ -152,7 +152,7 @@
           </v-list-item>
         </router-link>
         <router-link to="/usuarios" tag="row">
-          <v-list-item>
+          <v-list-item v-if="permissaoUsuario && permissaoUsuario.visualizar">
             <v-list-item-icon>
               <v-icon small>mdi-account</v-icon>
             </v-list-item-icon>
@@ -270,6 +270,16 @@ export default {
   data: () => ({
     usuario: JSON.parse(window.localStorage.getItem("usuario")),
     usuarioEditar: {},
+    permissaoAvaliacao: {},
+    permissaoCategoria: {},
+    permissaoPosicao: {},
+    permissaoPerfil: {},
+    permissaoUsuario: {},
+    permissaoPermissao: {},
+    permissaoTreinador: {},
+    permissaoStatus: {},
+    permissaoAtleta: {},
+    permissoes: [],
     rules: {
       required: value => !!value || "Preenchimento obrigatório."
     },
@@ -326,6 +336,7 @@ export default {
 
   created() {
     this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("usuarios/" + this.usuario.id, {
         headers: {
@@ -343,6 +354,17 @@ export default {
 
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
+    },
+    carregarPermissao(){      
+      this.permissaoAtleta = this.usuario.permissoes.filter(x => x.entidade == "Atleta")[0];
+      this.permissaoAvaliacao = this.usuario.permissoes.filter(x => x.entidade == "Avaliação")[0];
+      this.permissaoCategoria = this.usuario.permissoes.filter(x => x.entidade == "Categoria")[0];
+      this.permissaoPerfil = this.usuario.permissoes.filter(x => x.entidade == "Perfil de Usuário")[0];
+      this.permissaoPosicao = this.usuario.permissoes.filter(x => x.entidade == "Posição")[0];
+      this.permissaoStatus = this.usuario.permissoes.filter(x => x.entidade == "Status")[0];
+      this.permissaoTreinador = this.usuario.permissoes.filter(x => x.entidade == "Treinador")[0];
+      this.permissaoUsuario = this.usuario.permissoes.filter(x => x.entidade == "Usuário")[0];
+      this.permissaoPermissao = this.usuario.permissoes.filter(x => x.entidade == "Permissão")[0];
     },
     logout() {
       /*this.$http.post("logout", {

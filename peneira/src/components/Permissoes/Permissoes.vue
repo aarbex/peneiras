@@ -4,26 +4,89 @@
     <v-row class="my-5">
       <h2 class="mx-auto">Permissões</h2>
     </v-row>
-    <v-simple-table class="mx-5">
+    <v-simple-table class="ma-5">
+    <template v-slot:default>
       <thead>
-        <tr mx-auto>
-          <th>Funcionalidade</th>
-          <th>Listar</th>
-          <th>Incluir</th>
-          <th>Editar</th>
-          <th>Excluir</th>
+        <tr>
+          <th class="text-center">Entidade</th>
+          <th class="text-center">Visualizar</th>
+          <th class="text-center">Adicionar</th>
+          <th class="text-center">Editar</th>
+          <th class="text-center">Excluir</th>
+          <th class="text-center">Ações</th>
         </tr>
       </thead>
       <tbody>
-        <tr>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
-          <td></td>
+        <tr v-for="item in permissoes" :key="item.id">
+          <td>{{ item.entidade }}</td>
+          <td>{{ item.visualizar ? "Sim" : "Não" }}</td>
+          <td>{{ item.adicionar ? "Sim" : "Não"}}</td>
+          <td>{{ item.editar ? "Sim" : "Não"}}</td>
+          <td>{{ item.excluir ? "Sim" : "Não"}}</td>
+          <td><v-btn v-if="permissaoPermissao && permissaoPermissao.editar" text @click="dialog = true; permissao = item; carregaPermissao(item)">Editar</v-btn></td>
+          
         </tr>
       </tbody>
-    </v-simple-table>
+    </template>
+  </v-simple-table>
+  <div style="padding-right: 20px; padding-left: 20px; display: flex; ">
+      <div style="width: 100%; margin: 0 auto; margin-bottom: 20px; text-align: center;">
+        <router-link to="/perfis" tag="button">
+          <v-btn color="black" text>Voltar</v-btn>
+        </router-link>
+      </div>
+  </div>
+    <v-dialog v-model="dialog" width="50%">
+      <v-card>
+        <v-toolbar dark color="primary">Editar Permissão</v-toolbar>
+        <v-card-text>
+          <v-container>
+            <v-row dense>
+              <v-col cols="12">
+                <h1>{{entidade}}</h1>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-checkbox
+                  v-model="visualizar"
+                  label="Visualizar"
+                  hide-details
+                  class="shrink mr-2 mt-0"
+                ></v-checkbox>
+              </v-col>
+              <v-col cols="12" sm="6" md="3">
+                <v-checkbox                  
+                  v-model="adicionar"
+                  label="Adicionar"
+                  hide-details
+                  class="shrink mr-2 mt-0"
+                ></v-checkbox>
+              </v-col>       
+              <v-col cols="12" sm="6" md="3">
+                <v-checkbox
+                  v-model="editar"
+                  label="Editar"
+                  hide-details
+                  class="shrink mr-2 mt-0"
+                ></v-checkbox>
+              </v-col>       
+              <v-col cols="12" sm="6" md="3">
+                <v-checkbox                
+                  v-model="excluir"
+                  label="Excluir"
+                  hide-details
+                  class="shrink mr-2 mt-0"
+                ></v-checkbox>
+              </v-col>                     
+            </v-row>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <div class="flex-grow-1"></div>
+          <v-btn color="black" text @click="dialog = false;">Cancelar</v-btn>
+          <v-btn color="blue darken-1" text @click="editarPermissao(permissao)">Salvar</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <div class="flex-grow-1 mx-auto" align="center">
       <small class="mx-5">Sport Club Corinthians Paulista © 2019</small>
       <br />
@@ -42,113 +105,72 @@ export default {
     return {
       dialog: false,
       nome: "",
-
-      perfis: [],
-      perfil: {},
-      perfilVerificado: "",
-      dtCadastro: "",
-      date: new Date().toISOString().substr(0, 10),
+      usuario : JSON.parse(window.localStorage.getItem("usuario")),
+      permissoes: [],
+      permissao: {},
+      entidade:"",
+      visualizar:"",
+      adicionar:"",
+      editar:"",
+      excluir:"",
+      permissaoPermissao:{},
       id: this.$route.params.id
     };
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
-      .get("perfis", {
+      .get("permissoes", {
         headers: {
           Authorization: "Bearer " + window.localStorage.getItem("token"),
           "Content-Type": "application/json"
         }
       })
       .then(res => res.json())
-      .then(perfis => (this.perfis = perfis));
+      .then(permissoes => (this.permissoes = permissoes.filter(x => x.perfilID == this.id)));
   },
+  
 
-  methods: {
-    filterOnlyCapsText(value, search) {
-      return (
-        value != null &&
-        search != null &&
-        typeof value === "string" &&
-        value
-          .toString()
-          .toLowerCase()
-          .indexOf(search) !== -1
-      );
-    },
-    formatDate(date) {
-      if (!date) return null;
-
-      const [year, month, day] = date.split("-");
-      return `${day}/${month}/${year}`;
-    },
-    removerPerfil(perfil) {
-      this.$http
-        .delete(`perfis/${perfil.id}`, {
+  methods: {    
+    carregarPermissao(){      
+      this.permissaoPermissao = this.usuario.permissoes.filter(x => x.entidade == "Permissão")[0];      
+    },  
+    editarPermissao(_permissao) {
+      let _permissaoEditar = {
+        id: _permissao.id,
+        perfilID: _permissao.perfilID,
+        entidadeID: _permissao.entidadeID,
+        visualizar: this.visualizar,
+        adicionar: this.adicionar,
+        editar: this.editar,
+        excluir: this.excluir
+      };      
+        this.$http.put(`permissao/${_permissao.id}`, _permissaoEditar, {
           headers: {
             Authorization: "Bearer " + window.localStorage.getItem("token"),
             "Content-Type": "application/json"
           }
-        })
-        .then(() => {
-          let indice = this.perfis.indexOf(perfil);
-          this.perfis.splice(indice, 1);
-          //this.perfis = this.perfis.filter(p => p.id != perfil.id);
-          this.dialog1 = false;
-        });
+        }).then(res => {if(res.status == 200){
+          window.location.href = window.location.origin + "/permissao/" + _permissao.perfilID
+        }});    
     },
-    verificaPerfil() {
-      this.perfilVerificado = this.perfis.filter(x => x.nome === this.nome)[0];
-      if (this.perfilVerificado) {
-        this.dialog2 = true;
-      } else {
-        this.addPerfil();
-        this.perfilVerificado = "";
-      }
-    },
-    addPerfil() {
-      this.dtCadastro = this.formatDate(this.date);
-      let _perfil = {
-        nome: this.nome,
-        dtCadastro: this.dtCadastro
-      };
-      if (this.nome.length > 0) {
-        this.$http
-          .post("perfis", _perfil, {
-            headers: {
-              Authorization: "Bearer " + window.localStorage.getItem("token"),
-              "Content-Type": "application/json"
-            }
-          })
-          .then(res => res.json());
-        window.location.href = window.location.origin + "/perfis";
-      }
-    },
-
-    editarPerfil(_perfil) {
-      let _perfilEditar = {
-        id: _perfil.id,
-        nome: this.nome,
-        dtCadastro: this.dtCadastro
-      };
-      if (this.nome.length > 0) {
-        this.$http.put(`perfis/${_perfilEditar.id}`, _perfilEditar, {
-          headers: {
-            Authorization: "Bearer " + window.localStorage.getItem("token"),
-            "Content-Type": "application/json"
-          }
-        });
-        window.location.href = window.location.origin + "/perfis";
-      }
-    },
-    carregaPerfil(perfil) {
-      this.nome = perfil.nome;
-      this.dtCadastro = perfil.dtCadastro;
+    carregaPermissao(permissao) {
+      this.perfilID = permissao.perfilID;
+      this.entidade = permissao.entidade;
+      this.visualizar = permissao.visualizar;
+      this.adicionar = permissao.adicionar;
+      this.editar = permissao.editar;
+      this.excluir = permissao.excluir;
     },
     limparFormulario() {
-      this.nome = "";
-      this.dtCadastro = "";
-      this.perfil = {};
+      this.entidade = "";
+      this.visualizar = "";
+      this.adicionar = "";
+      this.editar = "";
+      this.excluir = "";
+      this.permissao = {};
     }
   }
 };
@@ -171,5 +193,11 @@ table {
 }
 .actionButtons {
   margin: 0 3px;
+}
+td{
+  text-align: center;
+}
+th{
+  text-align: center;
 }
 </style>

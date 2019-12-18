@@ -27,7 +27,7 @@
           </v-col>
         </template>
         <template v-slot:item.action="{ item }">
-          <v-menu>
+          <v-menu >
             <template v-slot:activator="{ on }">
               <v-btn light icon v-on="on">
                 <v-icon primary>mdi-dots-vertical</v-icon>
@@ -41,11 +41,12 @@
                 </v-list-item>
               </router-link>
               <v-list-item
+              v-if="permissaoAvaliacao && permissaoAvaliacao.editar"
                 @click="dialog = true; avaliacao = item; carregaAvaliacao(item); verificaAutorizador()"
               >
                 <v-list-item-title>Editar</v-list-item-title>
               </v-list-item>
-              <v-list-item @click="dialog1 = true; avaliacao = item">
+              <v-list-item v-if="permissaoAvaliacao && permissaoAvaliacao.excluir" @click="dialog1 = true; avaliacao = item">
                 <v-list-item-title>Excluir</v-list-item-title>
               </v-list-item>
             </v-list>
@@ -71,6 +72,7 @@
           fab
           dark
           v-on="on"
+          v-if="permissaoAvaliacao && permissaoAvaliacao.adicionar"
           @click="limparFormulario()"
         >
           <v-tooltip top>
@@ -439,6 +441,7 @@ export default {
   data() {
     return {
       search: "",
+      permissaoAvaliacao: {},
       atletas: [],
       atleta: {},
       atletaID: "",
@@ -521,6 +524,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("avaliacoes", {
         headers: {
@@ -588,6 +593,10 @@ export default {
 
       const [year, month, day] = date.split("-");
       return `${day}/${month}/${year}`;
+    },
+    carregarPermissao(){      
+      this.permissaoAvaliacao = this.usuario.permissoes.filter(x => x.entidade == "Avaliação")[0];
+      
     },
     limparDataDispensa() {
       this.dtDispensa = "";

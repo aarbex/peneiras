@@ -35,10 +35,13 @@
           </template>
 
           <v-list bottom>
-            <v-list-item @click="dialog = true; posicao = item;carregaPosicao(item)">
+            <v-list-item  v-if="!permissaoPosicao.excluir && !permissaoPosicao.editar">
+              <v-list-item-title>Não há ações disponíveis</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="permissaoPosicao && permissaoPosicao.editar" @click="dialog = true; posicao = item;carregaPosicao(item)">
               <v-list-item-title text>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="dialog1 = true; posicao = item">
+            <v-list-item v-if="permissaoPosicao && permissaoPosicao.excluir" @click="dialog1 = true; posicao = item">
               <v-list-item-title text>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -55,6 +58,7 @@
     <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
+        v-if="permissaoPosicao && permissaoPosicao.editar"
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
           color="primary"
           class="ms-5 mb-5"
@@ -186,6 +190,7 @@ export default {
       rules: {
         required: value => !!value || "Preenchimento obrigatório."
       },
+      permissaoPosicao:{},
       posicoes: [],
       posicao: {},
       posicaoVerificada: "",
@@ -223,6 +228,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("posicoes", {
         headers: {
@@ -261,6 +268,9 @@ export default {
     }
 
       return str.join(" ");
+    },
+    carregarPermissao(){      
+      this.permissaoPosicao = this.usuario.permissoes.filter(x => x.entidade == "Posição")[0];         
     },
     filterOnlyCapsText(value, search) {
       return (

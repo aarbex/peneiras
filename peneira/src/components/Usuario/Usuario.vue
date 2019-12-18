@@ -35,13 +35,16 @@
           </template>
 
           <v-list bottom>
-            <v-list-item @click="dialog5 = true; usuario = item">
+            <v-list-item  v-if="!permissaoUsuario.excluir && !permissaoUsuario.editar">
+              <v-list-item-title>Não há ações disponíveis</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="permissaoUsuario && permissaoUsuario.editar" @click="dialog5 = true; usuario = item">
               <v-list-item-title>Redefinir senha</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="dialog = true; usuario = item; carregaUsuario(item)">
+            <v-list-item v-if="permissaoUsuario && permissaoUsuario.editar" @click="dialog = true; usuario = item; carregaUsuario(item)">
               <v-list-item-title>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="dialog1 = true; usuario = item">
+            <v-list-item v-if="permissaoUsuario && permissaoUsuario.excluir" @click="dialog1 = true; usuario = item">
               <v-list-item-title>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -58,6 +61,7 @@
     <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
+        v-if="permissaoUsuario && permissaoUsuario.adicionar"
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
           color="primary"
           class="ms-5 mb-5"
@@ -316,6 +320,7 @@ export default {
       select: null,
       usuarios: [],
       usuario: {},
+      permissaoUsuario:{},
       usuarioVerificado: "",
       usuarioSessao: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
@@ -345,6 +350,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("usuarios", {
         headers: {
@@ -383,6 +390,9 @@ export default {
           .toUpperCase()         
           .indexOf(search) !== -1)
       );
+    },
+    carregarPermissao(){      
+      this.permissaoUsuario = this.usuario.permissoes.filter(x => x.entidade == "Usuário")[0];         
     },
     formatDate(date) {
       if (!date) return null;

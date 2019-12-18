@@ -27,7 +27,7 @@
         </v-col>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-menu>
+        <v-menu >
           <template v-slot:activator="{ on }">
             <v-btn light icon v-on="on">
               <v-icon primary>mdi-dots-vertical</v-icon>
@@ -35,10 +35,13 @@
           </template>
 
           <v-list bottom>
-            <v-list-item @click="dialog = true; categoria = item; carregaCategoria(item)">
+            <v-list-item v-if="!permissaoCategoria.excluir && !permissaoCategoria.editar" >
+              <v-list-item-title>Não há ações disponíveis</v-list-item-title>
+            </v-list-item>
+            <v-list-item v-if="permissaoCategoria && permissaoCategoria.editar" @click="dialog = true; categoria = item; carregaCategoria(item)">
               <v-list-item-title>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="dialog1 = true; categoria = item">
+            <v-list-item v-if="permissaoCategoria && permissaoCategoria.excluir" @click="dialog1 = true; categoria = item">
               <v-list-item-title>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -55,6 +58,7 @@
     <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
+          v-if="permissaoCategoria && permissaoCategoria.adicionar"
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
           color="primary"
           class="ms-5 mb-5"
@@ -193,6 +197,7 @@ export default {
       avaliacaoVinculada:"",
       categoriaVerificada: "",
       dtCadastro: "",
+      permissaoCategoria: {},
       date: new Date().toISOString().substr(0, 10),
       usuario: JSON.parse(window.localStorage.getItem("usuario")),
       id: this.$route.params.id
@@ -223,6 +228,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("categorias", {
         headers: {
@@ -261,6 +268,9 @@ export default {
           .toUpperCase()         
           .indexOf(search) !== -1)
       );
+    },
+    carregarPermissao(){      
+      this.permissaoCategoria = this.usuario.permissoes.filter(x => x.entidade == "Categoria")[0];      
     },
     capital_letter(str) 
     {

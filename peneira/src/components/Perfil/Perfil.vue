@@ -35,10 +35,18 @@
           </template>
 
           <v-list bottom>
-            <v-list-item @click="dialog = true; perfil = item; carregaPerfil(item)">
+            <v-list-item  v-if="!permissaoPerfil.excluir && !permissaoPerfil.editar && !permissaoPermissao.visualizar">
+              <v-list-item-title>Não há ações disponíveis</v-list-item-title>
+            </v-list-item>
+            <router-link :to="'/permissao/' + item.id" tag="button">
+                <v-list-item v-if="permissaoPermissao && permissaoPermissao.visualizar">
+                  <v-item-list-title xSmall>Permissões</v-item-list-title>
+                </v-list-item>
+              </router-link>
+            <v-list-item v-if="permissaoPerfil && permissaoPerfil.editar" @click="dialog = true; perfil = item; carregaPerfil(item)">
               <v-list-item-title text>Editar</v-list-item-title>
             </v-list-item>
-            <v-list-item @click="dialog1 = true; perfil = item">
+            <v-list-item v-if="permissaoPerfil && permissaoPerfil.excluir" @click="dialog1 = true; perfil = item">
               <v-list-item-title text>Excluir</v-list-item-title>
             </v-list-item>
           </v-list>
@@ -55,6 +63,7 @@
     <v-dialog v-model="dialog" width="80%" persistent>
       <template v-slot:activator="{ on }">
         <v-btn
+          v-if="permissaoPerfil && permissaoPerfil.adicionar"
           style="position: fixed; z-index: 100; right: 10pt; bottom: 1pt;"
           color="primary"
           class="ms-5 mb-5"
@@ -183,8 +192,11 @@ export default {
       },
       perfis: [],
       perfil: {},
+      permissaoPerfil: {},
+      permissaoPermissao: {},
       usuarioVinculado:"",
       perfilID:"",
+      perfilIDNovo:"",
       perfilVerificado: "",
       usuarios:[],
       dtCadastro: "",
@@ -218,6 +230,8 @@ export default {
   },
 
   created() {
+    this.usuario = JSON.parse(window.localStorage.getItem("usuario"));
+    this.carregarPermissao();
     this.$http
       .get("perfis", {
         headers: {
@@ -274,6 +288,10 @@ export default {
 
     return str.join(" ");
 },
+carregarPermissao(){      
+      this.permissaoPerfil = this.usuario.permissoes.filter(x => x.entidade == "Perfil de Usuário")[0];
+      this.permissaoPermissao = this.usuario.permissoes.filter(x => x.entidade == "Permissão")[0];       
+    },
     verificaPerfilExclusao(){    
        
       this.usuarioVinculado = this.usuarios.filter(x => x.perfilID === this.perfilID)[0];      
@@ -321,7 +339,7 @@ export default {
         this.editarPerfil(perfil);
         this.perfilVerificado = "";
       }
-    },
+    },    
     addPerfil() {
       this.dtCadastro = this.formatDate(this.date);
       let _perfil = {
@@ -338,6 +356,7 @@ export default {
           })
           .then(res => {if(res.status == 200){
           res.json();
+          this.perfilIDNovo = res.body.id;                      
           window.location.href = window.location.origin + "/perfis"
         }}); 
       }
